@@ -1,0 +1,442 @@
+"""Payment methods resource for tokenizing and managing payment instruments."""
+
+from __future__ import annotations
+
+from ..http_client import HttpClient
+
+
+def _stable_payment_method_request_meta(action: str, payment_method_id: str) -> dict:
+    return {"idempotency_key": f"payment_methods_{action}_{payment_method_id}"}
+
+
+class PaymentMethods:
+    """
+    Payment methods resource for securely storing and managing payment instruments.
+
+    Payment methods represent saved payment instruments (mobile money accounts, bank
+    cards, etc.) that customers can reuse for faster checkout. Tokenization converts
+    sensitive payment details into a secure token that you can safely store and charge
+    repeatedly without handling raw payment credentials.
+
+    The typical flow is:
+    1. Tokenize payment details to create a payment method
+    2. Verify the payment method (triggers OTP for mobile money)
+    3. Confirm verification with OTP
+    4. Use the payment method ID for future charges
+
+    See https://commerce.zebo.dev/charge-repeat-customers for detailed guides.
+    """
+
+    def __init__(self, http: HttpClient):
+        """Initialize PaymentMethods resource with HTTP client."""
+        self.http = http
+
+    def tokenize(self, payload: dict):
+        """
+        Create a tokenized payment method from payment details.
+
+        Tokenization securely stores payment credentials (mobile money number, bank card,
+        etc.) and returns a reusable token. The token (payment method ID) can be used for
+        future charges without requiring the customer to re-enter payment details.
+
+        Mobile money payment methods require verification before use. After tokenization,
+        you must verify the payment method to confirm customer ownership.
+
+        Args:
+            payload: Tokenization parameters including:
+                - customer_id: Customer to attach payment method to (required)
+                - payment_method_data: Payment details (required):
+                    - type: Payment type ("mobile_money") (required)
+                    - mobile_money: Mobile money details (required if type is "mobile_money"):
+                        - network: Network ("mtn", "vodafone", "airteltigo") (required)
+                        - account_number: Phone number (required)
+                - verify_immediately: Send verification OTP immediately (default: false)
+
+        Returns:
+            ResponseObject containing:
+                - payment_method: Created payment method with id, type, and status
+                - requires_verification: Whether verification is needed before use (typically true)
+
+        Raises:
+            ApiError: If parameters are invalid or customer doesn't exist
+
+        Example:
+            ```python
+            # Tokenize MTN mobile money
+            result = client.payment_methods.tokenize({
+                "customer_id": "cu_abc123",
+                "payment_method_data": {
+                    "type": "mobile_money",
+                    "mobile_money": {
+                        "network": "mtn",
+                        "account_number": "0241234567"
+                    }
+                }
+            })
+
+            pm = result.data["payment_method"]
+            print(f"Payment method created: {pm['id']}")
+
+            # Verify if needed
+            if result.data.get("requires_verification"):
+                print("Verification required before use")
+                client.payment_methods.verify(pm['id'])
+
+            # Tokenize with immediate verification
+            result = client.payment_methods.tokenize({
+                "customer_id": "cu_abc123",
+                "payment_method_data": {
+                    "type": "mobile_money",
+                    "mobile_money": {
+                        "network": "vodafone",
+                        "account_number": "0501234567"
+                    }
+                },
+                "verify_immediately": True
+            })
+            
+            # OTP is sent immediately, prompt customer
+            if result.data.get("requires_verification"):
+                otp = input("Enter OTP: ")
+                client.payment_methods.confirm_verification({
+                    "payment_method_id": result.data["payment_method"]["id"],
+                    "token": otp
+                })
+            ```
+
+        Security Note:
+            Never log or store raw payment credentials (phone numbers, card numbers).
+            Only store the returned payment_method_id token.
+
+        See Also:
+            - verify(): Initiate verification after tokenization
+            - confirm_verification(): Complete verification with OTP
+            - https://commerce.zebo.dev/charge-repeat-customers
+        """
+        return self.http.post("/payment_methods/tokenize", payload)
+
+    def verify(self, payment_method_id: str, request_meta: dict | None = None):
+        """
+        Initiate verification for a payment method.
+
+        Verification confirms that the customer owns the payment instrument. For mobile
+        money, this sends an OTP to the phone number. The customer must submit this OTP
+        via confirm_verification() before the payment method can be used for charges.
+
+        Only unverified payment methods need verification. Once verified, the payment
+        method can be used indefinitely.
+
+        Args:
+            payment_method_id: The payment method ID to verify (e.g., "pm_xyz789")
+            request_meta: Request controls such as idempotency_key
+
+        Returns:
+            ResponseObject containing:
+                - payment_method: Updated payment method with verification status
+                - message: Confirmation that OTP was sent
+
+        Raises:
+            ApiError: If payment method doesn't exist or is already verified
+
+        Example:
+            ```python
+            # Tokenize payment method
+            result = client.payment_methods.tokenize({
+                "customer_id": "cu_abc123",
+                "payment_method_data": {
+                    "type": "mobile_money",
+                    "mobile_money": {
+                        "network": "mtn",
+                        "account_number": "0241234567"
+                    }
+                }
+            })
+
+            pm_id = result.data["payment_method"]["id"]
+
+            # Initiate verification
+            if result.data.get("requires_verification"):
+                verify_result = client.payment_methods.verify(pm_id)
+                print("OTP sent to customer's phone")
+
+                # Prompt customer for OTP
+                otp = input("Enter OTP: ")
+
+                # Confirm verification
+                client.payment_methods.confirm_verification({
+                    "payment_method_id": pm_id,
+                    "token": otp
+                })
+            ```
+
+        See Also:
+            - confirm_verification(): Submit OTP to complete verification
+            - tokenize(): Create payment method that may need verification
+            - https://commerce.zebo.dev/charge-repeat-customers
+        """
+        return self.http.post(
+            "/payment_methods/verify",
+            {
+                "payment_method_id": payment_method_id,
+                "request_meta": request_meta or _stable_payment_method_request_meta(
+                    "verify", payment_method_id
+                ),
+            },
+        )
+
+    def confirm_verification(self, payload: dict):
+        """
+        Submit OTP to complete payment method verification.
+
+        After calling verify(), the customer receives an OTP on their mobile device.
+        Collect this OTP from the customer and submit it via this method to complete
+        verification. Once verified, the payment method can be used for charges.
+
+        Args:
+            payload: Verification parameters including:
+                - payment_method_id: The payment method being verified (required)
+                - token: The OTP code from customer (required, 6 digits)
+
+        Returns:
+            ResponseObject containing:
+                - payment_method: Verified payment method ready for use
+                - status: Verification status
+
+        Raises:
+            ApiError: If OTP is invalid, expired, or verification fails
+
+        Example:
+            ```python
+            # Step 1: Tokenize
+            tokenize_result = client.payment_methods.tokenize({
+                "customer_id": "cu_abc123",
+                "payment_method_data": {
+                    "type": "mobile_money",
+                    "mobile_money": {
+                        "network": "mtn",
+                        "account_number": "0241234567"
+                    }
+                }
+            })
+
+            pm_id = tokenize_result.data["payment_method"]["id"]
+
+            # Step 2: Initiate verification
+            if tokenize_result.data.get("requires_verification"):
+                client.payment_methods.verify(pm_id)
+                print("OTP sent. Check your phone.")
+
+                # Step 3: Collect OTP from customer
+                otp = input("Enter the 6-digit code: ")
+
+                # Step 4: Confirm verification
+                result = client.payment_methods.confirm_verification({
+                    "payment_method_id": pm_id,
+                    "token": otp
+                })
+
+                if result.data["payment_method"]["verified"]:
+                    print("Payment method verified! Ready to use.")
+
+                    # Now you can charge it
+                    client.orders.pay({
+                        "order_id": "or_abc123",
+                        "payment_method_id": pm_id
+                    })
+            ```
+
+        See Also:
+            - verify(): Initiate verification and send OTP
+            - tokenize(): Create payment method
+            - https://commerce.zebo.dev/charge-repeat-customers
+        """
+        return self.http.post("/payment_methods/confirm_verification", payload)
+
+    def lookup(self, payment_method_id: str):
+        """
+        Retrieve details of a saved payment method.
+
+        Fetches information about a payment method including its type, verification status,
+        and masked details (last 4 digits for cards, masked phone number for mobile money).
+        Use this to display saved payment methods to customers or verify their status.
+
+        Args:
+            payment_method_id: The payment method ID (e.g., "pm_xyz789")
+
+        Returns:
+            ResponseObject containing:
+                - payment_method: Payment method details including:
+                    - id: Payment method ID
+                    - type: Payment type ("mobile_money", "card", etc.)
+                    - verified: Whether verification is complete
+                    - confirms_use: Whether OTP is required before charges
+                    - masked_details: Safely displayable payment info
+                    - customer_id: Associated customer
+                    - created_at: Creation timestamp
+
+        Raises:
+            ApiError: If payment method doesn't exist
+
+        Example:
+            ```python
+            # Look up payment method
+            result = client.payment_methods.lookup("pm_xyz789")
+            pm = result.data["payment_method"]
+
+            print(f"Type: {pm['type']}")
+            print(f"Verified: {pm['verified']}")
+            print(f"Details: {pm['masked_details']}")  # e.g., "MTN •••• 4567"
+
+            # Display saved payment methods to customer
+            customer_result = client.orders.lookup("or_abc123")
+            customer_id = customer_result.data["order"]["customer"]["id"]
+
+            # Get customer's payment methods (from your database)
+            pm_ids = get_customer_payment_methods(customer_id)
+
+            print("Saved payment methods:")
+            for pm_id in pm_ids:
+                result = client.payment_methods.lookup(pm_id)
+                pm = result.data["payment_method"]
+                print(f"  - {pm['masked_details']}")
+            ```
+
+        See Also:
+            - tokenize(): Create a payment method
+            - delete(): Remove a payment method
+            - https://commerce.zebo.dev/api/payment-methods/lookup
+        """
+        return self.http.post("/payment_methods/lookup", {"payment_method_id": payment_method_id})
+
+    def delete(self, payment_method_id: str, request_meta: dict | None = None):
+        """
+        Delete a saved payment method.
+
+        Permanently removes a payment method from the system. This action cannot be undone.
+        The payment method ID becomes invalid and cannot be used for future charges.
+        Use this when customers want to remove saved payment methods.
+
+        Args:
+            payment_method_id: The payment method ID to delete (e.g., "pm_xyz789")
+            request_meta: Request controls such as idempotency_key
+
+        Returns:
+            ResponseObject confirming deletion:
+                - deleted: True if deletion succeeded
+                - payment_method_id: ID of deleted payment method
+
+        Raises:
+            ApiError: If payment method doesn't exist or deletion fails
+
+        Example:
+            ```python
+            # Delete a payment method
+            result = client.payment_methods.delete("pm_xyz789")
+            print(f"Payment method deleted: {result.data['payment_method_id']}")
+
+            # Customer removes saved card flow
+            def remove_payment_method(customer_id, pm_id):
+                # Verify customer owns this payment method
+                pm_result = client.payment_methods.lookup(pm_id)
+                pm = pm_result.data["payment_method"]
+
+                if pm["customer_id"] != customer_id:
+                    raise ValueError("Payment method doesn't belong to customer")
+
+                # Delete it
+                result = client.payment_methods.delete(pm_id)
+
+                # Remove from your database
+                delete_from_database(pm_id)
+
+                return result.data["deleted"]
+
+            # Cleanup unused payment methods
+            for pm_id in old_payment_methods:
+                try:
+                    client.payment_methods.delete(pm_id)
+                    print(f"Deleted {pm_id}")
+                except Exception as e:
+                    print(f"Failed to delete {pm_id}: {e}")
+            ```
+
+        Security Note:
+            Ensure you verify customer ownership before allowing deletion of
+            payment methods to prevent unauthorized removal.
+
+        See Also:
+            - tokenize(): Create payment methods
+            - lookup(): View payment method details
+            - https://commerce.zebo.dev/api/payment-methods/delete
+        """
+        return self.http.post(
+            "/payment_methods/delete",
+            {
+                "payment_method_id": payment_method_id,
+                "request_meta": request_meta or _stable_payment_method_request_meta(
+                    "delete", payment_method_id
+                ),
+            },
+        )
+
+    def settings(self):
+        """
+        Retrieve payment method configuration and supported types.
+
+        Gets your application's payment method settings including enabled payment types,
+        supported networks, OTP requirements, and other configuration. Use this to
+        dynamically build payment forms based on what's enabled for your account.
+
+        Returns:
+            ResponseObject containing:
+                - settings: Payment configuration including:
+                    - enabled_types: List of enabled payment types
+                    - mobile_money: Mobile money configuration:
+                        - issuers: Supported networks ("mtn", "vodafone", "airteltigo")
+                        - default_confirms_use: Default OTP requirement
+                    - cards: Card payment configuration (if enabled)
+                    - other type-specific settings
+
+        Example:
+            ```python
+            # Get payment settings
+            result = client.payment_methods.settings()
+            settings = result.data["settings"]
+
+            # Check what's enabled
+            enabled_types = settings["enabled_types"]
+            print(f"Enabled payment types: {enabled_types}")
+
+            # Build mobile money form based on supported networks
+            if "mobile_money" in enabled_types:
+                mm_config = settings["mobile_money"]
+                print(f"Supported networks: {mm_config['issuers']}")
+                print(f"Default OTP: {mm_config['default_confirms_use']}")
+
+            # Dynamic payment form
+            def build_payment_form():
+                result = client.payment_methods.settings()
+                settings = result.data["settings"]
+
+                form = {"payment_types": []}
+
+                if "mobile_money" in settings["enabled_types"]:
+                    form["payment_types"].append({
+                        "type": "mobile_money",
+                        "issuers": settings["mobile_money"]["issuers"]
+                    })
+
+                if "card" in settings["enabled_types"]:
+                    form["payment_types"].append({
+                        "type": "card",
+                        "brands": settings["card"]["supported_brands"]
+                    })
+
+                return form
+            ```
+
+        See Also:
+            - tokenize(): Create payment methods based on settings
+            - https://commerce.zebo.dev/api/payment-methods/settings
+        """
+        return self.http.post("/payment_methods/settings", {})

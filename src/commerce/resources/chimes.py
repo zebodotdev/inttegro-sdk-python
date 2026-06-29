@@ -1,0 +1,116 @@
+"""Chimes resource for sending transactional notifications."""
+
+from __future__ import annotations
+
+from ..http_client import HttpClient
+
+
+class Chimes:
+    """
+    Chimes resource for sending transactional notifications to customers.
+
+    Chimes are transactional messages sent via SMS or email to notify customers about
+    important events like payment confirmations, order updates, and OTP codes.
+
+    See https://commerce.zebo.dev/api/chimes for detailed documentation.
+    """
+
+    def __init__(self, http: HttpClient):
+        """Initialize Chimes resource with HTTP client."""
+        self.http = http
+
+    def send(self, payload: dict):
+        """
+        Send an immediate transactional notification.
+
+        Sends an SMS or email notification to a customer right away. Use this for time-
+        sensitive messages like payment confirmations or OTP codes.
+
+        Args:
+            payload: Notification parameters including type, recipient, and message
+
+        Returns:
+            ResponseObject containing the sent chime with id, status, and sent_at
+
+        Example:
+            ```python
+            result = client.chimes.send({
+                "type": "sms",
+                "recipient": "+233241234567",
+                "message": "Your order has been confirmed. Total: GHS 50.00"
+            })
+            ```
+
+        See Also:
+            - schedule(): Schedule notification for future delivery
+        """
+        return self.http.post("/chimes/send", payload)
+
+    def lookup(self, chime_id: str):
+        """
+        Retrieve details of a sent notification.
+
+        Fetches information about a previously sent chime including its delivery status
+        and timing.
+
+        Args:
+            chime_id: The chime ID (e.g., "chm_abc123")
+
+        Returns:
+            ResponseObject containing the chime with delivery details
+
+        Example:
+            ```python
+            result = client.chimes.lookup("chm_abc123")
+            print(f"Status: {result.data['chime']['status']}")
+            ```
+
+        See Also:
+            - send(): Send notifications
+        """
+        return self.http.post("/chimes/lookup", {"chime_id": chime_id})
+
+    def schedule(self, payload: dict):
+        """
+        Schedule a notification for future delivery.
+
+        Schedules an SMS or email to be sent at a specific time in the future. Use this
+        for reminder messages or follow-ups.
+
+        Args:
+            payload: Scheduling parameters including recipients, message, and send_after
+
+        Returns:
+            ResponseObject containing the scheduled chime
+
+        Example:
+            ```python
+            from datetime import datetime, timedelta
+            tomorrow = (datetime.now() + timedelta(days=1)).isoformat()
+            result = client.chimes.schedule({
+                "recipients": ["+233241234567", "user@example.com"],
+                "full_message": "Reminder: Your appointment is tomorrow",
+                "send_after": tomorrow,
+                "sender_id": "YourBrand"
+            })
+            ```
+
+        See Also:
+            - send(): Send immediate notifications
+        """
+        return self.http.post("/chimes/schedule", payload)
+
+    def broadcast(self, payload: dict):
+        """
+        Broadcast a chime to multiple recipients.
+
+        Queues a broadcast with a shared message template. Use broadcasts for marketing
+        announcements or bulk notifications.
+
+        Args:
+            payload: Broadcast parameters including recipients and message template
+
+        Returns:
+            ResponseObject containing broadcast summary
+        """
+        return self.http.post("/chimes/broadcast", payload)
