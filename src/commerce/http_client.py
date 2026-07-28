@@ -190,6 +190,11 @@ class HttpClient:
         return any(key.lower() == name.lower() and bool(str(value).strip()) for key, value in headers.items())
 
     def _send(self, req: urllib.request.Request) -> tuple[int, dict[str, str], bytes]:
+        if self.transport:
+            status, headers, response_body = self.transport(req, self.timeout)
+            if isinstance(response_body, bytes):
+                return status, headers, response_body
+            return status, headers, str(response_body).encode("utf-8")
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 return resp.status, {k.lower(): v for k, v in resp.headers.items()}, resp.read()

@@ -142,9 +142,9 @@ class CommerceClientTest(unittest.TestCase):
         client.otp.lookup({"transaction_id": "txn_1"})
         client.otp.cancel({"transaction_id": "txn_1", "reason": "test"})
 
-        client.platform.create_app({"name": "My App"})
-        client.platform.generate_key({"app_id": "app_1"})
-        client.platform.new_session({"app_id": "app_1"})
+        client.apps.create({"name": "My App"})
+        client.apps.lookup()
+        client.apps.update({"alias": "my-app"})
 
         client.spec.countries()
         client.balances.get()
@@ -214,8 +214,8 @@ class CommerceClientTest(unittest.TestCase):
             "/otp/lookup",
             "/otp/cancel",
             "/apps/create",
-            "/keys/generate",
-            "/sessions/new",
+            "/apps/lookup",
+            "/apps/update",
             "/spec/countries",
             "/balances",
         ]
@@ -250,6 +250,23 @@ class CommerceClientTest(unittest.TestCase):
         body = json.loads(recorder.requests[0].data.decode("utf-8"))
         self.assertNotIn("request_meta", body)
         self.assertNotIn("idempotency_key", body)
+
+    def test_message_templates_create_uses_request_meta_idempotency_by_default(self):
+        recorder = TransportRecorder()
+        client = CommerceClient(api_key="test", base_url="https://api.zebo.dev", transport=recorder)
+
+        client.message_templates.create({
+            "name": "welcome_sms",
+            "channel": "sms",
+            "purpose": "marketing",
+            "sms": {"message_template": "Welcome {{name}}"},
+        })
+
+        request = recorder.requests[0]
+        headers = {key.lower(): value for key, value in request.header_items()}
+        body = json.loads(request.data.decode("utf-8"))
+        self.assertNotIn("idempotency-key", headers)
+        self.assertRegex(body["request_meta"]["idempotency_key"], UUID_V7_RE)
 
 
 if __name__ == "__main__":

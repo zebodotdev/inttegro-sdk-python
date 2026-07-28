@@ -1,6 +1,6 @@
 # Zebo Commerce Python SDK
 
-Lightweight Python client for the Zebo Commerce API. It mirrors the Studio samples: orders, payment methods, payouts, OTP, chimes, financial accounts, platform apps/keys/sessions, balance transactions, and specs.
+Lightweight Python client for the Zebo Commerce API. It mirrors the Studio samples: orders, payment methods, payouts, OTP, chimes, financial accounts, apps, balance transactions, and specs.
 
 ## Installation
 
@@ -234,12 +234,12 @@ client.prices.update({
 })
 ```
 
-### Platform: apps, keys, sessions
+### Apps
 
 ```python
-app = client.platform.create_app({"name": "My App"})
-key = client.platform.generate_key({"app_id": app.app.id, "name": "Server key"})
-session = client.platform.new_session({"app_id": app.app.id})
+app = client.apps.create({"name": "My App"})
+current_app = client.apps.lookup()
+updated_app = client.apps.update({"alias": "my-app"})
 ```
 
 ## Available resources
@@ -257,7 +257,7 @@ session = client.platform.new_session({"app_id": app.app.id})
 - `client.broadcasts.lookup|cancel`
 - `client.otp.initiate|verify|lookup|cancel`
 - `client.balances.get`
-- `client.platform.create_app|generate_key|new_session`
+- `client.apps.create|lookup|update`
 - `client.spec.countries`
 
 ## Development

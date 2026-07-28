@@ -13,13 +13,13 @@ from .resources.file_links import FileLinks
 from .resources.otp import Otp
 from .resources.orders import Orders
 from .resources.payment_methods import PaymentMethods
-from .resources.platform import Platform
 from .resources.payouts import Payouts
 from .resources.products import Products
 from .resources.prices import Prices
 from .resources.spec import Spec
 from .resources.balances import Balances
 from .resources.upload_requests import UploadRequests
+from .resources.apps import Apps
 
 
 class CommerceClient:
@@ -43,7 +43,7 @@ class CommerceClient:
         schedules: Schedules resource for looking up and canceling scheduled chimes
         broadcasts: Broadcasts resource for looking up and canceling broadcasts
         otp: OTP resource for one-time password verification
-        platform: Platform resource for application and API key management
+        apps: Apps resource for creating, looking up, and updating applications
         spec: Spec resource for retrieving supported countries and currencies
 
     Example:
@@ -142,7 +142,7 @@ class CommerceClient:
         self.broadcasts = Broadcasts(self.http)
         self.message_templates = MessageTemplates(self.http)
         self.otp = Otp(self.http)
-        self.platform = Platform(self.http)
+        self.apps = Apps(self.http)
         self.spec = Spec(self.http)
         self.balances = Balances(self.http)
         self.upload_requests = UploadRequests(self.http)

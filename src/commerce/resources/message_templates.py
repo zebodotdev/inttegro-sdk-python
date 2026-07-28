@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..http_client import HttpClient, generate_idempotency_key
+from ..http_client import HttpClient
 
 
 class MessageTemplates:
@@ -56,4 +56,4 @@ class MessageTemplates:
         return self.http.post("/message_templates/render_preview", payload)
 
     def _idempotency_headers(self, idempotency_key: str | None) -> dict[str, str]:
-        return {"Idempotency-Key": idempotency_key or generate_idempotency_key()}
+        return {"Idempotency-Key": idempotency_key} if idempotency_key else {}
