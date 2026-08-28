@@ -25,7 +25,7 @@ class Orders:
 
     All methods return a ResponseObject containing the API response data.
 
-    See https://commerce.zebo.dev/orders for detailed guides.
+    See https://studio.zebo.dev/orders for detailed guides.
     """
 
     def __init__(self, http: HttpClient):
@@ -125,7 +125,7 @@ class Orders:
 
         See Also:
             - pay(): Charge an order with a payment method
-            - https://commerce.zebo.dev/create-your-first-order
+            - https://studio.zebo.dev/create-your-first-order
         """
         return self.http.post("/orders/new", payload)
 
@@ -187,7 +187,7 @@ class Orders:
 
         See Also:
             - page(): List multiple orders with pagination
-            - https://commerce.zebo.dev/api/orders/lookup
+            - https://studio.zebo.dev/api/orders/lookup
         """
         body = {"order_id": order_id, **options}
         return self.http.post("/orders/lookup", body)
@@ -255,7 +255,7 @@ class Orders:
         See Also:
             - confirm_payment(): Submit OTP for payments requiring confirmation
             - create(): Create and pay order in one step with execute_payment=True
-            - https://commerce.zebo.dev/charge-repeat-customers
+            - https://studio.zebo.dev/charge-repeat-customers
         """
         return self.http.post("/orders/pay", payload)
 
@@ -306,7 +306,7 @@ class Orders:
         See Also:
             - pay(): Initiate payment that may require confirmation
             - request_confirmation(): Resend OTP if customer didn't receive it
-            - https://commerce.zebo.dev/charge-repeat-customers
+            - https://studio.zebo.dev/charge-repeat-customers
         """
         return self.http.post("/orders/confirm_payment", payload)
 
@@ -387,7 +387,7 @@ class Orders:
 
         See Also:
             - complete(): Mark order as fulfilled (separate from finalization)
-            - https://commerce.zebo.dev/api/orders/finalize
+            - https://studio.zebo.dev/api/orders/finalize
         """
         return self.http.post(
             "/orders/finalize",
@@ -463,7 +463,7 @@ class Orders:
         See Also:
             - finalize(): Financial finalization (different from completion)
             - refund(): Issue refund (easier before completion)
-            - https://commerce.zebo.dev/api/orders/complete
+            - https://studio.zebo.dev/api/orders/complete
         """
         return self.http.post("/orders/complete", payload)
 
@@ -513,7 +513,7 @@ class Orders:
 
         See Also:
             - refund(): Return money for paid orders
-            - https://commerce.zebo.dev/api/orders/cancel
+            - https://studio.zebo.dev/api/orders/cancel
         """
         return self.http.post(
             "/orders/cancel",
@@ -565,7 +565,7 @@ class Orders:
 
         See Also:
             - cancel(): Cancel unpaid orders
-            - https://commerce.zebo.dev/api/orders/refund
+            - https://studio.zebo.dev/api/orders/refund
         """
         return self.http.post("/orders/refund", {"order_id": order_id})
 
@@ -627,6 +627,6 @@ class Orders:
 
         See Also:
             - lookup(): Get a single order by ID
-            - https://commerce.zebo.dev/api/orders/page
+            - https://studio.zebo.dev/api/orders/page
         """
         return self.http.post("/orders/page", payload or {})
