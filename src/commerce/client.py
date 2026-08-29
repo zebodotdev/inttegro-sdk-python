@@ -86,7 +86,7 @@ class CommerceClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.zebo.dev",
+        base_url: str = "https://api.inttegro.com",
         timeout: float = 30.0,
         transport=None,
     ):
@@ -97,7 +97,7 @@ class CommerceClient:
             api_key: Your Commerce API key (required). Get this from your dashboard
                 at https://studio.inttegro.com/settings/keys. Use test keys (sk_test_...)
                 for development and live keys (sk_live_...) for production.
-            base_url: API base URL. Defaults to production (https://api.zebo.dev).
+            base_url: API base URL. Defaults to production (https://api.inttegro.com).
                 Override for testing or staging environments.
             timeout: Request timeout in seconds. Defaults to 30.0. Increase for
                 long-running operations or slow networks.

@@ -51,7 +51,7 @@ class ErrorTransport:
 class CommerceClientTest(unittest.TestCase):
     def test_paths_cover_spec(self):
         recorder = TransportRecorder()
-        client = CommerceClient(api_key="test", base_url="https://api.zebo.dev", transport=recorder)
+        client = CommerceClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
 
         client.orders.create({"number": "1"})
         client.orders.new({"number": "2"})
@@ -226,14 +226,14 @@ class CommerceClientTest(unittest.TestCase):
         self.assertEqual("or_123", resp.order["id"])
 
     def test_authentication_error_is_raised(self):
-        client = CommerceClient(api_key="bad", base_url="https://api.zebo.dev", transport=ErrorTransport())
+        client = CommerceClient(api_key="bad", base_url="https://api.inttegro.com", transport=ErrorTransport())
 
         with self.assertRaises(AuthenticationError):
             client.orders.lookup("or_1")
 
     def test_mutating_posts_generate_request_meta_idempotency_key(self):
         recorder = TransportRecorder()
-        client = CommerceClient(api_key="test", base_url="https://api.zebo.dev", transport=recorder)
+        client = CommerceClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
 
         client.orders.create({"number": "ORDER-1", "idempotency_key": "legacy"})
 
@@ -243,7 +243,7 @@ class CommerceClientTest(unittest.TestCase):
 
     def test_read_style_posts_do_not_generate_idempotency_metadata(self):
         recorder = TransportRecorder()
-        client = CommerceClient(api_key="test", base_url="https://api.zebo.dev", transport=recorder)
+        client = CommerceClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
 
         client.orders.lookup("or_1")
 
@@ -253,7 +253,7 @@ class CommerceClientTest(unittest.TestCase):
 
     def test_message_templates_create_uses_request_meta_idempotency_by_default(self):
         recorder = TransportRecorder()
-        client = CommerceClient(api_key="test", base_url="https://api.zebo.dev", transport=recorder)
+        client = CommerceClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
 
         client.message_templates.create({
             "name": "welcome_sms",

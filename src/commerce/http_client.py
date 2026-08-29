@@ -24,7 +24,7 @@ class HttpClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.zebo.dev",
+        base_url: str = "https://api.inttegro.com",
         timeout: float = 30.0,
         transport: Optional[Transport] = None,
     ):
