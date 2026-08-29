@@ -12,7 +12,7 @@ class Chimes:
     Chimes are transactional messages sent via SMS or email to notify customers about
     important events like payment confirmations, order updates, and OTP codes.
 
-    See https://studio.zebo.dev/api/chimes for detailed documentation.
+    See https://studio.inttegro.com/api/chimes for detailed documentation.
     """
 
     def __init__(self, http: HttpClient):

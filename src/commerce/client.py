@@ -95,7 +95,7 @@ class CommerceClient:
 
         Args:
             api_key: Your Commerce API key (required). Get this from your dashboard
-                at https://studio.zebo.dev/settings/keys. Use test keys (sk_test_...)
+                at https://studio.inttegro.com/settings/keys. Use test keys (sk_test_...)
                 for development and live keys (sk_live_...) for production.
             base_url: API base URL. Defaults to production (https://api.zebo.dev).
                 Override for testing or staging environments.

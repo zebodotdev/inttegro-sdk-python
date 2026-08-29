@@ -14,7 +14,7 @@ class Spec:
     issuers. Use this to build dynamic forms, validate user input, or display
     available options.
 
-    See https://studio.zebo.dev/api/spec for detailed documentation.
+    See https://studio.inttegro.com/api/spec for detailed documentation.
     """
 
     def __init__(self, http: HttpClient):
@@ -72,6 +72,6 @@ class Spec:
             - Dynamic form generation
 
         See Also:
-            - https://studio.zebo.dev/api/spec/countries
+            - https://studio.inttegro.com/api/spec/countries
         """
         return self.http.post("/spec/countries", {})

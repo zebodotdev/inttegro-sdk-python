@@ -2,7 +2,7 @@
 name = "zebo-commerce"
 version = "0.1.0"
 description = "Lightweight Python SDK for the Zebo Commerce API"
-authors = ["Zebo Engineering <engineering@zebo.dev>"]
+authors = ["Zebo Engineering <engineering@inttegro.com>"]
 license = "MIT"
 readme = "README.md"
 packages = [{ include = "commerce", from = "src" }]

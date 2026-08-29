@@ -13,7 +13,7 @@ class Otp:
     phone numbers, confirming sensitive actions, or adding two-factor authentication.
     This is separate from payment and payment method verification OTPs.
 
-    See https://studio.zebo.dev/api/otp for detailed documentation.
+    See https://studio.inttegro.com/api/otp for detailed documentation.
     """
 
     def __init__(self, http: HttpClient):

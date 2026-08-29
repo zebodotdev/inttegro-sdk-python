@@ -24,7 +24,7 @@ class PaymentMethods:
     3. Confirm verification with OTP
     4. Use the payment method ID for future charges
 
-    See https://studio.zebo.dev/charge-repeat-customers for detailed guides.
+    See https://studio.inttegro.com/charge-repeat-customers for detailed guides.
     """
 
     def __init__(self, http: HttpClient):
@@ -111,7 +111,7 @@ class PaymentMethods:
         See Also:
             - verify(): Initiate verification after tokenization
             - confirm_verification(): Complete verification with OTP
-            - https://studio.zebo.dev/charge-repeat-customers
+            - https://studio.inttegro.com/charge-repeat-customers
         """
         return self.http.post("/payment_methods/tokenize", payload)
 
@@ -172,7 +172,7 @@ class PaymentMethods:
         See Also:
             - confirm_verification(): Submit OTP to complete verification
             - tokenize(): Create payment method that may need verification
-            - https://studio.zebo.dev/charge-repeat-customers
+            - https://studio.inttegro.com/charge-repeat-customers
         """
         return self.http.post(
             "/payment_methods/verify",
@@ -248,7 +248,7 @@ class PaymentMethods:
         See Also:
             - verify(): Initiate verification and send OTP
             - tokenize(): Create payment method
-            - https://studio.zebo.dev/charge-repeat-customers
+            - https://studio.inttegro.com/charge-repeat-customers
         """
         return self.http.post("/payment_methods/confirm_verification", payload)
 
@@ -304,7 +304,7 @@ class PaymentMethods:
         See Also:
             - tokenize(): Create a payment method
             - delete(): Remove a payment method
-            - https://studio.zebo.dev/api/payment-methods/lookup
+            - https://studio.inttegro.com/api/payment-methods/lookup
         """
         return self.http.post("/payment_methods/lookup", {"payment_method_id": payment_method_id})
 
@@ -367,7 +367,7 @@ class PaymentMethods:
         See Also:
             - tokenize(): Create payment methods
             - lookup(): View payment method details
-            - https://studio.zebo.dev/api/payment-methods/delete
+            - https://studio.inttegro.com/api/payment-methods/delete
         """
         return self.http.post(
             "/payment_methods/delete",
@@ -437,6 +437,6 @@ class PaymentMethods:
 
         See Also:
             - tokenize(): Create payment methods based on settings
-            - https://studio.zebo.dev/api/payment-methods/settings
+            - https://studio.inttegro.com/api/payment-methods/settings
         """
         return self.http.post("/payment_methods/settings", {})

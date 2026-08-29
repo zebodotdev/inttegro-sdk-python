@@ -13,7 +13,7 @@ class BalanceTransactions:
     transaction records a payment, payout, refund, fee, or other balance event with
     full details about amount, currency, source, and timing.
 
-    See https://studio.zebo.dev/api/balance-transactions for detailed documentation.
+    See https://studio.inttegro.com/api/balance-transactions for detailed documentation.
     """
 
     def __init__(self, http: HttpClient):
@@ -56,6 +56,6 @@ class BalanceTransactions:
         See Also:
             - Orders.page(): List orders (source of payment transactions)
             - Payouts.page(): List payouts (source of payout transactions)
-            - https://studio.zebo.dev/api/balance-transactions/page
+            - https://studio.inttegro.com/api/balance-transactions/page
         """
         return self.http.post("/balance_transactions/page", payload or {})

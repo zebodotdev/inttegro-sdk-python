@@ -19,7 +19,7 @@ class FinancialAccounts:
     3. Set as payout destination via Payouts resource
     4. Receive automatic or manual payouts
 
-    See https://studio.zebo.dev/set-up-financial-account for detailed guides.
+    See https://studio.inttegro.com/set-up-financial-account for detailed guides.
     """
 
     def __init__(self, http: HttpClient):
@@ -186,7 +186,7 @@ class FinancialAccounts:
         See Also:
             - verify(): Verify ownership of financial account
             - Payouts.set_destinations(): Configure account as payout destination
-            - https://studio.zebo.dev/set-up-financial-account
+            - https://studio.inttegro.com/set-up-financial-account
         """
         return self.http.post("/financial_accounts/connect", payload)
 

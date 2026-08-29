@@ -20,7 +20,7 @@ class Payouts:
     3. Configure automatic or manual payout schedule
     4. Monitor payouts via the page() method
 
-    See https://studio.zebo.dev/payouts for detailed guides.
+    See https://studio.inttegro.com/payouts for detailed guides.
     """
 
     def __init__(self, http: HttpClient):
@@ -106,7 +106,7 @@ class Payouts:
         See Also:
             - FinancialAccounts.connect(): Add new financial accounts
             - settings(): View current payout configuration
-            - https://studio.zebo.dev/set-up-financial-account
+            - https://studio.inttegro.com/set-up-financial-account
         """
         return self.http.post("/payouts/set_destinations", {"destinations": destinations})
 
@@ -175,7 +175,7 @@ class Payouts:
         See Also:
             - set_destinations(): Configure payout destinations
             - disable_automatic(): Switch to manual payouts
-            - https://studio.zebo.dev/api/payouts/settings
+            - https://studio.inttegro.com/api/payouts/settings
         """
         return self.http.post("/payouts/settings", {})
 
@@ -233,7 +233,7 @@ class Payouts:
         See Also:
             - settings(): View current schedule configuration
             - page(): Monitor executed payouts
-            - https://studio.zebo.dev/api/payouts/disable
+            - https://studio.inttegro.com/api/payouts/disable
         """
         return self.http.post("/payouts/disable", {})
 
@@ -289,7 +289,7 @@ class Payouts:
         See Also:
             - disable_fx(): Turn off currency conversion
             - set_destinations(): Configure currency routing
-            - https://studio.zebo.dev/api/payouts/enable-fx
+            - https://studio.inttegro.com/api/payouts/enable-fx
         """
         return self.http.post("/payouts/enable_fx", {})
 
@@ -347,7 +347,7 @@ class Payouts:
         See Also:
             - enable_fx(): Turn on currency conversion
             - set_destinations(): Configure per-currency accounts
-            - https://studio.zebo.dev/api/payouts/disable-fx
+            - https://studio.inttegro.com/api/payouts/disable-fx
         """
         return self.http.post("/payouts/disable_fx", {})
 
@@ -437,7 +437,7 @@ class Payouts:
 
         See Also:
             - settings(): View payout configuration
-            - https://studio.zebo.dev/api/payouts/page
+            - https://studio.inttegro.com/api/payouts/page
         """
         return self.http.post("/payouts/page", payload or {})
 
