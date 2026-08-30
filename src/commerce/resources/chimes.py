@@ -70,6 +70,18 @@ class Chimes:
         """
         return self.http.post("/chimes/lookup", {"chime_id": chime_id})
 
+    def page(self, payload: dict | None = None):
+        """
+        List chimes with page-based pagination.
+
+        Args:
+            payload: Optional pagination parameters.
+
+        Returns:
+            ResponseObject containing a page of chimes.
+        """
+        return self.http.post("/chimes/page", payload or {})
+
     def schedule(self, payload: dict):
         """
         Schedule a notification for future delivery.

@@ -10,12 +10,15 @@ from .resources.message_templates import MessageTemplates
 from .resources.financial_accounts import FinancialAccounts
 from .resources.files import Files
 from .resources.file_links import FileLinks
+from .resources.file_references import FileReferences
+from .resources.keys import Keys
 from .resources.otp import Otp
 from .resources.orders import Orders
 from .resources.payment_methods import PaymentMethods
 from .resources.payouts import Payouts
 from .resources.products import Products
 from .resources.prices import Prices
+from .resources.purchase_intents import PurchaseIntents
 from .resources.spec import Spec
 from .resources.balances import Balances
 from .resources.upload_requests import UploadRequests
@@ -134,15 +137,18 @@ class CommerceClient:
         self.financial_accounts = FinancialAccounts(self.http)
         self.files = Files(self.http)
         self.file_links = FileLinks(self.http)
+        self.file_references = FileReferences(self.http)
         self.customers = Customers(self.http)
         self.products = Products(self.http)
         self.prices = Prices(self.http)
+        self.purchase_intents = PurchaseIntents(self.http)
         self.chimes = Chimes(self.http)
         self.schedules = Schedules(self.http)
         self.broadcasts = Broadcasts(self.http)
         self.message_templates = MessageTemplates(self.http)
         self.otp = Otp(self.http)
         self.apps = Apps(self.http)
+        self.keys = Keys(self.http)
         self.spec = Spec(self.http)
         self.balances = Balances(self.http)
         self.upload_requests = UploadRequests(self.http)

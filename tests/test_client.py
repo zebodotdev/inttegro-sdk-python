@@ -1,6 +1,8 @@
 import json
+import os
 import re
 import sys
+import tempfile
 import unittest
 import urllib.parse
 from pathlib import Path
@@ -48,6 +50,43 @@ class ErrorTransport:
         )
 
 
+OPENAPI_CAPABILITY_URL_PATHS = {
+    "/file_links/open",
+    "/upload_requests/upload",
+}
+
+
+def openapi_spec_path() -> Path:
+    return Path(os.environ.get("COMMERCE_OPENAPI_SPEC", "../../openapi/commerce.yml"))
+
+
+def read_openapi_paths(path: Path) -> list[str]:
+    paths = []
+    in_paths = False
+    with path.open("r", encoding="utf-8") as handle:
+        for raw_line in handle:
+            line = raw_line.rstrip("\n")
+            stripped = line.strip()
+            if not stripped or stripped == "---":
+                continue
+            if not in_paths:
+                if stripped == "paths:":
+                    in_paths = True
+                continue
+            if not line.startswith((" ", "\t")):
+                break
+            if line.startswith("    /"):
+                path_key, separator, _ = stripped.partition(":")
+                if not separator:
+                    raise AssertionError(f"malformed OpenAPI path line: {line!r}")
+                paths.append(path_key)
+    if not in_paths:
+        raise AssertionError(f"OpenAPI paths block not found in {path}")
+    if not paths:
+        raise AssertionError(f"OpenAPI paths block in {path} was empty")
+    return paths
+
+
 class CommerceClientTest(unittest.TestCase):
     def test_paths_cover_spec(self):
         recorder = TransportRecorder()
@@ -56,14 +95,15 @@ class CommerceClientTest(unittest.TestCase):
         client.orders.create({"number": "1"})
         client.orders.new({"number": "2"})
         client.orders.lookup("or_1")
+        client.orders.update({"order_id": "or_1", "number": "ORDER-1A"})
         client.orders.pay({"order_id": "or_1"})
         client.orders.confirm_payment({"order_id": "or_1", "token": "123456"})
         client.orders.request_confirmation("or_1")
+        client.orders.cancel("or_1")
         client.orders.finalize("or_1")
+        client.orders.complete({"order_id": "or_1"})
         client.orders.send_invoice({"order_id": "or_1"})
         client.orders.send_receipt({"order_id": "or_1"})
-        client.orders.complete({"order_id": "or_1"})
-        client.orders.cancel("or_1")
         client.orders.refund("or_1")
         client.orders.page({})
 
@@ -71,30 +111,42 @@ class CommerceClientTest(unittest.TestCase):
         client.payment_methods.verify("pm_1")
         client.payment_methods.confirm_verification({"payment_method_id": "pm_1", "token": "123456"})
         client.payment_methods.lookup("pm_1")
+        client.payment_methods.page({})
+        client.payment_methods.update({"payment_method_id": "pm_1", "active": True})
+        client.payment_methods.activate("pm_1")
+        client.payment_methods.disactivate("pm_1")
+        client.payment_methods.archive("pm_1")
+        client.payment_methods.unarchive("pm_1")
         client.payment_methods.delete("pm_1")
         client.payment_methods.settings()
 
+        client.payouts.schedule({"destination_id": "fa_1", "max_amount": 100, "reference": "PAYOUT-1"})
+        client.payouts.lookup("po_1")
         client.payouts.set_destinations({"ghs": "dest"})
         client.payouts.settings()
         client.payouts.disable_automatic()
+        client.payouts.enable_automatic()
         client.payouts.enable_fx()
         client.payouts.disable_fx()
         client.payouts.page({})
         client.payouts.cancel("po_1")
 
+        client.balance_transactions.lookup("bt_1")
         client.balance_transactions.page({})
 
         client.financial_accounts.create({"name": "Account"})
         client.financial_accounts.lookup("fa_1")
-        client.financial_accounts.connect({"name": "Account"})
         client.financial_accounts.archive({"account_id": "fa_1"})
         client.financial_accounts.page({})
         client.financial_accounts.verify({"account_id": "fa_1"})
+        client.financial_accounts.connect({"name": "Account"})
+        client.financial_accounts.update({"account_id": "fa_1", "label": "Updated"})
         client.financial_accounts.enable_push("fa_1")
         client.financial_accounts.disable_push("fa_1", unset_as_payout_destination=True)
+        client.financial_accounts.disconnect("fa_1", unset_as_payout_destination=True)
+        client.financial_accounts.reconnect("fa_1")
         client.financial_accounts.enable_pull("fa_1")
         client.financial_accounts.disable_pull("fa_1")
-        client.financial_accounts.disconnect("fa_1", unset_as_payout_destination=True)
 
         client.customers.create({"name": "Jane Doe"})
         client.customers.lookup("cu_1")
@@ -116,6 +168,7 @@ class CommerceClientTest(unittest.TestCase):
 
         client.chimes.send({"message": "hi"})
         client.chimes.lookup("ch_1")
+        client.chimes.page({})
         client.chimes.schedule({
             "recipients": ["+233544998605"],
             "full_message": "later",
@@ -132,6 +185,19 @@ class CommerceClientTest(unittest.TestCase):
         client.broadcasts.lookup("brc_1")
         client.broadcasts.cancel("brc_1")
 
+        client.message_templates.create({
+            "name": "welcome_sms",
+            "channel": "sms",
+            "purpose": "marketing",
+            "sms": {"message_template": "Welcome {{name}}"},
+        })
+        client.message_templates.update({"id": "mtpl_1", "name": "welcome_sms"})
+        client.message_templates.publish("mtpl_1")
+        client.message_templates.archive("mtpl_1")
+        client.message_templates.lookup("mtpl_1")
+        client.message_templates.page({})
+        client.message_templates.render_preview({"message_template": {"template_id": "mtpl_1"}})
+
         client.otp.initiate({
             "recipient": "+233",
             "sender": "Acme",
@@ -146,80 +212,63 @@ class CommerceClientTest(unittest.TestCase):
         client.apps.lookup()
         client.apps.update({"alias": "my-app"})
 
+        client.keys.generate({"label": "Integration"})
+        client.keys.page({})
+        client.keys.lookup("sk_1")
+        client.keys.update({"secret_key_id": "sk_1", "label": "Renamed"})
+        client.keys.destroy("sk_1")
+        client.keys.usage({"secret_key_id": "sk_1"})
+
+        with tempfile.NamedTemporaryFile() as upload:
+            upload.write(b"hello")
+            upload.flush()
+            client.files.create(file=upload.name, purpose="identity")
+        client.files.lookup("file_1")
+        client.files.page({})
+        client.files.contents(file_id="file_1")
+        client.files.delete("file_1")
+        client.file_links.create({"file_id": "file_1"})
+        client.file_links.lookup("fl_1")
+        client.file_links.page({})
+        client.file_links.revoke({"id": "fl_1"})
+        client.upload_requests.create({"purpose": "identity"})
+        client.upload_requests.lookup("ur_1")
+        client.upload_requests.page({})
+        client.upload_requests.cancel({"id": "ur_1"})
+        client.file_references.reconcile({"resource_type": "product", "resource_id": "prod_1"})
+
+        client.purchase_intents.create({
+            "product_id": "prod_1",
+            "price_id": "pr_1",
+            "quantity": {"min": 1, "max": 5},
+        })
+        client.purchase_intents.update({"id": "sale_1", "minimum_quantity": 1})
+        client.purchase_intents.cancel("sale_1")
+        client.purchase_intents.lookup("sale_1")
+        client.purchase_intents.page({"page_number": 1, "page_size": 20})
+
+        client.prices.create({"currency": "ghs", "amount": 100})
+        client.prices.lookup("pr_1")
+        client.prices.page({})
+        client.prices.update({"price_id": "pr_1", "label": "Updated"})
+        client.prices.activate("pr_1")
+        client.prices.deactivate("pr_1")
+
         client.spec.countries()
         client.balances.get()
 
-        paths = [req.full_url for req in recorder.requests]
-        expected_paths = [
-            "/orders/new",
-            "/orders/new",
-            "/orders/lookup",
-            "/orders/pay",
-            "/orders/confirm_payment",
-            "/orders/request_confirmation",
-            "/orders/finalize",
-            "/orders/send_invoice",
-            "/orders/send_receipt",
-            "/orders/complete",
-            "/orders/cancel",
-            "/orders/refund",
-            "/orders/page",
-            "/payment_methods/tokenize",
-            "/payment_methods/verify",
-            "/payment_methods/confirm_verification",
-            "/payment_methods/lookup",
-            "/payment_methods/delete",
-            "/payment_methods/settings",
-            "/payouts/set_destinations",
-            "/payouts/settings",
-            "/payouts/disable",
-            "/payouts/enable_fx",
-            "/payouts/disable_fx",
-            "/payouts/page",
-            "/payouts/cancel",
-            "/balance_transactions/page",
-            "/financial_accounts/create",
-            "/financial_accounts/lookup",
-            "/financial_accounts/connect",
-            "/financial_accounts/archive",
-            "/financial_accounts/page",
-            "/financial_accounts/verify",
-            "/financial_accounts/enable_push",
-            "/financial_accounts/disable_push",
-            "/financial_accounts/enable_pull",
-            "/financial_accounts/disable_pull",
-            "/financial_accounts/disconnect",
-            "/customers/create",
-            "/customers/lookup",
-            "/customers/page",
-            "/products/create",
-            "/products/add_price",
-            "/products/set_default_unit_price",
-            "/products/lookup",
-            "/products/update",
-            "/products/publish",
-            "/products/unpublish",
-            "/products/archive",
-            "/products/page",
-            "/chimes/send",
-            "/chimes/lookup",
-            "/chimes/schedule",
-            "/chimes/broadcast",
-            "/schedules/lookup",
-            "/schedules/cancel",
-            "/broadcasts/lookup",
-            "/broadcasts/cancel",
-            "/otp/initiate",
-            "/otp/verify",
-            "/otp/lookup",
-            "/otp/cancel",
-            "/apps/create",
-            "/apps/lookup",
-            "/apps/update",
-            "/spec/countries",
-            "/balances",
+        covered_paths = {urllib.parse.urlparse(req.full_url).path for req in recorder.requests}
+        spec_path = openapi_spec_path()
+        missing_paths = [
+            path
+            for path in read_openapi_paths(spec_path)
+            if path not in covered_paths and path not in OPENAPI_CAPABILITY_URL_PATHS
         ]
-        self.assertEqual(expected_paths, [urllib.parse.urlparse(p).path for p in paths])
+        self.assertEqual([], missing_paths, f"Python SDK missing OpenAPI paths from {spec_path}")
+
+        spec_paths = set(read_openapi_paths(spec_path))
+        stale_exceptions = sorted(path for path in OPENAPI_CAPABILITY_URL_PATHS if path not in spec_paths)
+        self.assertEqual([], stale_exceptions, "Python SDK OpenAPI coverage exceptions no longer exist in spec")
 
         # Response object wrapping
         resp = client.orders.create({"order": {"id": "or_123"}})

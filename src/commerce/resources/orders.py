@@ -127,11 +127,11 @@ class Orders:
             - pay(): Charge an order with a payment method
             - https://studio.inttegro.com/create-your-first-order
         """
-        return self.http.post("/orders/new", payload)
+        return self.http.post("/orders/create", payload)
 
     def new(self, payload: dict):
         """
-        Alias for create(). Creates a new order.
+        Create an order through the legacy /orders/new compatibility endpoint.
 
         This is a convenience method that calls create() internally. Use whichever
         method name feels more natural in your code.
@@ -144,12 +144,10 @@ class Orders:
 
         Example:
             ```python
-            # These are equivalent
-            order1 = client.orders.create({...})
-            order2 = client.orders.new({...})
+            order = client.orders.new({...})
             ```
         """
-        return self.create(payload)
+        return self.http.post("/orders/new", payload)
 
     def lookup(self, order_id: str, **options):
         """
@@ -191,6 +189,18 @@ class Orders:
         """
         body = {"order_id": order_id, **options}
         return self.http.post("/orders/lookup", body)
+
+    def update(self, payload: dict):
+        """
+        Update mutable fields on an existing order.
+
+        Args:
+            payload: Update parameters including order_id and fields to change.
+
+        Returns:
+            ResponseObject containing the updated order.
+        """
+        return self.http.post("/orders/update", payload)
 
     def pay(self, payload: dict):
         """

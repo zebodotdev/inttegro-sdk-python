@@ -20,6 +20,18 @@ class BalanceTransactions:
         """Initialize BalanceTransactions resource with HTTP client."""
         self.http = http
 
+    def lookup(self, transaction_id: str):
+        """
+        Retrieve a balance transaction by ID.
+
+        Args:
+            transaction_id: Balance transaction identifier.
+
+        Returns:
+            ResponseObject containing the balance transaction.
+        """
+        return self.http.post("/balance_transactions/lookup", {"transaction_id": transaction_id})
+
     def page(self, payload: dict | None = None):
         """
         List balance transactions with page-based pagination.

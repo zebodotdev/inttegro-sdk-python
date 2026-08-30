@@ -19,6 +19,18 @@ class Prices:
         """Lookup a price by ID."""
         return self.http.post("/prices/lookup", {"price_id": price_id})
 
+    def page(self, payload: dict | None = None):
+        """Page through prices."""
+        return self.http.post("/prices/page", payload or {})
+
     def update(self, payload: dict):
         """Update a price."""
         return self.http.post("/prices/update", payload)
+
+    def activate(self, price_id: str):
+        """Activate an inactive price."""
+        return self.http.post("/prices/activate", {"price_id": price_id})
+
+    def deactivate(self, price_id: str):
+        """Deactivate a price."""
+        return self.http.post("/prices/deactivate", {"price_id": price_id})

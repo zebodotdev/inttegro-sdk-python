@@ -179,6 +179,31 @@ class Payouts:
         """
         return self.http.post("/payouts/settings", {})
 
+    def schedule(self, payload: dict):
+        """
+        Schedule a payout to a connected financial account.
+
+        Args:
+            payload: Schedule parameters including destination_id, max_amount, reference,
+                and optionally execute_after.
+
+        Returns:
+            ResponseObject containing the scheduled payout.
+        """
+        return self.http.post("/payouts/schedule", payload)
+
+    def lookup(self, payout_id: str):
+        """
+        Retrieve a payout by ID.
+
+        Args:
+            payout_id: Payout identifier.
+
+        Returns:
+            ResponseObject containing the payout.
+        """
+        return self.http.post("/payouts/lookup", {"payout_id": payout_id})
+
     def disable_automatic(self):
         """
         Switch payout schedule to manual mode.
@@ -236,6 +261,15 @@ class Payouts:
             - https://studio.inttegro.com/api/payouts/disable
         """
         return self.http.post("/payouts/disable", {})
+
+    def enable_automatic(self):
+        """
+        Re-enable automatic payouts for your application.
+
+        Returns:
+            ResponseObject containing the updated payout settings.
+        """
+        return self.http.post("/payouts/enable", {})
 
     def enable_fx(self):
         """

@@ -308,6 +308,50 @@ class PaymentMethods:
         """
         return self.http.post("/payment_methods/lookup", {"payment_method_id": payment_method_id})
 
+    def page(self, payload: dict | None = None):
+        """
+        List payment methods with optional pagination and customer filtering.
+
+        Args:
+            payload: Optional page_number, page_size, and customer_id filters.
+
+        Returns:
+            ResponseObject containing a page of payment methods.
+        """
+        return self.http.post("/payment_methods/page", payload or {})
+
+    def update(self, payload: dict):
+        """
+        Update mutable payment method fields.
+
+        Args:
+            payload: Update parameters including payment_method_id.
+
+        Returns:
+            ResponseObject containing the updated payment method.
+        """
+        return self.http.post("/payment_methods/update", payload)
+
+    def activate(self, payment_method_id: str):
+        """Mark a payment method active."""
+        return self.http.post("/payment_methods/activate", {"payment_method_id": payment_method_id})
+
+    def disactivate(self, payment_method_id: str):
+        """Mark a payment method inactive."""
+        return self.http.post("/payment_methods/disactivate", {"payment_method_id": payment_method_id})
+
+    def deactivate(self, payment_method_id: str):
+        """Alias for disactivate()."""
+        return self.disactivate(payment_method_id)
+
+    def archive(self, payment_method_id: str):
+        """Archive a payment method."""
+        return self.http.post("/payment_methods/archive", {"payment_method_id": payment_method_id})
+
+    def unarchive(self, payment_method_id: str):
+        """Unarchive a payment method."""
+        return self.http.post("/payment_methods/unarchive", {"payment_method_id": payment_method_id})
+
     def delete(self, payment_method_id: str, request_meta: dict | None = None):
         """
         Delete a saved payment method.

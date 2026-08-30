@@ -307,6 +307,18 @@ class FinancialAccounts:
             payload["unset_as_payout_destination"] = unset_as_payout_destination
         return self.http.post("/financial_accounts/disconnect", payload)
 
+    def reconnect(self, account_id: str):
+        """
+        Reconnect a previously disconnected financial account.
+
+        Args:
+            account_id: The financial account ID to reconnect.
+
+        Returns:
+            ResponseObject containing the reconnected financial account.
+        """
+        return self.http.post("/financial_accounts/reconnect", {"account_id": account_id})
+
     def enable_pull(self, account_id: str):
         """Enable pull configuration for charges (creates mandate)."""
         return self.http.post("/financial_accounts/enable_pull", {"account_id": account_id})
