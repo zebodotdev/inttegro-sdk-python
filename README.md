@@ -270,3 +270,16 @@ poetry run python -m unittest discover -s tests -p "test_*.py"
 ```
 
 CI and release workflows live in `sdks/python/.github`.
+
+## API enum values
+
+String enums are exported from `commerce` and encode directly in JSON:
+
+```python
+from commerce import ProductType, RefundReason
+
+payload = {
+    "type": ProductType.DIGITAL,
+    "reason": RefundReason.REQUESTED_BY_CUSTOMER,
+}
+```
