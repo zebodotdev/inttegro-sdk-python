@@ -9,9 +9,9 @@ class BalanceTransactions:
     """
     Balance transactions resource for viewing detailed account activity.
 
-    Balance transactions represent individual changes to your Commerce balance. Each
-    transaction records a payment, payout, refund, fee, or other balance event with
-    full details about amount, currency, source, and timing.
+    Balance transactions are merchant balance entries caused by payments or refunds.
+    ``type`` is either ``payment`` or ``refund`` and identifies the semantic source,
+    not accounting direction. The matching ``payment_id`` or ``refund_id`` is present.
 
     See https://studio.inttegro.com/api/balance-transactions for detailed documentation.
     """
@@ -28,7 +28,9 @@ class BalanceTransactions:
             transaction_id: Balance transaction identifier.
 
         Returns:
-            ResponseObject containing the balance transaction.
+            ResponseObject whose ``transaction`` contains required ``id``, ``type``,
+            ``order_id``, ``amount``, and ``created_at`` fields. Switch on ``type`` to
+            read exactly one matching ``payment_id`` or ``refund_id``.
         """
         return self.http.post("/balance_transactions/lookup", {"transaction_id": transaction_id})
 
@@ -36,9 +38,8 @@ class BalanceTransactions:
         """
         List balance transactions with page-based pagination.
 
-        Retrieves a paginated history of all balance activity including payments received,
-        payouts sent, refunds issued, and fees charged. Results are sorted by creation
-        date (most recent first).
+        Retrieves payment- and refund-sourced merchant balance entries, sorted by
+        creation date (most recent first).
 
         Args:
             payload: Pagination parameters including:
@@ -50,17 +51,20 @@ class BalanceTransactions:
                 - page: Object with:
                     - number: The page number returned
                     - size: Number of transactions in this page
-                    - transactions: Array of balance transaction objects
+                    - transactions: Array of objects with required ``id``, ``type``,
+                      ``order_id``, ``amount``, and ``created_at``. A payment entry has
+                      ``payment_id``; a refund entry has ``refund_id``.
 
         Example:
             ```python
             # Get first page
             result = client.balance_transactions.page({"page_number": 1, "page_size": 20})
-            page = result.data["page"]
-            
+            page = result.page
+
             for txn in page["transactions"]:
-                print(f"{txn['id']}: {txn['amount_expected']['value']}")
-            
+                source_id = txn["payment_id"] if txn["type"] == "payment" else txn["refund_id"]
+                print(f"{txn['id']} ({txn['type']} {source_id}): {txn['amount']['value']}")
+
             # Get second page
             result = client.balance_transactions.page({"page_number": 2, "page_size": 20})
             ```

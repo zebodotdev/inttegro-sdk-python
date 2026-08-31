@@ -50,6 +50,40 @@ class ErrorTransport:
         )
 
 
+class BalanceTransactionTransport:
+    def __call__(self, req, timeout):
+        del timeout
+        if urllib.parse.urlparse(req.full_url).path.endswith("/lookup"):
+            body = {
+                "transaction": {
+                    "id": "bt_payment",
+                    "type": "payment",
+                    "payment_id": "py_123",
+                    "order_id": "or_123",
+                    "amount": {"currency": "GHS", "value": 2500},
+                    "created_at": "2026-08-31T12:00:00Z",
+                }
+            }
+        else:
+            body = {
+                "page": {
+                    "number": 1,
+                    "size": 1,
+                    "transactions": [
+                        {
+                            "id": "bt_refund",
+                            "type": "refund",
+                            "refund_id": "rf_123",
+                            "order_id": "or_123",
+                            "amount": {"currency": "GHS", "value": 500},
+                            "created_at": "2026-08-31T12:01:00Z",
+                        }
+                    ],
+                }
+            }
+        return 200, {"content-type": "application/json"}, json.dumps(body)
+
+
 OPENAPI_CAPABILITY_URL_PATHS = {
     "/file_links/open",
     "/upload_requests/upload",
@@ -88,6 +122,24 @@ def read_openapi_paths(path: Path) -> list[str]:
 
 
 class CommerceClientTest(unittest.TestCase):
+    def test_balance_transactions_expose_matching_semantic_sources(self):
+        client = CommerceClient(
+            api_key="test",
+            base_url="https://api.inttegro.com",
+            transport=BalanceTransactionTransport(),
+        )
+
+        payment = client.balance_transactions.lookup("bt_payment").transaction
+        self.assertEqual("payment", payment.type)
+        self.assertEqual("py_123", payment.payment_id)
+        self.assertFalse(hasattr(payment, "refund_id"))
+        self.assertEqual(2500, payment.amount.value)
+
+        refund = client.balance_transactions.page({"page_number": 1}).page.transactions[0]
+        self.assertEqual("refund", refund.type)
+        self.assertEqual("rf_123", refund.refund_id)
+        self.assertFalse(hasattr(refund, "payment_id"))
+
     def test_paths_cover_spec(self):
         recorder = TransportRecorder()
         client = CommerceClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
