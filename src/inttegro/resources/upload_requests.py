@@ -24,5 +24,9 @@ class UploadRequests:
         headers = {"Idempotency-Key": idempotency_key} if idempotency_key else {}
         return self.http.post_with_headers("/upload_requests/cancel", payload, headers)
 
+    def review(self, payload: dict[str, Any], idempotency_key: str | None = None) -> ResponseObject:
+        headers = {"Idempotency-Key": idempotency_key} if idempotency_key else {}
+        return self.http.post_with_headers("/upload_requests/review", payload, headers)
+
     def fulfill(self, *, upload_url: str, file: str) -> ResponseObject:
         return self.http.post_multipart(upload_url, {}, {"file": file}, authenticated=False)

@@ -202,6 +202,7 @@ class InttegroClientTest(unittest.TestCase):
 
         client.customers.create({"name": "Jane Doe"})
         client.customers.lookup("cu_1")
+        client.customers.update({"customer_id": "cu_1", "name": "Jane Smith"})
         client.customers.page({"page_number": 1})
 
         client.products.create({"type": "physical", "name": "Product"})
@@ -287,6 +288,7 @@ class InttegroClientTest(unittest.TestCase):
         client.upload_requests.lookup("ur_1")
         client.upload_requests.page({})
         client.upload_requests.cancel({"id": "ur_1"})
+        client.upload_requests.review({"id": "ur_1", "attempt_id": "uat_1", "decision": "approved"})
         client.file_references.reconcile({"resource_type": "product", "resource_id": "prod_1"})
 
         client.purchase_intents.create({
@@ -305,6 +307,19 @@ class InttegroClientTest(unittest.TestCase):
         client.prices.update({"price_id": "pr_1", "label": "Updated"})
         client.prices.activate("pr_1")
         client.prices.deactivate("pr_1")
+        client.prices.archive("pr_1")
+
+        client.refunds.create({
+            "order_id": "or_1",
+            "reason": "requested_by_customer",
+            "line_items": [{
+                "order_line_item_id": "oli_1",
+                "refund_amount": {"currency": "ghs", "value": 100},
+            }],
+        })
+        client.refunds.cancel("rf_1")
+        client.refunds.lookup("rf_1")
+        client.refunds.page({"page_number": 1})
 
         client.spec.countries()
         client.balances.get()

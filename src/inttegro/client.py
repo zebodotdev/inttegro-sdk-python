@@ -19,6 +19,7 @@ from .resources.payouts import Payouts
 from .resources.products import Products
 from .resources.prices import Prices
 from .resources.purchase_intents import PurchaseIntents
+from .resources.refunds import Refunds
 from .resources.spec import Spec
 from .resources.balances import Balances
 from .resources.upload_requests import UploadRequests
@@ -42,6 +43,7 @@ class InttegroClient:
         customers: Customers resource for creating and managing customers
         products: Products resource for managing catalog products
         prices: Prices resource for managing catalog prices
+        refunds: Refunds resource for creating and managing refunds
         chimes: Chimes resource for sending transactional notifications
         schedules: Schedules resource for looking up and canceling scheduled chimes
         broadcasts: Broadcasts resource for looking up and canceling broadcasts
@@ -142,6 +144,7 @@ class InttegroClient:
         self.products = Products(self.http)
         self.prices = Prices(self.http)
         self.purchase_intents = PurchaseIntents(self.http)
+        self.refunds = Refunds(self.http)
         self.chimes = Chimes(self.http)
         self.schedules = Schedules(self.http)
         self.broadcasts = Broadcasts(self.http)

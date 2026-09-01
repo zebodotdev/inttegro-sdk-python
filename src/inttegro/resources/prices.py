@@ -34,3 +34,8 @@ class Prices:
     def deactivate(self, price_id: str):
         """Deactivate a price."""
         return self.http.post("/prices/deactivate", {"price_id": price_id})
+
+    def archive(self, price_id: str, idempotency_key: str | None = None):
+        """Archive a price and mark it inactive."""
+        headers = {"Idempotency-Key": idempotency_key} if idempotency_key else {}
+        return self.http.post_with_headers("/prices/archive", {"price_id": price_id}, headers)
