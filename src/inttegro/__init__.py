@@ -1,6 +1,6 @@
-from .client import CommerceClient
+from .client import InttegroClient
 from .errors import (
-    CommerceError,
+    InttegroError,
     NetworkError,
     TimeoutError,
     APIError,
@@ -11,8 +11,8 @@ from .enums import *  # noqa: F401,F403
 from .enums import __all__ as _enum_exports
 
 __all__ = [
-    "CommerceClient",
-    "CommerceError",
+    "InttegroClient",
+    "InttegroError",
     "NetworkError",
     "TimeoutError",
     "APIError",

@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "zebo-commerce"
-version = "0.1.0"
-description = "Lightweight Python SDK for the Zebo Commerce API"
-authors = ["Zebo Engineering <engineering@inttegro.com>"]
+name = "inttegro"
+version = "1.0.0"
+description = "Official Python SDK for the Inttegro API"
+authors = ["Inttegro Engineering <engineering@inttegro.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{ include = "commerce", from = "src" }]
+packages = [{ include = "inttegro", from = "src" }]
 
 [tool.poetry.dependencies]
 python = ">=3.10"

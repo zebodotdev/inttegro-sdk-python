@@ -4,14 +4,11 @@ on:
   push:
     tags:
       - "python-sdk-v*"
-      - "commerce-python-v*"
+      - "inttegro-python-v*"
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: sdks/python
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,5 +27,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: commerce-python-sdk
-          path: sdks/python/dist/*
+          name: inttegro-python-sdk
+          path: dist/*

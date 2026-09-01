@@ -25,13 +25,13 @@ from .resources.upload_requests import UploadRequests
 from .resources.apps import Apps
 
 
-class CommerceClient:
+class InttegroClient:
     """
-    Main Commerce SDK client for the Zebo Commerce API.
+    Main SDK client for the Inttegro API.
 
-    The Commerce client provides access to all API resources including orders,
+    The Inttegro client provides access to all API resources including orders,
     payment methods, payouts, financial accounts, and more. Initialize with
-    your API key from the Commerce dashboard.
+    your API key from the Inttegro dashboard.
 
     Attributes:
         orders: Orders resource for creating and managing orders, processing payments
@@ -52,10 +52,10 @@ class CommerceClient:
     Example:
         ```python
         import os
-        from commerce import CommerceClient
+        from inttegro import InttegroClient
 
         # Initialize client with API key
-        client = CommerceClient(api_key=os.environ["COMMERCE_API_KEY"])
+        client = InttegroClient(api_key=os.environ["INTTEGRO_API_KEY"])
 
         # Create and process an order
         result = client.orders.create({
@@ -94,10 +94,10 @@ class CommerceClient:
         transport=None,
     ):
         """
-        Initialize a new Commerce client.
+        Initialize a new Inttegro client.
 
         Args:
-            api_key: Your Commerce API key (required). Get this from your dashboard
+            api_key: Your Inttegro API key (required). Get this from your dashboard
                 at https://studio.inttegro.com/settings/keys. Use test keys (sk_test_...)
                 for development and live keys (sk_live_...) for production.
             base_url: API base URL. Defaults to production (https://api.inttegro.com).
@@ -113,16 +113,16 @@ class CommerceClient:
         Example:
             ```python
             # Production usage
-            client = CommerceClient(api_key="sk_live_...")
+            client = InttegroClient(api_key="sk_live_...")
 
             # Development with custom timeout
-            client = CommerceClient(
+            client = InttegroClient(
                 api_key="sk_test_...",
                 timeout=60.0
             )
 
             # Testing with mock server
-            client = CommerceClient(
+            client = InttegroClient(
                 api_key="sk_test_...",
                 base_url="http://localhost:8080"
             )

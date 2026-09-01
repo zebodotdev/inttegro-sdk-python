@@ -9,8 +9,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from commerce import AuthenticationError
-from commerce.client import CommerceClient
+from inttegro import AuthenticationError
+from inttegro.client import InttegroClient
 
 
 UUID_V7_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", re.I)
@@ -91,7 +91,7 @@ OPENAPI_CAPABILITY_URL_PATHS = {
 
 
 def openapi_spec_path() -> Path:
-    return Path(os.environ.get("COMMERCE_OPENAPI_SPEC", "../../openapi/commerce.yml"))
+    return Path(os.environ.get("INTTEGRO_OPENAPI_SPEC", "../../openapi/commerce.yml"))
 
 
 def read_openapi_paths(path: Path) -> list[str]:
@@ -121,9 +121,9 @@ def read_openapi_paths(path: Path) -> list[str]:
     return paths
 
 
-class CommerceClientTest(unittest.TestCase):
+class InttegroClientTest(unittest.TestCase):
     def test_balance_transactions_expose_matching_semantic_sources(self):
-        client = CommerceClient(
+        client = InttegroClient(
             api_key="test",
             base_url="https://api.inttegro.com",
             transport=BalanceTransactionTransport(),
@@ -142,7 +142,7 @@ class CommerceClientTest(unittest.TestCase):
 
     def test_paths_cover_spec(self):
         recorder = TransportRecorder()
-        client = CommerceClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
+        client = InttegroClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
 
         client.orders.create({"number": "1"})
         client.orders.new({"number": "2"})
@@ -327,14 +327,14 @@ class CommerceClientTest(unittest.TestCase):
         self.assertEqual("or_123", resp.order["id"])
 
     def test_authentication_error_is_raised(self):
-        client = CommerceClient(api_key="bad", base_url="https://api.inttegro.com", transport=ErrorTransport())
+        client = InttegroClient(api_key="bad", base_url="https://api.inttegro.com", transport=ErrorTransport())
 
         with self.assertRaises(AuthenticationError):
             client.orders.lookup("or_1")
 
     def test_mutating_posts_generate_request_meta_idempotency_key(self):
         recorder = TransportRecorder()
-        client = CommerceClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
+        client = InttegroClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
 
         client.orders.create({"number": "ORDER-1", "idempotency_key": "legacy"})
 
@@ -344,7 +344,7 @@ class CommerceClientTest(unittest.TestCase):
 
     def test_read_style_posts_do_not_generate_idempotency_metadata(self):
         recorder = TransportRecorder()
-        client = CommerceClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
+        client = InttegroClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
 
         client.orders.lookup("or_1")
 
@@ -354,7 +354,7 @@ class CommerceClientTest(unittest.TestCase):
 
     def test_message_templates_create_uses_request_meta_idempotency_by_default(self):
         recorder = TransportRecorder()
-        client = CommerceClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
+        client = InttegroClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
 
         client.message_templates.create({
             "name": "welcome_sms",

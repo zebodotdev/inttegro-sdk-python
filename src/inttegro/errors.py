@@ -1,8 +1,8 @@
-class CommerceError(Exception):
-    """Base error for the Commerce SDK."""
+class InttegroError(Exception):
+    """Base error for the Inttegro SDK."""
 
 
-class NetworkError(CommerceError):
+class NetworkError(InttegroError):
     """Raised for network connectivity errors."""
 
     def __init__(self, message: str, original: Exception | None = None):
@@ -14,7 +14,7 @@ class TimeoutError(NetworkError):
     """Raised when a request times out."""
 
 
-class APIError(CommerceError):
+class APIError(InttegroError):
     """Raised for API errors (HTTP >= 400)."""
 
     def __init__(

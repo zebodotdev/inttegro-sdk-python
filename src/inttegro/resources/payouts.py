@@ -9,7 +9,7 @@ class Payouts:
     """
     Payouts resource for configuring and managing transfers of funds from your balance.
 
-    Payouts move money from your Commerce balance to your financial accounts (bank accounts,
+    Payouts move money from your Inttegro balance to your financial accounts (bank accounts,
     mobile money wallets, or Dosh). You can configure automatic weekly payouts or trigger
     manual payouts on demand. Set different destinations for different currencies to route
     funds appropriately.
@@ -31,7 +31,7 @@ class Payouts:
         """
         Configure where funds should be sent for each currency.
 
-        Maps currencies to financial accounts so Commerce knows where to send payouts.
+        Maps currencies to financial accounts so Inttegro knows where to send payouts.
         Each currency can have one destination. When a payout is created, funds in each
         currency are sent to their configured financial account.
 
@@ -244,10 +244,10 @@ class Payouts:
                     if approved:
                         # Trigger manual payout via dashboard
                         print(f"Approved payout for vendor {vendor_id}")
-                        print("Trigger payout in Commerce dashboard")
+                        print("Trigger payout in Inttegro dashboard")
 
             # Re-enable automatic if needed
-            # (Use dashboard: Commerce > Settings > Payouts > Schedule)
+            # (Use dashboard: Inttegro > Settings > Payouts > Schedule)
             ```
 
         Note:
@@ -275,7 +275,7 @@ class Payouts:
         """
         Enable foreign exchange conversion for payouts.
 
-        Allows Commerce to automatically convert currencies during payouts when needed.
+        Allows Inttegro to automatically convert currencies during payouts when needed.
         When enabled and you have a destination configured for a base currency (e.g., GHS),
         funds in other currencies can be converted and included in that payout rather than
         waiting for a matching destination.
@@ -317,7 +317,7 @@ class Payouts:
 
         Note:
             - FX rates are determined at payout execution time
-            - Check Commerce dashboard for current FX fees
+            - Check Inttegro dashboard for current FX fees
             - Disable FX to keep currencies separate
 
         See Also:
@@ -418,52 +418,52 @@ class Payouts:
             # Get recent payouts
             result = client.payouts.page({"page_number": 1, "page_size": 20})
             page = result.data["page"]
-            
+
             for payout in page["payouts"]:
                 amount = payout["amount"]
                 print(f"{payout['id']}: {amount['value']} {amount['currency']} - {payout['status']}")
-            
+
             # Paginate through all payouts
             for page_num in range(1, 11):
                 result = client.payouts.page({
                     "page_number": page_num,
                     "page_size": 50
                 })
-                
+
                 page = result.data["page"]
                 if page["size"] == 0:
                     break
-                
+
                 payouts = page["payouts"]
                 print(f"Page {page_num}: {len(payouts)} payouts")
-            
+
             # Get large page of payouts
             result = client.payouts.page({
                 "page_number": 1,
                 "page_size": 100
             })
-            
+
             # Build reconciliation report
             def reconcile_payouts():
                 result = client.payouts.page({
                     "page_number": 1,
                     "page_size": 256  # Maximum page size
                 })
-                
+
                 total_paid = {}
                 for payout in result.data["page"]["payouts"]:
                     if payout["status"] != "paid":
                         continue
-                    
+
                     amount = payout["amount"]
                     currency = amount["currency"]
                     value = amount["value"]
-                    
+
                     if currency not in total_paid:
                         total_paid[currency] = 0
-                    
+
                     total_paid[currency] += value
-                
+
                 print("Total payouts by currency:")
                 for currency, total in total_paid.items():
                     print(f"  {currency.upper()}: {total}")

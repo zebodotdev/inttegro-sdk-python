@@ -10,7 +10,7 @@ class FinancialAccounts:
     Financial accounts resource for connecting and managing payout destinations.
 
     Financial accounts represent bank accounts, mobile money wallets, or Dosh accounts
-    where you receive payouts. Before you can receive funds from Commerce, you must connect
+    where you receive payouts. Before you can receive funds from Inttegro, you must connect
     and verify at least one financial account, then configure it as a payout destination.
 
     The typical flow is:
@@ -143,24 +143,24 @@ class FinancialAccounts:
                     "enabled": True
                 }
             })
-            
+
             fa = result.data["financial_account"]
             print(f"Financial account created: {fa['id']}")
-            
+
             # Verify if needed
             if result.data.get("requires_verification"):
                 # Initiate verification (sends OTP)
                 client.financial_accounts.verify({"account_id": fa["id"]})
-                
+
                 # Collect OTP from user
                 otp = input("Enter OTP: ")
-                
+
                 # Complete verification
                 client.financial_accounts.verify({
                     "account_id": fa["id"],
                     "token": otp
                 })
-            
+
             # Connect Vodafone wallet
             result = client.financial_accounts.connect({
                 "type": "wallet",

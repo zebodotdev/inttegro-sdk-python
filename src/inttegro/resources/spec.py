@@ -9,7 +9,7 @@ class Spec:
     """
     Spec resource for retrieving supported countries, currencies, and API specifications.
 
-    The Spec resource provides reference data about what Commerce supports including
+    The Spec resource provides reference data about what Inttegro supports including
     available countries, currencies, payment methods per country, and mobile money
     issuers. Use this to build dynamic forms, validate user input, or display
     available options.
@@ -25,7 +25,7 @@ class Spec:
         """
         Retrieve the list of supported countries and their specifications.
 
-        Returns detailed information about each country Commerce supports including
+        Returns detailed information about each country Inttegro supports including
         available currencies, payment methods, mobile money issuers, and other
         country-specific configuration.
 

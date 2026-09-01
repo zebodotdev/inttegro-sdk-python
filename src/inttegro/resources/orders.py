@@ -13,7 +13,7 @@ class Orders:
     """
     Orders resource for creating orders, processing payments, and managing order lifecycle.
 
-    Orders are the central transaction object in Commerce. They represent a purchase with
+    Orders are the central transaction object in Inttegro. They represent a purchase with
     line items, customer information, and payment details. Use this resource to create
     orders, charge customers, handle confirmations, and process refunds.
 
@@ -604,33 +604,33 @@ class Orders:
             # Get first page of orders
             result = client.orders.page({"page_number": 1, "page_size": 20})
             page = result.data["page"]
-            
+
             for order in page["orders"]:
                 print(f"{order['id']}: {order['status']}")
-            
+
             # Get second page
             next_page = client.orders.page({
                 "page_number": 2,
                 "page_size": 20
             })
-            
+
             # Retrieve more orders per page
             large_page = client.orders.page({
                 "page_number": 1,
                 "page_size": 100
             })
-            
+
             # Iterate through all pages
             for page_num in range(1, 11):  # Max 10 pages
                 result = client.orders.page({
                     "page_number": page_num,
                     "page_size": 50
                 })
-                
+
                 page = result.data["page"]
                 if page["size"] == 0:
                     break
-                
+
                 for order in page["orders"]:
                     print(f"Order: {order['id']}")
             ```

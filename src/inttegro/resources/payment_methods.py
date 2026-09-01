@@ -94,7 +94,7 @@ class PaymentMethods:
                 },
                 "verify_immediately": True
             })
-            
+
             # OTP is sent immediately, prompt customer
             if result.data.get("requires_verification"):
                 otp = input("Enter OTP: ")

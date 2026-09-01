@@ -1,4 +1,4 @@
-"""Apps resource for managing the authenticated Commerce application."""
+"""Apps resource for managing the authenticated Inttegro application."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ class Apps:
         self.http = http
 
     def create(self, payload: dict):
-        """Create a Commerce application."""
+        """Create a Inttegro application."""
         return self.http.post("/apps/create", payload)
 
     def lookup(self):

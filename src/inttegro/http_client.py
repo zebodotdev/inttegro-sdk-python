@@ -35,7 +35,7 @@ class HttpClient:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.transport = transport
-        self.user_agent = f"zebo-commerce-sdk-python/{VERSION}"
+        self.user_agent = f"inttegro-sdk-python/{VERSION}"
 
     def get(self, path: str, query: Optional[dict[str, Any]] = None) -> ResponseObject:
         return self.request("GET", path, query=query)
@@ -72,7 +72,7 @@ class HttpClient:
         headers: Optional[dict[str, str]] = None,
         authenticated: bool = True,
     ) -> ResponseObject:
-        boundary = "----CommerceBoundary{}".format(uuid.uuid4().hex)
+        boundary = "----InttegroBoundary{}".format(uuid.uuid4().hex)
         data = self._encode_multipart(fields, files, boundary)
         req = urllib.request.Request(url=self._build_url(path, None), data=data, method="POST")
         req.add_header("Accept", "application/json")
