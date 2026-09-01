@@ -294,7 +294,7 @@ class InttegroClientTest(unittest.TestCase):
             "price_id": "pr_1",
             "quantity": {"min": 1, "max": 5},
         })
-        client.purchase_intents.update({"id": "sale_1", "minimum_quantity": 1})
+        client.purchase_intents.update({"id": "sale_1", "quantity": {"min": 1}})
         client.purchase_intents.cancel("sale_1")
         client.purchase_intents.lookup("sale_1")
         client.purchase_intents.page({"page_number": 1, "page_size": 20})
