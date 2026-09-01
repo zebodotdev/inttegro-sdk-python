@@ -2,13 +2,13 @@ version: 2
 
 updates:
   - package-ecosystem: "pip"
-    directory: "/sdks/python"
+    directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
 
   - package-ecosystem: "github-actions"
-    directory: "/sdks/python"
+    directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5

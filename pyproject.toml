@@ -7,6 +7,12 @@ license = "MIT"
 readme = "README.md"
 packages = [{ include = "inttegro", from = "src" }]
 
+[tool.poetry.urls]
+Homepage = "https://studio.inttegro.com"
+Repository = "https://github.com/zebodotdev/inttegro-sdk-python"
+Issues = "https://github.com/zebodotdev/inttegro-sdk-python/issues"
+Documentation = "https://studio.inttegro.com/api-reference"
+
 [tool.poetry.dependencies]
 python = ">=3.10"
 
@@ -14,5 +20,5 @@ python = ">=3.10"
 coverage = "^7.6.1"
 
 [build-system]
-requires = ["poetry-core>=1.8.0"]
+requires = ["poetry-core==2.4.1"]
 build-backend = "poetry.core.masonry.api"

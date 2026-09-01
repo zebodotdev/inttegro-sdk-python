@@ -80,6 +80,16 @@ Python-specific features:
 
 See the [API reference](https://studio.inttegro.com/api-reference) for request fields and lifecycle rules, [errors](https://studio.inttegro.com/errors) for recovery guidance, and [idempotency](https://studio.inttegro.com/idempotency) for safe retries.
 
+## Verify a release
+
+The GitHub release for each version is the canonical record. It contains the exact wheel and source distribution uploaded to PyPI, SHA-256 checksums, and a Sigstore attestation tied to the source commit and release workflow.
+
+```bash
+sha256sum --check SHA256SUMS
+gh attestation verify inttegro-1.0.0-py3-none-any.whl \
+  --repo zebodotdev/inttegro-sdk-python
+```
+
 ## Develop
 
 ```bash

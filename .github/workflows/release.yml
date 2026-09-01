@@ -1,31 +1,105 @@
-name: Python SDK Release
+name: Release
 
 on:
   push:
     tags:
-      - "python-sdk-v*"
-      - "inttegro-python-v*"
+      - "v*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  build:
+  release:
+    if: github.repository == 'zebodotdev/inttegro-sdk-python'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: release
+    permissions:
+      attestations: write
+      contents: write
+      id-token: write
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Check out the release commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
 
-      - name: Install Poetry
-        run: pip install poetry
+      - name: Verify the release tag and package versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_version="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["tool"]["poetry"]["version"])')"
+          runtime_version="$(python -c 'import sys; sys.path.insert(0, "src"); from inttegro.version import VERSION; print(VERSION)')"
+          test "${GITHUB_REF_NAME}" = "v${package_version}"
+          test "${runtime_version}" = "${package_version}"
+          test "$(git rev-list -n 1 "${GITHUB_REF_NAME}")" = "${GITHUB_SHA}"
 
-      - name: Build package
-        run: poetry build
+      - name: Test and build
+        run: |
+          python -m unittest discover -s tests -p "test_*.py"
+          python -m pip install --disable-pip-version-check build==1.6.0
+          python -m build
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Inspect the distributions
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find dist -maxdepth 1 -name '*.whl' | wc -l | tr -d ' ')" = "1"
+          test "$(find dist -maxdepth 1 -name '*.tar.gz' | wc -l | tr -d ' ')" = "1"
+
+      - name: Attest the distributions
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
-          name: inttegro-python-sdk
-          path: dist/*
+          subject-path: |
+            dist/*.whl
+            dist/*.tar.gz
+
+      - name: Record release provenance and checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          cp dist/*.whl dist/*.tar.gz artifacts/
+          cp "${{ steps.attest.outputs.bundle-path }}" artifacts/ATTESTATION.sigstore.jsonl
+          {
+            echo "repository=https://github.com/${GITHUB_REPOSITORY}"
+            echo "tag=${GITHUB_REF_NAME}"
+            echo "commit=${GITHUB_SHA}"
+            echo "workflow=${GITHUB_WORKFLOW_REF}"
+          } > artifacts/PROVENANCE.txt
+          (
+            cd artifacts
+            sha256sum ./*.whl ./*.tar.gz ./ATTESTATION.sigstore.jsonl ./PROVENANCE.txt > SHA256SUMS
+          )
+
+      - name: Create the draft GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${GITHUB_REF_NAME}" artifacts/*
+          --draft
+          --generate-notes
+          --title "Inttegro Python SDK ${GITHUB_REF_NAME}"
+          --verify-tag
+
+      - name: Publish the exact distributions to PyPI with OIDC
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: dist
+          attestations: true
+          print-hash: true
+          verbose: true
+
+      - name: Finalize the immutable GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "${GITHUB_REF_NAME}" --draft=false
