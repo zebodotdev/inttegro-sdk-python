@@ -108,7 +108,7 @@ The GitHub release for each version is the canonical record. It contains the exa
 
 ```bash
 sha256sum --check SHA256SUMS
-gh attestation verify inttegro-1.0.0-py3-none-any.whl \
+gh attestation verify inttegro-2.0.0-py3-none-any.whl \
   --repo zebodotdev/inttegro-sdk-python
 ```
 
