@@ -156,7 +156,14 @@ class InttegroClientTest(unittest.TestCase):
         client.orders.complete({"order_id": "or_1"})
         client.orders.send_invoice({"order_id": "or_1"})
         client.orders.send_receipt({"order_id": "or_1"})
-        client.orders.refund("or_1")
+        client.orders.refund({
+            "order_id": "or_1",
+            "reason": "requested_by_customer",
+            "line_items": [{
+                "order_line_item_id": "oli_1",
+                "refund_amount": {"currency": "ghs", "value": 100},
+            }],
+        })
         client.orders.page({})
 
         client.payment_methods.tokenize({"type": "mobile_money"})
@@ -340,6 +347,26 @@ class InttegroClientTest(unittest.TestCase):
         # Response object wrapping
         resp = client.orders.create({"order": {"id": "or_123"}})
         self.assertEqual("or_123", resp.order["id"])
+
+    def test_order_refund_alias_preserves_create_refund_shape(self):
+        recorder = TransportRecorder()
+        client = InttegroClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
+        payload = {
+            "order_id": "or_1",
+            "reason": "requested_by_customer",
+            "request_meta": {"idempotency_key": "refund-alias-1"},
+            "line_items": [{
+                "order_line_item_id": "oli_1",
+                "refund_amount": {"currency": "ghs", "value": 100},
+            }],
+        }
+
+        client.orders.refund(payload, idempotency_key="refund-alias-header-1")
+
+        request = recorder.requests[-1]
+        self.assertEqual("/orders/refund", urllib.parse.urlparse(request.full_url).path)
+        self.assertEqual(payload, json.loads(request.data.decode("utf-8")))
+        self.assertEqual("refund-alias-header-1", request.headers["Idempotency-key"])
 
     def test_authentication_error_is_raised(self):
         client = InttegroClient(api_key="bad", base_url="https://api.inttegro.com", transport=ErrorTransport())

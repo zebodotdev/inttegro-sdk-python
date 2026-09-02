@@ -533,51 +533,45 @@ class Orders:
             },
         )
 
-    def refund(self, order_id: str):
+    def refund(self, payload: dict, idempotency_key: str | None = None):
         """
-        Issue a full refund for a paid order.
+        Create a refund through the ``/orders/refund`` compatibility alias.
 
-        Refunds return money to the customer and reverse the original payment. The refund
-        process depends on the payment method—mobile money refunds are instant, while
-        card refunds may take 5-10 business days to appear on the customer's statement.
-
-        Only paid orders can be refunded. The order status will change to "refunded" and
-        the amount will be returned to the customer's payment method.
+        This accepts the same line-item payload and returns the same refund response as
+        :meth:`client.refunds.create`. New integrations should use that canonical method.
 
         Args:
-            order_id: The order ID to refund
+            payload: A create-refund payload containing ``order_id``, ``reason``, and
+                one or more ``line_items``.
+            idempotency_key: Optional header value for safely retrying the request.
 
         Returns:
-            ResponseObject containing:
-                - order: Updated order with refund status
-                - refund: Refund object with id, amount, and status
+            ResponseObject containing the created ``refund``.
 
         Raises:
-            ApiError: If order is not paid, already refunded, or refund fails
+            ApiError: If the order or line-item amount is not refundable, or processing fails.
 
         Example:
             ```python
-            # Issue refund
-            result = client.orders.refund("or_abc123")
+            result = client.orders.refund({
+                "order_id": "or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
+                "reason": "requested_by_customer",
+                "line_items": [{
+                    "order_line_item_id": "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
+                    "refund_amount": {"currency": "ghs", "value": 2500},
+                }],
+            })
             refund = result.data["refund"]
             print(f"Refund status: {refund['status']}")
-            print(f"Refund amount: {refund['amount']['value']} {refund['amount']['currency']}")
-
-            # Check refund in order details
-            order = result.data["order"]
-            print(f"Order status: {order['status']}")  # "refunded"
+            print(f"Refund amount: {refund['total']['value']} {refund['total']['currency']}")
             ```
 
-        Note:
-            - Mobile money refunds: Instant to customer's account
-            - Card refunds: 5-10 business days to appear on statement
-            - Only full refunds supported currently (no partial refunds)
-
         See Also:
-            - cancel(): Cancel unpaid orders
-            - https://studio.inttegro.com/api/orders/refund
+            - ``client.refunds.create``: Canonical refund creation API
+            - https://studio.inttegro.com/refunds
         """
-        return self.http.post("/orders/refund", {"order_id": order_id})
+        headers = {"Idempotency-Key": idempotency_key} if idempotency_key else {}
+        return self.http.post_with_headers("/orders/refund", payload, headers)
 
     def page(self, payload: dict | None = None):
         """
