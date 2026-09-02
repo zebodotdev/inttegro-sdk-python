@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [2.0.0] - 2026-09-02
+
 - Made the generated model module private; public types are imported directly from `inttegro`.
 - Added OpenAPI-generated immutable dataclass response models and typed nested fields.
 - Added generated `TypedDict` request contracts and endpoint-specific resource return types.
