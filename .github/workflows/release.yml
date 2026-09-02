@@ -17,8 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: release
-    env:
-      INTTEGRO_OPENAPI_SPEC: openapi/commerce.yml
     permissions:
       attestations: write
       contents: write
@@ -35,14 +33,6 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-
-      - name: Check out the OpenAPI contract
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: zebodotdev/openapi
-          ref: 7f9e846dc4202e2abb75733e99c69e4fd5b86fae
-          path: openapi
-          persist-credentials: false
 
       - name: Verify the release tag and package versions
         shell: bash

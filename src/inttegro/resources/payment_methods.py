@@ -288,8 +288,8 @@ class PaymentMethods:
             print(f"Details: {pm['masked_details']}")  # e.g., "MTN •••• 4567"
 
             # Display saved payment methods to customer
-            customer_result = client.orders.lookup("or_abc123")
-            customer_id = customer_result.data["order"]["customer"]["id"]
+            order = client.orders.lookup("or_abc123")
+            customer_id = order.customer.id
 
             # Get customer's payment methods (from your database)
             pm_ids = get_customer_payment_methods(customer_id)

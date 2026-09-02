@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 
 class ResponseObject:
@@ -8,14 +9,14 @@ class ResponseObject:
     Lightweight wrapper that allows attribute and dict-style access.
     """
 
-    def __init__(self, data: dict[str, Any] | list[Any] | None = None):
-        raw = data or {}
+    _data: dict[str, Any] | list[Any]
+
+    def __init__(self, data: dict[str, Any] | list[Any] | None = None) -> None:
+        raw = {} if data is None else data
         if isinstance(raw, dict):
             self._data = {k: self._wrap(v) for k, v in raw.items()}
         elif isinstance(raw, list):
             self._data = [self._wrap(v) for v in raw]
-        else:
-            self._data = raw
 
     def __getattr__(self, name: str) -> Any:
         if isinstance(self._data, dict) and name in self._data:
@@ -25,7 +26,7 @@ class ResponseObject:
     def __getitem__(self, key: Any) -> Any:
         return self._data[key]
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[Any]:
         if isinstance(self._data, dict):
             return iter(self._data)
         if isinstance(self._data, list):
@@ -35,7 +36,7 @@ class ResponseObject:
     def __len__(self) -> int:
         return len(self._data)
 
-    def to_dict(self) -> Any:
+    def to_dict(self) -> dict[str, Any] | list[Any]:
         return self._unwrap(self._data)
 
     def _wrap(self, value: Any) -> Any:

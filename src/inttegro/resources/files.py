@@ -8,7 +8,10 @@ from ..response_object import ResponseObject
 
 
 class FileDownload:
-    def __init__(self, data: bytes, headers: dict[str, str] | None = None):
+    data: bytes
+    headers: dict[str, str]
+
+    def __init__(self, data: bytes, headers: dict[str, str] | None = None) -> None:
         self.data = data
         self.headers = headers or {}
 

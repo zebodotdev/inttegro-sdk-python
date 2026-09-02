@@ -2,7 +2,27 @@
 
 from __future__ import annotations
 
+from typing import TypeVar
+
+from .._model_base import ApiModel
 from ..http_client import HttpClient
+from .._models import Order, OrderPage, Refund
+from ..response_object import ResponseObject
+
+
+ModelT = TypeVar("ModelT", bound=ApiModel)
+
+
+def _resource(response: ApiModel | ResponseObject, field: str, model_type: type[ModelT]) -> ModelT:
+    """Extract a domain resource from an internal wire envelope."""
+    value = getattr(response, field, None)
+    if isinstance(value, model_type):
+        return value
+    if isinstance(response, ResponseObject):
+        payload = response.to_dict()
+        if isinstance(payload, dict) and isinstance(payload.get(field), dict):
+            return model_type.from_dict(payload[field])
+    raise TypeError(f"Inttegro returned an invalid {field} response")
 
 
 def _stable_order_request_meta(action: str, order_id: str) -> dict:
@@ -23,7 +43,8 @@ class Orders:
     3. Finalize order to make it available in reporting
     4. Complete order when fulfillment is done (optional)
 
-    All methods return a ResponseObject containing the API response data.
+    Order operations return typed domain models. The HTTP response envelope is
+    decoded internally and does not leak into the public resource API.
 
     See https://studio.inttegro.com/orders for detailed guides.
     """
@@ -55,10 +76,7 @@ class Orders:
                 - custom_data: Key-value custom data (max 25KB)
 
         Returns:
-            ResponseObject containing the created order with:
-                - order: The order object with id, status, customer, line_items, etc.
-                - invoice: Associated invoice details if payment was executed
-                - redirect_url: URL to redirect customer for payment (if applicable)
+            The created Order.
 
         Raises:
             ApiError: If request fails (invalid parameters, authentication error, etc.)
@@ -66,7 +84,7 @@ class Orders:
         Example:
             ```python
             # Create order with new customer
-            result = client.orders.create({
+            order = client.orders.create({
                 "customer_data": {
                     "name": "Akua Asantewaa",
                     "phone_number": "+233541234567",
@@ -91,8 +109,7 @@ class Orders:
                 "execute_payment": True
             })
 
-            order = result.data["order"]
-            print(f"Created order: {order['id']}")
+            print(f"Created order: {order.id}")
             ```
 
             ```python
@@ -127,7 +144,7 @@ class Orders:
             - pay(): Charge an order with a payment method
             - https://studio.inttegro.com/create-your-first-order
         """
-        return self.http.post("/orders/create", payload)
+        return _resource(self.http.post("/orders/create", payload), "order", Order)
 
     def new(self, payload: dict):
         """
@@ -140,14 +157,14 @@ class Orders:
             payload: Same parameters as create()
 
         Returns:
-            ResponseObject with created order details
+            The created Order.
 
         Example:
             ```python
             order = client.orders.new({...})
             ```
         """
-        return self.http.post("/orders/new", payload)
+        return _resource(self.http.post("/orders/new", payload), "order", Order)
 
     def lookup(self, order_id: str, **options):
         """
@@ -163,8 +180,7 @@ class Orders:
                 - expand: List of fields to expand (e.g., ["customer", "payment"])
 
         Returns:
-            ResponseObject containing:
-                - order: Full order object with all details
+            The complete Order.
 
         Raises:
             ApiError: If order not found or request fails
@@ -172,12 +188,11 @@ class Orders:
         Example:
             ```python
             # Basic lookup
-            result = client.orders.lookup("or_abc123")
-            order = result.data["order"]
-            print(f"Order status: {order['status']}")
+            order = client.orders.lookup("or_abc123")
+            print(f"Order status: {order.status}")
 
             # Lookup with expanded fields
-            result = client.orders.lookup(
+            order = client.orders.lookup(
                 "or_abc123",
                 expand=["customer", "payment", "line_items"]
             )
@@ -188,7 +203,7 @@ class Orders:
             - https://studio.inttegro.com/api/orders/lookup
         """
         body = {"order_id": order_id, **options}
-        return self.http.post("/orders/lookup", body)
+        return _resource(self.http.post("/orders/lookup", body), "order", Order)
 
     def update(self, payload: dict):
         """
@@ -198,9 +213,9 @@ class Orders:
             payload: Update parameters including order_id and fields to change.
 
         Returns:
-            ResponseObject containing the updated order.
+            The updated Order.
         """
-        return self.http.post("/orders/update", payload)
+        return _resource(self.http.post("/orders/update", payload), "order", Order)
 
     def pay(self, payload: dict):
         """
@@ -218,11 +233,7 @@ class Orders:
                 - request_meta.idempotency_key: Unique key to prevent duplicate charges (optional)
 
         Returns:
-            ResponseObject containing:
-                - order: Updated order with payment status
-                - payment: Payment object with status and details
-                - next_action: Required action if payment needs confirmation
-                  (type: "confirm_payment" means OTP is needed)
+            The updated Order, including its typed payment and next-action state.
 
         Raises:
             ApiError: If payment fails or parameters are invalid
@@ -230,18 +241,18 @@ class Orders:
         Example:
             ```python
             # Pay with saved payment method
-            result = client.orders.pay({
+            order = client.orders.pay({
                 "order_id": "or_abc123",
                 "payment_method_id": "pm_xyz789"
             })
 
             # Check if confirmation is needed
-            if result.data.get("next_action", {}).get("type") == "confirm_payment":
+            if order.payment and order.payment.next_action and order.payment.next_action.type == "confirm_payment":
                 print("OTP sent to customer's phone")
                 # Prompt customer for OTP and call confirm_payment()
 
             # Pay with new mobile money number
-            result = client.orders.pay({
+            order = client.orders.pay({
                 "order_id": "or_abc123",
                 "payment_method_data": {
                     "type": "mobile_money",
@@ -253,7 +264,7 @@ class Orders:
             })
 
             # Idempotent payment (safe to retry)
-            result = client.orders.pay({
+            order = client.orders.pay({
                 "order_id": "or_abc123",
                 "payment_method_id": "pm_xyz789",
                 "request_meta": {
@@ -267,7 +278,7 @@ class Orders:
             - create(): Create and pay order in one step with execute_payment=True
             - https://studio.inttegro.com/charge-repeat-customers
         """
-        return self.http.post("/orders/pay", payload)
+        return _resource(self.http.post("/orders/pay", payload), "order", Order)
 
     def confirm_payment(self, payload: dict):
         """
@@ -283,9 +294,7 @@ class Orders:
                 - token: The OTP code from customer (required, 6 digits)
 
         Returns:
-            ResponseObject containing:
-                - order: Updated order with final payment status
-                - payment: Payment object showing success or failure
+            The updated Order with its final payment status.
 
         Raises:
             ApiError: If OTP is invalid, expired, or payment fails
@@ -293,23 +302,23 @@ class Orders:
         Example:
             ```python
             # Step 1: Initiate payment
-            result = client.orders.pay({
+            order = client.orders.pay({
                 "order_id": "or_abc123",
                 "payment_method_id": "pm_xyz789"
             })
 
             # Step 2: Check if confirmation needed
-            if result.data.get("next_action", {}).get("type") == "confirm_payment":
+            if order.payment and order.payment.next_action and order.payment.next_action.type == "confirm_payment":
                 # Display OTP input form to customer
                 otp = input("Enter the OTP sent to your phone: ")
 
                 # Step 3: Submit OTP
-                result = client.orders.confirm_payment({
+                order = client.orders.confirm_payment({
                     "order_id": "or_abc123",
                     "token": otp
                 })
 
-                if result.data["payment"]["status"] == "paid":
+                if order.payment and order.payment.status == "paid":
                     print("Payment successful!")
             ```
 
@@ -318,7 +327,7 @@ class Orders:
             - request_confirmation(): Resend OTP if customer didn't receive it
             - https://studio.inttegro.com/charge-repeat-customers
         """
-        return self.http.post("/orders/confirm_payment", payload)
+        return _resource(self.http.post("/orders/confirm_payment", payload), "order", Order)
 
     def request_confirmation(self, order_id: str, request_meta: dict | None = None):
         """
@@ -333,7 +342,7 @@ class Orders:
             request_meta: Request controls such as idempotency_key
 
         Returns:
-            ResponseObject confirming OTP was resent
+            The updated Order.
 
         Raises:
             ApiError: If order has no pending confirmation or request fails
@@ -356,14 +365,18 @@ class Orders:
             - confirm_payment(): Submit the OTP code
             - pay(): Initial payment that triggers OTP
         """
-        return self.http.post(
-            "/orders/request_confirmation",
-            {
-                "order_id": order_id,
-                "request_meta": request_meta or _stable_order_request_meta(
-                    "request_confirmation", order_id
-                ),
-            },
+        return _resource(
+            self.http.post(
+                "/orders/request_confirmation",
+                {
+                    "order_id": order_id,
+                    "request_meta": request_meta or _stable_order_request_meta(
+                        "request_confirmation", order_id
+                    ),
+                },
+            ),
+            "order",
+            Order,
         )
 
     def finalize(self, order_id: str, request_meta: dict | None = None):
@@ -382,7 +395,7 @@ class Orders:
             request_meta: Request controls such as idempotency_key
 
         Returns:
-            ResponseObject containing the finalized order
+            The finalized Order.
 
         Raises:
             ApiError: If order is not paid or cannot be finalized
@@ -390,21 +403,24 @@ class Orders:
         Example:
             ```python
             # Finalize order manually
-            result = client.orders.finalize("or_abc123")
-            order = result.data["order"]
-            print(f"Order finalized at: {order['finalized_at']}")
+            order = client.orders.finalize("or_abc123")
+            print(f"Order finalized at: {order.sealed_at}")
             ```
 
         See Also:
             - complete(): Mark order as fulfilled (separate from finalization)
             - https://studio.inttegro.com/api/orders/finalize
         """
-        return self.http.post(
-            "/orders/finalize",
-            {
-                "order_id": order_id,
-                "request_meta": request_meta or _stable_order_request_meta("finalize", order_id),
-            },
+        return _resource(
+            self.http.post(
+                "/orders/finalize",
+                {
+                    "order_id": order_id,
+                    "request_meta": request_meta or _stable_order_request_meta("finalize", order_id),
+                },
+            ),
+            "order",
+            Order,
         )
 
     def send_invoice(self, payload: dict):
@@ -416,7 +432,7 @@ class Orders:
                 - order_id: The order whose invoice should be sent (required)
 
         Returns:
-            ResponseObject containing the order and delivery details
+            An OrderDocumentDeliveryResult containing the order and delivery details.
         """
         return self.http.post("/orders/send_invoice", payload)
 
@@ -429,7 +445,7 @@ class Orders:
                 - order_id: The paid order whose receipt should be sent (required)
 
         Returns:
-            ResponseObject containing the order and delivery details
+            An OrderDocumentDeliveryResult containing the order and delivery details.
         """
         return self.http.post("/orders/send_receipt", payload)
 
@@ -448,7 +464,7 @@ class Orders:
                 - proof: Optional fulfillment proof (tracking number, photo URL, etc.)
 
         Returns:
-            ResponseObject containing the completed order
+            The completed Order.
 
         Raises:
             ApiError: If order cannot be completed (not paid, already completed, etc.)
@@ -456,18 +472,17 @@ class Orders:
         Example:
             ```python
             # Complete physical goods order
-            result = client.orders.complete({
+            order = client.orders.complete({
                 "order_id": "or_abc123",
                 "proof": "TRACKING123456"
             })
 
             # Complete digital order
-            result = client.orders.complete({
+            order = client.orders.complete({
                 "order_id": "or_abc123"
             })
 
-            order = result.data["order"]
-            print(f"Order completed at: {order['completed_at']}")
+            print(f"Order completed at: {order.completed_at}")
             ```
 
         See Also:
@@ -475,7 +490,7 @@ class Orders:
             - refund(): Issue refund (easier before completion)
             - https://studio.inttegro.com/api/orders/complete
         """
-        return self.http.post("/orders/complete", payload)
+        return _resource(self.http.post("/orders/complete", payload), "order", Order)
 
     def cancel(self, order_id: str, request_meta: dict | None = None):
         """
@@ -492,7 +507,7 @@ class Orders:
             request_meta: Request controls such as idempotency_key
 
         Returns:
-            ResponseObject containing the cancelled order
+            The cancelled Order.
 
         Raises:
             ApiError: If order is already paid or cannot be cancelled
@@ -500,23 +515,22 @@ class Orders:
         Example:
             ```python
             # Cancel abandoned order
-            result = client.orders.cancel("or_abc123")
-            order = result.data["order"]
-            print(f"Order status: {order['status']}")  # "cancelled"
+            order = client.orders.cancel("or_abc123")
+            print(f"Order status: {order.status}")  # "canceled"
 
             # Cancellation flow with expiration
             import time
 
             # Create order
-            order_result = client.orders.create({...})
-            order_id = order_result.data["order"]["id"]
+            order = client.orders.create({...})
+            order_id = order.id
 
             # Wait for payment (with timeout)
             time.sleep(300)  # 5 minutes
 
             # Check if still unpaid
-            lookup_result = client.orders.lookup(order_id)
-            if lookup_result.data["order"]["status"] == "pending":
+            order = client.orders.lookup(order_id)
+            if order.status == "preparing":
                 # Cancel expired order
                 client.orders.cancel(order_id)
             ```
@@ -525,20 +539,24 @@ class Orders:
             - refund(): Return money for paid orders
             - https://studio.inttegro.com/api/orders/cancel
         """
-        return self.http.post(
-            "/orders/cancel",
-            {
-                "order_id": order_id,
-                "request_meta": request_meta or _stable_order_request_meta("cancel", order_id),
-            },
+        return _resource(
+            self.http.post(
+                "/orders/cancel",
+                {
+                    "order_id": order_id,
+                    "request_meta": request_meta or _stable_order_request_meta("cancel", order_id),
+                },
+            ),
+            "order",
+            Order,
         )
 
     def refund(self, payload: dict, idempotency_key: str | None = None):
         """
         Create a refund through the ``/orders/refund`` compatibility alias.
 
-        This accepts the same line-item payload and returns the same refund response as
-        :meth:`client.refunds.create`. New integrations should use that canonical method.
+        This accepts the same line-item payload as :meth:`client.refunds.create` and
+        returns the created Refund directly. New integrations should use that canonical method.
 
         Args:
             payload: A create-refund payload containing ``order_id``, ``reason``, and
@@ -546,14 +564,14 @@ class Orders:
             idempotency_key: Optional header value for safely retrying the request.
 
         Returns:
-            ResponseObject containing the created ``refund``.
+            The created Refund.
 
         Raises:
             ApiError: If the order or line-item amount is not refundable, or processing fails.
 
         Example:
             ```python
-            result = client.orders.refund({
+            refund = client.orders.refund({
                 "order_id": "or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
                 "reason": "requested_by_customer",
                 "line_items": [{
@@ -561,9 +579,8 @@ class Orders:
                     "refund_amount": {"currency": "ghs", "value": 2500},
                 }],
             })
-            refund = result.data["refund"]
-            print(f"Refund status: {refund['status']}")
-            print(f"Refund amount: {refund['total']['value']} {refund['total']['currency']}")
+            print(f"Refund status: {refund.status}")
+            print(f"Refund amount: {refund.total.value} {refund.total.currency}")
             ```
 
         See Also:
@@ -571,7 +588,9 @@ class Orders:
             - https://studio.inttegro.com/refunds
         """
         headers = {"Idempotency-Key": idempotency_key} if idempotency_key else {}
-        return self.http.post_with_headers("/orders/refund", payload, headers)
+        return _resource(
+            self.http.post_with_headers("/orders/refund", payload, headers), "refund", Refund
+        )
 
     def page(self, payload: dict | None = None):
         """
@@ -583,54 +602,49 @@ class Orders:
 
         Args:
             payload: Pagination parameters including:
-                - page_number: Page index to fetch (1-10 inclusive, default: 1)
-                - page_size: Number of orders per page (1-256, default: 20)
+                - page_number: Zero-based page index to fetch (0-10 inclusive)
+                - page_size: Number of orders per page (1-256)
+                - customer_id: Optional customer whose orders should be returned
 
         Returns:
-            ResponseObject containing:
-                - page: Object with:
-                    - number: The page number returned
-                    - size: Number of orders in this page
-                    - orders: Array of order objects
+            A typed OrderPage.
 
         Example:
             ```python
             # Get first page of orders
-            result = client.orders.page({"page_number": 1, "page_size": 20})
-            page = result.data["page"]
+            page = client.orders.page({"page_number": 0, "page_size": 20})
 
-            for order in page["orders"]:
-                print(f"{order['id']}: {order['status']}")
+            for order in page.orders:
+                print(f"{order.id}: {order.status}")
 
             # Get second page
             next_page = client.orders.page({
-                "page_number": 2,
+                "page_number": 1,
                 "page_size": 20
             })
 
             # Retrieve more orders per page
             large_page = client.orders.page({
-                "page_number": 1,
+                "page_number": 0,
                 "page_size": 100
             })
 
             # Iterate through all pages
-            for page_num in range(1, 11):  # Max 10 pages
-                result = client.orders.page({
+            for page_num in range(0, 11):
+                page = client.orders.page({
                     "page_number": page_num,
                     "page_size": 50
                 })
 
-                page = result.data["page"]
-                if page["size"] == 0:
+                if page.size == 0:
                     break
 
-                for order in page["orders"]:
-                    print(f"Order: {order['id']}")
+                for order in page.orders:
+                    print(f"Order: {order.id}")
             ```
 
         See Also:
             - lookup(): Get a single order by ID
             - https://studio.inttegro.com/api/orders/page
         """
-        return self.http.post("/orders/page", payload or {})
+        return _resource(self.http.post("/orders/page", payload or {}), "page", OrderPage)

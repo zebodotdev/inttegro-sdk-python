@@ -9,11 +9,27 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from inttegro import AuthenticationError
+from inttegro import AuthenticationError, Order, OrderDocumentDeliveryResult, OrderPage, Refund
 from inttegro.client import InttegroClient
 
 
 UUID_V7_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", re.I)
+
+ORDER_BODY = {
+    "id": "or_123",
+    "status": "preparing",
+    "initiated_at": "2026-09-02T12:00:00Z",
+    "customer": {"id": "cu_123", "guest": False, "name": "Akua Mensah"},
+}
+REFUND_BODY = {
+    "id": "rf_123",
+    "order_id": "or_123",
+    "reason": "requested_by_customer",
+    "status": "pending",
+    "total": {"currency": "ghs", "value": 100},
+    "line_items": [],
+    "created_at": "2026-09-02T12:00:00Z",
+}
 
 
 class TransportRecorder:
@@ -28,7 +44,20 @@ class TransportRecorder:
                 body = json.loads(req.data.decode("utf-8"))
             except Exception:
                 body = {}
-        return 200, {"content-type": "application/json"}, json.dumps(body or {"ok": True})
+        path = urllib.parse.urlparse(req.full_url).path
+        if path == "/orders/page":
+            response = {"page": {"number": 0, "size": 1, "orders": [ORDER_BODY]}}
+        elif path in {"/orders/send_invoice", "/orders/send_receipt"}:
+            response = {"order": ORDER_BODY, "delivery": {}}
+        elif path == "/orders/refund" or path in {"/refunds/create", "/refunds/cancel", "/refunds/lookup"}:
+            response = {"refund": REFUND_BODY}
+        elif path == "/refunds/page":
+            response = {"page": {"number": 0, "size": 1, "refunds": [REFUND_BODY]}}
+        elif path.startswith("/orders/"):
+            response = {"order": ORDER_BODY}
+        else:
+            response = body or {"ok": True}
+        return 200, {"content-type": "application/json"}, json.dumps(response)
 
 
 class ErrorTransport:
@@ -122,6 +151,33 @@ def read_openapi_paths(path: Path) -> list[str]:
 
 
 class InttegroClientTest(unittest.TestCase):
+    def test_orders_return_domain_models_instead_of_wire_envelopes(self):
+        recorder = TransportRecorder()
+        client = InttegroClient(api_key="test", transport=recorder)
+
+        self.assertIsInstance(client.orders.lookup("or_123"), Order)
+        self.assertIsInstance(client.orders.pay({"order_id": "or_123"}), Order)
+        self.assertIsInstance(client.orders.page({"page_size": 1}), OrderPage)
+        self.assertIsInstance(
+            client.orders.send_invoice({"order_id": "or_123"}),
+            OrderDocumentDeliveryResult,
+        )
+        self.assertIsInstance(
+            client.orders.refund(
+                {
+                    "order_id": "or_123",
+                    "reason": "requested_by_customer",
+                    "line_items": [
+                        {
+                            "order_line_item_id": "oli_123",
+                            "refund_amount": {"currency": "ghs", "value": 100},
+                        }
+                    ],
+                }
+            ),
+            Refund,
+        )
+
     def test_balance_transactions_expose_matching_semantic_sources(self):
         client = InttegroClient(
             api_key="test",
@@ -344,9 +400,8 @@ class InttegroClientTest(unittest.TestCase):
         stale_exceptions = sorted(path for path in OPENAPI_CAPABILITY_URL_PATHS if path not in spec_paths)
         self.assertEqual([], stale_exceptions, "Python SDK OpenAPI coverage exceptions no longer exist in spec")
 
-        # Response object wrapping
-        resp = client.orders.create({"order": {"id": "or_123"}})
-        self.assertEqual("or_123", resp.order["id"])
+        order = client.orders.create({"number": "ORDER-3"})
+        self.assertEqual("or_123", order.id)
 
     def test_order_refund_alias_preserves_create_refund_shape(self):
         recorder = TransportRecorder()

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .http_client import HttpClient
+from .http_client import HttpClient, Transport
 from .resources.balance_transactions import BalanceTransactions
 from .resources.chimes import Chimes
 from .resources.customers import Customers
@@ -88,13 +88,38 @@ class InttegroClient:
         across multiple threads.
     """
 
+    http: HttpClient
+    orders: Orders
+    payment_methods: PaymentMethods
+    payouts: Payouts
+    balance_transactions: BalanceTransactions
+    financial_accounts: FinancialAccounts
+    files: Files
+    file_links: FileLinks
+    file_references: FileReferences
+    customers: Customers
+    products: Products
+    prices: Prices
+    purchase_intents: PurchaseIntents
+    refunds: Refunds
+    chimes: Chimes
+    schedules: Schedules
+    broadcasts: Broadcasts
+    message_templates: MessageTemplates
+    otp: Otp
+    apps: Apps
+    keys: Keys
+    spec: Spec
+    balances: Balances
+    upload_requests: UploadRequests
+
     def __init__(
         self,
         api_key: str,
         base_url: str = "https://api.inttegro.com",
         timeout: float = 30.0,
-        transport=None,
-    ):
+        transport: Transport | None = None,
+    ) -> None:
         """
         Initialize a new Inttegro client.
 

@@ -1,3 +1,11 @@
+from __future__ import annotations
+
+from typing import TypeAlias
+
+
+JSONValue: TypeAlias = str | int | float | bool | None | list["JSONValue"] | dict[str, "JSONValue"]
+
+
 class InttegroError(Exception):
     """Base error for the Inttegro SDK."""
 
@@ -5,7 +13,9 @@ class InttegroError(Exception):
 class NetworkError(InttegroError):
     """Raised for network connectivity errors."""
 
-    def __init__(self, message: str, original: Exception | None = None):
+    original: Exception | None
+
+    def __init__(self, message: str, original: Exception | None = None) -> None:
         super().__init__(message)
         self.original = original
 
@@ -17,6 +27,16 @@ class TimeoutError(NetworkError):
 class APIError(InttegroError):
     """Raised for API errors (HTTP >= 400)."""
 
+    status: int
+    code: str | None
+    type: str | None
+    url: str | None
+    detail: str | None
+    fix_code: str | None
+    cause: str | None
+    body: str | None
+    data: JSONValue
+
     def __init__(
         self,
         message: str,
@@ -27,9 +47,9 @@ class APIError(InttegroError):
         detail: str | None = None,
         fix_code: str | None = None,
         cause: str | None = None,
-        body=None,
-        data=None,
-    ):
+        body: str | None = None,
+        data: JSONValue = None,
+    ) -> None:
         super().__init__(message)
         self.status = status
         self.code = code
@@ -49,6 +69,8 @@ class AuthenticationError(APIError):
 class RateLimitError(APIError):
     """Raised on 429 responses."""
 
+    retry_after: int | None
+
     def __init__(
         self,
         message: str,
@@ -59,10 +81,10 @@ class RateLimitError(APIError):
         detail: str | None = None,
         fix_code: str | None = None,
         cause: str | None = None,
-        body=None,
-        data=None,
+        body: str | None = None,
+        data: JSONValue = None,
         retry_after: int | None = None,
-    ):
+    ) -> None:
         super().__init__(
             message,
             status=status,

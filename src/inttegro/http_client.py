@@ -12,6 +12,8 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional
 
+from ._model_base import ApiModel, ModelDecodeError, decode_value
+from ._response_types import response_type_for_path
 from .errors import APIError, AuthenticationError, NetworkError, RateLimitError, TimeoutError
 from .response_object import ResponseObject
 from .version import VERSION
@@ -21,13 +23,19 @@ Transport = Callable[[urllib.request.Request, float | None], tuple[int, Dict[str
 
 
 class HttpClient:
+    api_key: str
+    base_url: str
+    timeout: float
+    transport: Transport | None
+    user_agent: str
+
     def __init__(
         self,
         api_key: str,
         base_url: str = "https://api.inttegro.com",
         timeout: float = 30.0,
         transport: Optional[Transport] = None,
-    ):
+    ) -> None:
         if not api_key:
             raise ValueError("api_key is required")
 
@@ -37,10 +45,15 @@ class HttpClient:
         self.transport = transport
         self.user_agent = f"inttegro-sdk-python/{VERSION}"
 
-    def get(self, path: str, query: Optional[dict[str, Any]] = None) -> ResponseObject:
+    def get(self, path: str, query: Optional[dict[str, Any]] = None) -> ApiModel | ResponseObject:
         return self.request("GET", path, query=query)
 
-    def post(self, path: str, body: Optional[dict[str, Any]] = None, query: Optional[dict[str, Any]] = None) -> ResponseObject:
+    def post(
+        self,
+        path: str,
+        body: Optional[dict[str, Any]] = None,
+        query: Optional[dict[str, Any]] = None,
+    ) -> ApiModel | ResponseObject:
         return self.request("POST", path, body=body, query=query)
 
     def post_with_headers(
@@ -48,7 +61,7 @@ class HttpClient:
         path: str,
         body: Optional[dict[str, Any]] = None,
         headers: Optional[dict[str, str]] = None,
-    ) -> ResponseObject:
+    ) -> ApiModel | ResponseObject:
         request_headers = dict(headers or {})
         request_body = self._without_top_level_idempotency(body or {})
         if self._is_idempotent_mutation_path(path) and not self._has_header(request_headers, "Idempotency-Key"):
@@ -62,7 +75,7 @@ class HttpClient:
         for key, value in request_headers.items():
             req.add_header(key, value)
         status, response_headers, response_body = self._send(req)
-        return self._parse_response(status, response_body.decode("utf-8"), response_headers)
+        return self._parse_response(status, response_body.decode("utf-8"), response_headers, path)
 
     def post_multipart(
         self,
@@ -71,7 +84,7 @@ class HttpClient:
         files: dict[str, str],
         headers: Optional[dict[str, str]] = None,
         authenticated: bool = True,
-    ) -> ResponseObject:
+    ) -> ApiModel | ResponseObject:
         boundary = "----InttegroBoundary{}".format(uuid.uuid4().hex)
         data = self._encode_multipart(fields, files, boundary)
         req = urllib.request.Request(url=self._build_url(path, None), data=data, method="POST")
@@ -87,7 +100,7 @@ class HttpClient:
             req.add_header(key, value)
 
         status, response_headers, body = self._send(req)
-        return self._parse_response(status, body.decode("utf-8"), response_headers)
+        return self._parse_response(status, body.decode("utf-8"), response_headers, path)
 
     def post_binary_json(self, path: str, body: dict[str, Any]) -> tuple[bytes, dict[str, str]]:
         body = self._without_top_level_idempotency(body)
@@ -116,7 +129,7 @@ class HttpClient:
         path: str,
         body: Optional[dict[str, Any]] = None,
         query: Optional[dict[str, Any]] = None,
-    ) -> ResponseObject:
+    ) -> ApiModel | ResponseObject:
         url = self._build_url(path, query)
         if body is not None:
             body = self._without_top_level_idempotency(body)
@@ -153,7 +166,7 @@ class HttpClient:
         except Exception as e:
             raise NetworkError("Network request failed", e)
 
-        return self._parse_response(status, resp_body, headers)
+        return self._parse_response(status, resp_body, headers, path)
 
     def _build_url(self, path: str, query: Optional[dict[str, Any]]) -> str:
         if path.startswith("http://") or path.startswith("https://"):
@@ -231,10 +244,28 @@ class HttpClient:
         chunks.append(f"--{boundary}--\r\n".encode())
         return b"".join(chunks)
 
-    def _parse_response(self, status: int, body: str, headers: dict[str, str]) -> ResponseObject:
+    def _parse_response(
+        self,
+        status: int,
+        body: str,
+        headers: dict[str, str],
+        path: str | None = None,
+    ) -> ApiModel | ResponseObject:
         parsed = self._parse_json(body)
         if status < 400:
-            return ResponseObject(parsed if isinstance(parsed, dict) else {})
+            payload = parsed if isinstance(parsed, dict) else {}
+            normalized_path = urllib.parse.urlparse(path).path if path else ""
+            response_type = response_type_for_path(normalized_path)
+            if response_type is not None:
+                try:
+                    decoded = decode_value(response_type, payload)
+                    if isinstance(decoded, ApiModel):
+                        return decoded
+                except ModelDecodeError:
+                    # Unknown enum values or a temporarily divergent server response
+                    # retain the legacy dynamic wrapper instead of losing data.
+                    pass
+            return ResponseObject(payload)
         return self._handle_error(status, headers, body, parsed)
 
     def _parse_json(self, body: str) -> Any:

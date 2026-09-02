@@ -1,0 +1,7 @@
+{
+  "include": ["tests/typecheck"],
+  "extraPaths": ["src"],
+  "pythonVersion": "3.10",
+  "typeCheckingMode": "strict",
+  "reportUnnecessaryTypeIgnoreComment": "error"
+}
