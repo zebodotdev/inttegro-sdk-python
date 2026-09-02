@@ -31,33 +31,39 @@ Create and finalize an order, then send the customer to its hosted invoice URL:
 ```python
 import os
 
-from inttegro import APIError, InttegroClient, ProductType
+import inttegro
+from inttegro import APIError, LineItemType, ProductType
 
-inttegro = InttegroClient(api_key=os.environ["INTTEGRO_API_KEY"])
+client = inttegro.InttegroClient(api_key=os.environ["INTTEGRO_API_KEY"])
 
 try:
-    order = inttegro.orders.create({
-        "request_meta": {"idempotency_key": "checkout-cart-123"},
-        "customer_data": {
-            "name": "Akua Mensah",
-            "email_address": "akua@example.com",
-            "phone_number": "+233544998605",
-        },
-        "finalize": True,
-        "checkout_settings": {
-            "redirect_url": "https://example.com/orders/complete",
-            "cancel_url": "https://example.com/cart",
-        },
-        "line_items": [{
-            "type": "product",
-            "product": {
-                "type": ProductType.DIGITAL,
-                "name": "Monthly subscription",
-                "quantity": 1,
-                "price": {"currency": "ghs", "value": 5000},
-            },
-        }],
-    })
+    request = inttegro.orders.CreateRequest(
+        request_meta=inttegro.orders.RequestMeta(
+            idempotency_key="checkout-cart-123",
+        ),
+        customer_data=inttegro.orders.Customer(
+            name="Akua Mensah",
+            email_address="akua@example.com",
+            phone_number="+233544998605",
+        ),
+        finalize=True,
+        checkout_settings=inttegro.orders.CheckoutSettings(
+            redirect_url="https://example.com/orders/complete",
+            cancel_url="https://example.com/cart",
+        ),
+        line_items=[
+            inttegro.orders.ProductLineItem(
+                type=LineItemType.PRODUCT,
+                product=inttegro.orders.Product(
+                    type=ProductType.DIGITAL,
+                    name="Monthly subscription",
+                    quantity=1,
+                    price=inttegro.orders.Money(currency="ghs", value=5000),
+                ),
+            ),
+        ],
+    )
+    order = client.orders.create(request)
 
     checkout_url = order.invoice.format.web.url
     print(order.id, checkout_url)
@@ -75,28 +81,35 @@ The SDK covers orders and checkout, customers, products and prices, purchase int
 Python-specific features:
 
 - Standard-library-only runtime with no third-party dependencies.
-- OpenAPI-generated, immutable domain dataclasses with fully typed nested fields.
-- OpenAPI-generated `TypedDict` requests with required, optional, union, and enum fields.
+- OpenAPI-generated, immutable request and response dataclasses with fully typed nested fields.
+- Resource namespaces such as `inttegro.orders.CreateRequest` keep related request objects together.
 - Backwards-compatible mapping access and `to_dict()` conversion on every response model.
+- Backwards-compatible dictionary request payloads for integrations migrating to typed objects.
 - JSON-compatible string enums for public API values.
 - Configurable timeout, base URL, and injectable transport for tests or custom networking.
 - Structured authentication, rate-limit, network, timeout, and API exceptions.
 
-Response fields are available to editors, Pyright, and mypy without plugins:
+Request and response fields are available to editors, Pyright, and mypy without plugins:
 
 ```python
-from inttegro import CreateRefundRequest, RefundResponse
+import os
 
-request: CreateRefundRequest = {
-    "order_id": "or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
-    "reason": "requested_by_customer",
-    "line_items": [{
-        "order_line_item_id": "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
-        "refund_amount": {"currency": "ghs", "value": 2500},
-    }],
-}
+import inttegro
 
-response: RefundResponse = inttegro.refunds.create(request)
+client = inttegro.InttegroClient(api_key=os.environ["INTTEGRO_API_KEY"])
+
+request = inttegro.refunds.CreateRequest(
+    order_id="or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
+    reason=inttegro.RefundReason.REQUESTED_BY_CUSTOMER,
+    line_items=[
+        inttegro.refunds.LineItem(
+            order_line_item_id="oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
+            refund_amount=inttegro.refunds.Money(currency="ghs", value=2500),
+        ),
+    ],
+)
+
+response: inttegro.RefundResponse = client.refunds.create(request)
 print(response.refund.id, response.refund.total.value)
 ```
 

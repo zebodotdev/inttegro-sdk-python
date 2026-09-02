@@ -1,0 +1,43 @@
+"""Typed request objects for financial-account operations."""
+
+from .request_types import (
+    FinancialAccountBankRequest as CreateBankRequest,
+    FinancialAccountBankRequestBankAccount as BankAccount,
+    FinancialAccountBankRequestPullConfiguration as BankPullConfiguration,
+    FinancialAccountBankRequestPushConfiguration as BankPushConfiguration,
+    FinancialAccountDoshRequest as CreateDoshRequest,
+    FinancialAccountDoshRequestPullConfiguration as DoshPullConfiguration,
+    FinancialAccountDoshRequestPushConfiguration as DoshPushConfiguration,
+    FinancialAccountOwnerInput as Owner,
+    FinancialAccountOwnerInputAddress as OwnerAddress,
+    FinancialAccountOwnerUpdateInput as OwnerUpdate,
+    FinancialAccountOwnerUpdateInputAddress as OwnerUpdateAddress,
+    FinancialAccountPageRequest as PageRequest,
+    FinancialAccountUpdateRequest as UpdateRequest,
+    FinancialAccountWalletRequest as CreateWalletRequest,
+    FinancialAccountWalletRequestPullConfiguration as WalletPullConfiguration,
+    FinancialAccountWalletRequestPushConfiguration as WalletPushConfiguration,
+    FinancialAccountWalletRequestWallet as Wallet,
+    FinancialAccountWalletRequestWalletMobileMoney as MobileMoney,
+)
+
+__all__ = [
+    "BankAccount",
+    "BankPullConfiguration",
+    "BankPushConfiguration",
+    "CreateBankRequest",
+    "CreateDoshRequest",
+    "CreateWalletRequest",
+    "DoshPullConfiguration",
+    "DoshPushConfiguration",
+    "MobileMoney",
+    "Owner",
+    "OwnerAddress",
+    "OwnerUpdate",
+    "OwnerUpdateAddress",
+    "PageRequest",
+    "UpdateRequest",
+    "Wallet",
+    "WalletPullConfiguration",
+    "WalletPushConfiguration",
+]

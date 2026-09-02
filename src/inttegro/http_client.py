@@ -9,10 +9,12 @@ import uuid
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional
 
 from ._model_base import ApiModel, ModelDecodeError, decode_value
+from ._request_base import ApiRequest, encode_request_value
 from ._response_types import response_type_for_path
 from .errors import APIError, AuthenticationError, NetworkError, RateLimitError, TimeoutError
 from .response_object import ResponseObject
@@ -20,6 +22,7 @@ from .version import VERSION
 
 
 Transport = Callable[[urllib.request.Request, float | None], tuple[int, Dict[str, str], str]]
+RequestBody = ApiRequest | Mapping[str, Any]
 
 
 class HttpClient:
@@ -51,7 +54,7 @@ class HttpClient:
     def post(
         self,
         path: str,
-        body: Optional[dict[str, Any]] = None,
+        body: Optional[RequestBody] = None,
         query: Optional[dict[str, Any]] = None,
     ) -> ApiModel | ResponseObject:
         return self.request("POST", path, body=body, query=query)
@@ -59,7 +62,7 @@ class HttpClient:
     def post_with_headers(
         self,
         path: str,
-        body: Optional[dict[str, Any]] = None,
+        body: Optional[RequestBody] = None,
         headers: Optional[dict[str, str]] = None,
     ) -> ApiModel | ResponseObject:
         request_headers = dict(headers or {})
@@ -102,7 +105,7 @@ class HttpClient:
         status, response_headers, body = self._send(req)
         return self._parse_response(status, body.decode("utf-8"), response_headers, path)
 
-    def post_binary_json(self, path: str, body: dict[str, Any]) -> tuple[bytes, dict[str, str]]:
+    def post_binary_json(self, path: str, body: RequestBody) -> tuple[bytes, dict[str, str]]:
         body = self._without_top_level_idempotency(body)
         data = json.dumps(body).encode("utf-8")
         req = urllib.request.Request(url=self._build_url(path, None), data=data, method="POST")
@@ -127,7 +130,7 @@ class HttpClient:
         self,
         method: str,
         path: str,
-        body: Optional[dict[str, Any]] = None,
+        body: Optional[RequestBody] = None,
         query: Optional[dict[str, Any]] = None,
     ) -> ApiModel | ResponseObject:
         url = self._build_url(path, query)
@@ -189,8 +192,11 @@ class HttpClient:
         payload["request_meta"] = request_meta
         return payload
 
-    def _without_top_level_idempotency(self, body: dict[str, Any]) -> dict[str, Any]:
-        payload = dict(body)
+    def _without_top_level_idempotency(self, body: RequestBody) -> dict[str, Any]:
+        encoded = encode_request_value(body)
+        if not isinstance(encoded, dict):
+            raise TypeError("request body must encode to a JSON object")
+        payload = dict(encoded)
         payload.pop("idempotency_key", None)
         return payload
 

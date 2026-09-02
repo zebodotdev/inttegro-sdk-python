@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+- Replaced dictionary-shaped request contracts with immutable, keyword-only request dataclasses.
+- Added resource request namespaces such as `inttegro.orders.CreateRequest` and recursively serialize nested request objects.
+- Preserved dictionary payload support for backwards compatibility.
+
 ## [2.0.0] - 2026-09-02
 
 - Made the generated model module private; public types are imported directly from `inttegro`.

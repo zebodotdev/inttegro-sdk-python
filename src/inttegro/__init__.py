@@ -13,6 +13,27 @@ from ._models import *  # noqa: F401,F403
 from ._models import __all__ as _model_exports
 from .request_types import *  # noqa: F401,F403
 from .request_types import __all__ as _request_type_exports
+from . import (
+    apps,
+    balance_transactions,
+    chimes,
+    customers,
+    file_links,
+    file_references,
+    files,
+    financial_accounts,
+    keys,
+    message_templates,
+    orders,
+    otp,
+    payment_methods,
+    payouts,
+    prices,
+    products,
+    purchase_intents,
+    refunds,
+    upload_requests,
+)
 
 __all__ = [
     "InttegroClient",
@@ -22,4 +43,23 @@ __all__ = [
     "APIError",
     "AuthenticationError",
     "RateLimitError",
+    "apps",
+    "balance_transactions",
+    "chimes",
+    "customers",
+    "file_links",
+    "file_references",
+    "files",
+    "financial_accounts",
+    "keys",
+    "message_templates",
+    "orders",
+    "otp",
+    "payment_methods",
+    "payouts",
+    "prices",
+    "products",
+    "purchase_intents",
+    "refunds",
+    "upload_requests",
 ] + _enum_exports + _model_exports + _request_type_exports

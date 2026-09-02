@@ -1,1207 +1,1291 @@
-"""Generated typed request dictionaries. Do not edit by hand."""
+"""Generated immutable request objects. Do not edit by hand."""
 
 from __future__ import annotations
 
-from typing import Any, Literal, TypeAlias, TypedDict
+from dataclasses import dataclass, field
+from typing import Any, Literal, TypeAlias
 
-class _InitiateOTPRequestOptional(TypedDict, total=False):
-    async_delivery: bool
-    message_template: str
-    purpose: str
-    sender: str
-    token_alphabet: str
-    token_alphabet_type: Literal['numeric', 'alpha', 'alphanumeric']
-    validity_duration_in_minutes: int
+from ._request_base import ApiRequest, UNSET, UnsetType
+from .enums import (
+    AppCredentialOwner,
+    AppManagementRole,
+    BankAccountType,
+    ChimeRecipientType,
+    ChimeTransport,
+    FileDelivery,
+    FileDisposition,
+    FileLinkDeliveryMode,
+    FileLinkStatus,
+    FileStatus,
+    FinancialAccountType,
+    LineItemType,
+    MessageTemplateChannel,
+    MessageTemplateStatus,
+    MessageTemplateVariableItemType,
+    MessageTemplateVariableType,
+    MobileMoneyNetwork,
+    OTPAlphabetType,
+    PaymentMethodType,
+    ProductShipmentInputType,
+    ProductType,
+    RefundReason,
+    UploadRequestStatus,
+    UploadReviewDecision,
+    WalletType,
+)
 
-class InitiateOTPRequest(_InitiateOTPRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class InitiateOTPRequest(ApiRequest):
+    async_delivery: bool | UnsetType = field(default=UNSET)
+    message_template: str | UnsetType = field(default=UNSET)
+    purpose: str | UnsetType = field(default=UNSET)
+    sender: str | UnsetType = field(default=UNSET)
+    token_alphabet: str | UnsetType = field(default=UNSET)
+    token_alphabet_type: Literal['numeric', 'alpha', 'alphanumeric', OTPAlphabetType.NUMERIC, OTPAlphabetType.ALPHA, OTPAlphabetType.ALPHANUMERIC] | UnsetType = field(default=UNSET)
+    validity_duration_in_minutes: int | UnsetType = field(default=UNSET)
     recipient: str
     service_name: str
     token_size: int
 
-class VerifyOTPRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class VerifyOTPRequest(ApiRequest):
     transaction_id: str
     recipient: str
     token: str
 
-class LookupOTPRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupOTPRequest(ApiRequest):
     transaction_id: str
 
-class _SendChimeRequestOptional(TypedDict, total=False):
-    full_message: str
-    email: ChimeEmailMessageInput
-    message_template: MessageTemplateReferenceInput
-    sender_id: str
-    purpose: str
-    custom_data: dict[str, str]
-    request_meta: SendChimeRequestRequestMeta
-
-class SendChimeRequest(_SendChimeRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class SendChimeRequest(ApiRequest):
+    full_message: str | UnsetType = field(default=UNSET)
+    email: ChimeEmailMessageInput | UnsetType = field(default=UNSET)
+    message_template: MessageTemplateReferenceInput | UnsetType = field(default=UNSET)
+    sender_id: str | UnsetType = field(default=UNSET)
+    purpose: str | UnsetType = field(default=UNSET)
+    custom_data: dict[str, str] | UnsetType = field(default=UNSET)
+    request_meta: SendChimeRequestRequestMeta | UnsetType = field(default=UNSET)
     recipient: ChimeRecipientInput
 
-class _ChimeInlineRecipientInputVariant1Optional(TypedDict, total=False):
-    name: str
-
-class ChimeInlineRecipientInputVariant1(_ChimeInlineRecipientInputVariant1Optional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ChimeInlineRecipientInputVariant1(ApiRequest):
+    name: str | UnsetType = field(default=UNSET)
     phone: ChimeInlineRecipientInputVariant1Phone
-    type: Literal['phone']
+    type: Literal['phone', ChimeRecipientType.PHONE]
 
-class ChimeInlineRecipientInputVariant1Phone(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ChimeInlineRecipientInputVariant1Phone(ApiRequest):
     number: str
 
-class _ChimeInlineRecipientInputVariant2Optional(TypedDict, total=False):
-    name: str
-
-class ChimeInlineRecipientInputVariant2(_ChimeInlineRecipientInputVariant2Optional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ChimeInlineRecipientInputVariant2(ApiRequest):
+    name: str | UnsetType = field(default=UNSET)
     email: ChimeInlineRecipientInputVariant2Email
-    type: Literal['email']
+    type: Literal['email', ChimeRecipientType.EMAIL]
 
-class ChimeInlineRecipientInputVariant2Email(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ChimeInlineRecipientInputVariant2Email(ApiRequest):
     address: str
 
-class ChimeSavedCustomerRecipientInput(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ChimeSavedCustomerRecipientInput(ApiRequest):
     customer_id: str
-    transport: Literal['sms', 'email']
+    transport: Literal['sms', 'email', ChimeTransport.SMS, ChimeTransport.EMAIL]
 
-class _ChimeEmailMessageInputOptional(TypedDict, total=False):
-    html: str
-    reply_to: str
-    headers: dict[str, str]
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ChimeEmailMessageInput(ApiRequest):
+    html: str | UnsetType = field(default=UNSET)
+    reply_to: str | UnsetType = field(default=UNSET)
+    headers: dict[str, str] | UnsetType = field(default=UNSET)
+    subject: str
+    text: str
+    from_: ChimeEmailMailboxInput = field(metadata={'wire_name': 'from'})
 
-_ChimeEmailMessageInputRequired = TypedDict('_ChimeEmailMessageInputRequired', {'subject': 'str', 'text': 'str', 'from': 'ChimeEmailMailboxInput'})
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ChimeEmailMailboxInput(ApiRequest):
+    name: str | UnsetType = field(default=UNSET)
+    address: str | UnsetType = field(default=UNSET)
 
-class ChimeEmailMessageInput(_ChimeEmailMessageInputOptional, _ChimeEmailMessageInputRequired):
-    pass
-
-class ChimeEmailMailboxInput(TypedDict, total=False):
-    name: str
-    address: str
-
-class _MessageTemplateReferenceInputOptional(TypedDict, total=False):
-    variables: MessageTemplateVariablesInput
-
-class MessageTemplateReferenceInput(_MessageTemplateReferenceInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class MessageTemplateReferenceInput(ApiRequest):
+    variables: MessageTemplateVariablesInput | UnsetType = field(default=UNSET)
     template_id: str
 
-class SendChimeRequestRequestMeta(TypedDict, total=False):
-    idempotency_key: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class SendChimeRequestRequestMeta(ApiRequest):
+    idempotency_key: str | UnsetType = field(default=UNSET)
 
-class LookupChimeRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupChimeRequest(ApiRequest):
     chime_id: str
 
-class PageChimesRequest(TypedDict, total=False):
-    customer_id: str
-    page_number: int
-    page_size: int
-    recipient: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PageChimesRequest(ApiRequest):
+    customer_id: str | UnsetType = field(default=UNSET)
+    page_number: int | UnsetType = field(default=UNSET)
+    page_size: int | UnsetType = field(default=UNSET)
+    recipient: str | UnsetType = field(default=UNSET)
 
-class _ScheduleChimeRequestOptional(TypedDict, total=False):
-    request_meta: ScheduleChimeRequestRequestMeta
-    full_message: str
-    email: ChimeEmailMessageInput
-    message_template: MessageTemplateReferenceInput
-    sender_id: str
-    purpose: str
-
-class ScheduleChimeRequest(_ScheduleChimeRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ScheduleChimeRequest(ApiRequest):
+    request_meta: ScheduleChimeRequestRequestMeta | UnsetType = field(default=UNSET)
+    full_message: str | UnsetType = field(default=UNSET)
+    email: ChimeEmailMessageInput | UnsetType = field(default=UNSET)
+    message_template: MessageTemplateReferenceInput | UnsetType = field(default=UNSET)
+    sender_id: str | UnsetType = field(default=UNSET)
+    purpose: str | UnsetType = field(default=UNSET)
     recipients: list[ChimeRecipientInput]
     send_after: str
 
-class ScheduleChimeRequestRequestMeta(TypedDict, total=False):
-    idempotency_key: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ScheduleChimeRequestRequestMeta(ApiRequest):
+    idempotency_key: str | UnsetType = field(default=UNSET)
 
-class _BroadcastRequestOptional(TypedDict, total=False):
-    request_meta: BroadcastRequestRequestMeta
-    message_template: str | MessageTemplateReferenceInput
-    email: ChimeEmailMessageInput
-    purpose: str
-    sender: str
-
-class BroadcastRequest(_BroadcastRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class BroadcastRequest(ApiRequest):
+    request_meta: BroadcastRequestRequestMeta | UnsetType = field(default=UNSET)
+    message_template: str | MessageTemplateReferenceInput | UnsetType = field(default=UNSET)
+    email: ChimeEmailMessageInput | UnsetType = field(default=UNSET)
+    purpose: str | UnsetType = field(default=UNSET)
+    sender: str | UnsetType = field(default=UNSET)
     recipients: list[ChimeRecipientInput]
 
-class BroadcastRequestRequestMeta(TypedDict, total=False):
-    idempotency_key: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class BroadcastRequestRequestMeta(ApiRequest):
+    idempotency_key: str | UnsetType = field(default=UNSET)
 
-class LookupScheduleRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupScheduleRequest(ApiRequest):
     schedule_id: str
 
-class CancelScheduleRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CancelScheduleRequest(ApiRequest):
     schedule_id: str
 
-class LookupBroadcastRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupBroadcastRequest(ApiRequest):
     broadcast_id: str
 
-class CancelBroadcastRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CancelBroadcastRequest(ApiRequest):
     broadcast_id: str
 
-class _CreateSMSMessageTemplateRequestOptional(TypedDict, total=False):
-    about: str
-    locale: str
-    variables: list[MessageTemplateVariableInput]
-
-class CreateSMSMessageTemplateRequest(_CreateSMSMessageTemplateRequestOptional):
-    channel: Literal['sms']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateSMSMessageTemplateRequest(ApiRequest):
+    about: str | UnsetType = field(default=UNSET)
+    locale: str | UnsetType = field(default=UNSET)
+    variables: list[MessageTemplateVariableInput] | UnsetType = field(default=UNSET)
+    channel: Literal['sms', MessageTemplateChannel.SMS]
     name: str
     purpose: str
     sms: MessageTemplateSMSContentInput
 
-class MessageTemplateSMSContentInput(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class MessageTemplateSMSContentInput(ApiRequest):
     message_template: str
 
-class _MessageTemplateVariableInputOptional(TypedDict, total=False):
-    required: bool
-    default: Any
-    about: str
-    items: list[MessageTemplateVariableItemInput]
-
-class MessageTemplateVariableInput(_MessageTemplateVariableInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class MessageTemplateVariableInput(ApiRequest):
+    required: bool | UnsetType = field(default=UNSET)
+    default: Any | UnsetType = field(default=UNSET)
+    about: str | UnsetType = field(default=UNSET)
+    items: list[MessageTemplateVariableItemInput] | UnsetType = field(default=UNSET)
     name: str
-    type: Literal['string', 'number', 'integer', 'boolean', 'url', 'email', 'phone', 'date', 'datetime', 'array']
+    type: Literal['string', 'number', 'integer', 'boolean', 'url', 'email', 'phone', 'date', 'datetime', 'array', MessageTemplateVariableType.STRING, MessageTemplateVariableType.NUMBER, MessageTemplateVariableType.INTEGER, MessageTemplateVariableType.BOOLEAN, MessageTemplateVariableType.URL, MessageTemplateVariableType.EMAIL, MessageTemplateVariableType.PHONE, MessageTemplateVariableType.DATE, MessageTemplateVariableType.DATETIME, MessageTemplateVariableType.ARRAY]
 
-class _MessageTemplateVariableItemInputOptional(TypedDict, total=False):
-    about: str
-    default: Any
-    required: bool
-
-class MessageTemplateVariableItemInput(_MessageTemplateVariableItemInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class MessageTemplateVariableItemInput(ApiRequest):
+    about: str | UnsetType = field(default=UNSET)
+    default: Any | UnsetType = field(default=UNSET)
+    required: bool | UnsetType = field(default=UNSET)
     name: str
-    type: Literal['string', 'number', 'integer', 'boolean', 'url', 'email', 'phone', 'date', 'datetime']
+    type: Literal['string', 'number', 'integer', 'boolean', 'url', 'email', 'phone', 'date', 'datetime', MessageTemplateVariableItemType.STRING, MessageTemplateVariableItemType.NUMBER, MessageTemplateVariableItemType.INTEGER, MessageTemplateVariableItemType.BOOLEAN, MessageTemplateVariableItemType.URL, MessageTemplateVariableItemType.EMAIL, MessageTemplateVariableItemType.PHONE, MessageTemplateVariableItemType.DATE, MessageTemplateVariableItemType.DATETIME]
 
-class _CreateEmailMessageTemplateRequestOptional(TypedDict, total=False):
-    about: str
-    attachments: MessageTemplateAttachmentIDsInput
-    locale: str
-    variables: list[MessageTemplateVariableInput]
-
-class CreateEmailMessageTemplateRequest(_CreateEmailMessageTemplateRequestOptional):
-    channel: Literal['email']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateEmailMessageTemplateRequest(ApiRequest):
+    about: str | UnsetType = field(default=UNSET)
+    attachments: MessageTemplateAttachmentIDsInput | UnsetType = field(default=UNSET)
+    locale: str | UnsetType = field(default=UNSET)
+    variables: list[MessageTemplateVariableInput] | UnsetType = field(default=UNSET)
+    channel: Literal['email', MessageTemplateChannel.EMAIL]
     email: MessageTemplateEmailContentInput
     name: str
     purpose: str
 
-_MessageTemplateEmailContentInputOptional = TypedDict('_MessageTemplateEmailContentInputOptional', {'from': 'MessageTemplateMailboxInput', 'reply_to': 'MessageTemplateMailboxInput', 'headers': 'dict[str, str]'}, total=False)
-
-class MessageTemplateEmailContentInput(_MessageTemplateEmailContentInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class MessageTemplateEmailContentInput(ApiRequest):
+    from_: MessageTemplateMailboxInput | UnsetType = field(default=UNSET, metadata={'wire_name': 'from'})
+    reply_to: MessageTemplateMailboxInput | UnsetType = field(default=UNSET)
+    headers: dict[str, str] | UnsetType = field(default=UNSET)
     subject: str
     html: str
 
-class _MessageTemplateMailboxInputOptional(TypedDict, total=False):
-    name: str
-
-class MessageTemplateMailboxInput(_MessageTemplateMailboxInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class MessageTemplateMailboxInput(ApiRequest):
+    name: str | UnsetType = field(default=UNSET)
     address: str
 
-class _UpdateMessageTemplateRequestOptional(TypedDict, total=False):
-    name: str
-    about: str
-    channel: Literal['sms', 'email']
-    purpose: str
-    locale: str
-    variables: list[MessageTemplateVariableInput]
-    sms: MessageTemplateSMSContentInput
-    email: MessageTemplateEmailContentInput
-    attachments: MessageTemplateAttachmentIDsInput
-
-class UpdateMessageTemplateRequest(_UpdateMessageTemplateRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdateMessageTemplateRequest(ApiRequest):
+    name: str | UnsetType = field(default=UNSET)
+    about: str | UnsetType = field(default=UNSET)
+    channel: Literal['sms', 'email', MessageTemplateChannel.SMS, MessageTemplateChannel.EMAIL] | UnsetType = field(default=UNSET)
+    purpose: str | UnsetType = field(default=UNSET)
+    locale: str | UnsetType = field(default=UNSET)
+    variables: list[MessageTemplateVariableInput] | UnsetType = field(default=UNSET)
+    sms: MessageTemplateSMSContentInput | UnsetType = field(default=UNSET)
+    email: MessageTemplateEmailContentInput | UnsetType = field(default=UNSET)
+    attachments: MessageTemplateAttachmentIDsInput | UnsetType = field(default=UNSET)
     id: str
 
-class MessageTemplateIDRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class MessageTemplateIDRequest(ApiRequest):
     id: str
 
-class PageMessageTemplatesRequest(TypedDict, total=False):
-    page: int
-    size: int
-    status: Literal['draft', 'published', 'archived']
-    channel: Literal['sms', 'email']
-    purpose: str
-    locale: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PageMessageTemplatesRequest(ApiRequest):
+    page: int | UnsetType = field(default=UNSET)
+    size: int | UnsetType = field(default=UNSET)
+    status: Literal['draft', 'published', 'archived', MessageTemplateStatus.DRAFT, MessageTemplateStatus.PUBLISHED, MessageTemplateStatus.ARCHIVED] | UnsetType = field(default=UNSET)
+    channel: Literal['sms', 'email', MessageTemplateChannel.SMS, MessageTemplateChannel.EMAIL] | UnsetType = field(default=UNSET)
+    purpose: str | UnsetType = field(default=UNSET)
+    locale: str | UnsetType = field(default=UNSET)
 
-class RenderMessageTemplatePreviewRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class RenderMessageTemplatePreviewRequest(ApiRequest):
     message_template: MessageTemplateReferenceInput
 
-class _CreateCustomerRequestOptional(TypedDict, total=False):
-    billing_address: CustomerAddressInput
-    custom_data: dict[str, Any]
-    email_address: str
-    phone_number: str
-    reference: str
-    shipping_address: CustomerAddressInput
-    title: str
-
-class CreateCustomerRequest(_CreateCustomerRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateCustomerRequest(ApiRequest):
+    billing_address: CustomerAddressInput | UnsetType = field(default=UNSET)
+    custom_data: dict[str, Any] | UnsetType = field(default=UNSET)
+    email_address: str | UnsetType = field(default=UNSET)
+    phone_number: str | UnsetType = field(default=UNSET)
+    reference: str | UnsetType = field(default=UNSET)
+    shipping_address: CustomerAddressInput | UnsetType = field(default=UNSET)
+    title: str | UnsetType = field(default=UNSET)
     name: str
 
-class _CustomerAddressInputOptional(TypedDict, total=False):
-    city: str
-    line1: str
-    line2: str
-    name: str
-    phone_number: str
-    post_code: str
-    region: str
-
-class CustomerAddressInput(_CustomerAddressInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CustomerAddressInput(ApiRequest):
+    city: str | UnsetType = field(default=UNSET)
+    line1: str | UnsetType = field(default=UNSET)
+    line2: str | UnsetType = field(default=UNSET)
+    name: str | UnsetType = field(default=UNSET)
+    phone_number: str | UnsetType = field(default=UNSET)
+    post_code: str | UnsetType = field(default=UNSET)
+    region: str | UnsetType = field(default=UNSET)
     country: str
 
-class LookupCustomerRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupCustomerRequest(ApiRequest):
     customer_id: str
 
-class _UpdateCustomerRequestOptional(TypedDict, total=False):
-    billing_address: CustomerAddressInput
-    custom_data: dict[str, Any]
-    email_address: str
-    name: str
-    phone_number: str
-    reference: str
-    shipping_address: CustomerAddressInput
-    suffix: str
-    title: str
-
-class UpdateCustomerRequest(_UpdateCustomerRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdateCustomerRequest(ApiRequest):
+    billing_address: CustomerAddressInput | UnsetType = field(default=UNSET)
+    custom_data: dict[str, Any] | UnsetType = field(default=UNSET)
+    email_address: str | UnsetType = field(default=UNSET)
+    name: str | UnsetType = field(default=UNSET)
+    phone_number: str | UnsetType = field(default=UNSET)
+    reference: str | UnsetType = field(default=UNSET)
+    shipping_address: CustomerAddressInput | UnsetType = field(default=UNSET)
+    suffix: str | UnsetType = field(default=UNSET)
+    title: str | UnsetType = field(default=UNSET)
     customer_id: str
 
-class _PageCustomersRequestOptional(TypedDict, total=False):
-    page_size: int
-
-class PageCustomersRequest(_PageCustomersRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PageCustomersRequest(ApiRequest):
+    page_size: int | UnsetType = field(default=UNSET)
     page_number: int
 
-class _CreateOrderNewCustomerInputOptional(TypedDict, total=False):
-    number: str
-    receipt_number: str
-    statement_descriptor: str
-    statement_descriptor_prefix: str
-    execute_payment: bool
-    finalize: bool
-    request_meta: CreateOrderNewCustomerInputRequestMeta
-    checkout_settings: CreateOrderNewCustomerInputCheckoutSettings
-    invoice_settings: InvoiceSettingsInput
-    payout_settings: OrderPayoutSettingsRequest
-    custom_data: dict[str, str]
-    billing_details: BillingDetailsInput
-    shipping: ShippingInput
-
-class CreateOrderNewCustomerInput(_CreateOrderNewCustomerInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateOrderNewCustomerInput(ApiRequest):
+    number: str | UnsetType = field(default=UNSET)
+    receipt_number: str | UnsetType = field(default=UNSET)
+    statement_descriptor: str | UnsetType = field(default=UNSET)
+    statement_descriptor_prefix: str | UnsetType = field(default=UNSET)
+    execute_payment: bool | UnsetType = field(default=UNSET)
+    finalize: bool | UnsetType = field(default=UNSET)
+    request_meta: CreateOrderNewCustomerInputRequestMeta | UnsetType = field(default=UNSET)
+    checkout_settings: CreateOrderNewCustomerInputCheckoutSettings | UnsetType = field(default=UNSET)
+    invoice_settings: InvoiceSettingsInput | UnsetType = field(default=UNSET)
+    payout_settings: OrderPayoutSettingsRequest | UnsetType = field(default=UNSET)
+    custom_data: dict[str, str] | UnsetType = field(default=UNSET)
+    billing_details: BillingDetailsInput | UnsetType = field(default=UNSET)
+    shipping: ShippingInput | UnsetType = field(default=UNSET)
+    payment_method_data: PaymentMethodDataInput | UnsetType = field(default=UNSET)
     customer_data: CustomerDataInput
     line_items: list[LineItemInput]
 
-class _CustomerDataInputOptional(TypedDict, total=False):
-    reference: str
-    custom_data: dict[str, Any]
-
-class CustomerDataInput(_CustomerDataInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CustomerDataInput(ApiRequest):
+    reference: str | UnsetType = field(default=UNSET)
+    custom_data: dict[str, Any] | UnsetType = field(default=UNSET)
     name: str
     email_address: str
     phone_number: str
 
-class CreateOrderNewCustomerInputRequestMeta(TypedDict, total=False):
-    idempotency_key: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateOrderNewCustomerInputRequestMeta(ApiRequest):
+    idempotency_key: str | UnsetType = field(default=UNSET)
 
-class CreateOrderNewCustomerInputCheckoutSettings(TypedDict, total=False):
-    redirect_url: str
-    cancel_url: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateOrderNewCustomerInputCheckoutSettings(ApiRequest):
+    redirect_url: str | UnsetType = field(default=UNSET)
+    cancel_url: str | UnsetType = field(default=UNSET)
 
-class InvoiceSettingsInput(TypedDict, total=False):
-    number: str
-    memo: str
-    footer: str
-    custom_data: dict[str, str]
+@dataclass(frozen=True, slots=True, kw_only=True)
+class InvoiceSettingsInput(ApiRequest):
+    number: str | UnsetType = field(default=UNSET)
+    memo: str | UnsetType = field(default=UNSET)
+    footer: str | UnsetType = field(default=UNSET)
+    custom_data: dict[str, str] | UnsetType = field(default=UNSET)
 
-class OrderPayoutSettingsRequest(TypedDict, total=False):
-    destination: OrderPayoutSettingsRequestDestination
-    enable_fx: Literal[False]
+@dataclass(frozen=True, slots=True, kw_only=True)
+class OrderPayoutSettingsRequest(ApiRequest):
+    destination: OrderPayoutSettingsRequestDestination | UnsetType = field(default=UNSET)
+    enable_fx: Literal[False] | UnsetType = field(default=UNSET)
 
-class OrderPayoutSettingsRequestDestination(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class OrderPayoutSettingsRequestDestination(ApiRequest):
     financial_account_id: str
 
-class ProductLineItemInput(TypedDict):
-    type: Literal['product']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProductLineItemInput(ApiRequest):
+    type: Literal['product', LineItemType.PRODUCT]
     product: ProductDetailsInput
 
-class _InlineProductDetailsInputOptional(TypedDict, total=False):
-    about: str
-    custom_data: dict[str, Any]
-    reference: str
-    tax_code: str
-
-class InlineProductDetailsInput(_InlineProductDetailsInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class InlineProductDetailsInput(ApiRequest):
+    about: str | UnsetType = field(default=UNSET)
+    custom_data: dict[str, Any] | UnsetType = field(default=UNSET)
+    reference: str | UnsetType = field(default=UNSET)
+    tax_code: str | UnsetType = field(default=UNSET)
     name: str
     price: MoneyInput
     quantity: int
-    type: Literal['physical', 'digital', 'service', 'voucher', 'custom', 'cause']
+    type: Literal['physical', 'digital', 'service', 'voucher', 'custom', 'cause', ProductType.PHYSICAL, ProductType.DIGITAL, ProductType.SERVICE, ProductType.VOUCHER, ProductType.CUSTOM, ProductType.CAUSE]
 
-class MoneyInput(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class MoneyInput(ApiRequest):
     currency: str
     value: int
 
-class CatalogProductWithPriceDataInput(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CatalogProductWithPriceDataInput(ApiRequest):
     price: MoneyInput
     product_id: str
     quantity: int
 
-class CatalogProductWithPriceReferenceInput(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CatalogProductWithPriceReferenceInput(ApiRequest):
     price_id: str
     product_id: str
     quantity: int
 
-class FeeLineItemInput(TypedDict):
-    type: Literal['fee']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FeeLineItemInput(ApiRequest):
+    type: Literal['fee', LineItemType.FEE]
     fee: FeeDetailsInput
 
-class _FeeDetailsInputOptional(TypedDict, total=False):
-    id: str
-    label: str
-    tax_code: str
-    description: str
-    custom_data: dict[str, Any]
-
-class FeeDetailsInput(_FeeDetailsInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FeeDetailsInput(ApiRequest):
+    id: str | UnsetType = field(default=UNSET)
+    label: str | UnsetType = field(default=UNSET)
+    tax_code: str | UnsetType = field(default=UNSET)
+    description: str | UnsetType = field(default=UNSET)
+    custom_data: dict[str, Any] | UnsetType = field(default=UNSET)
     amount: MoneyInput
 
-class ShippingLineItemInput(TypedDict):
-    type: Literal['shipping']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ShippingLineItemInput(ApiRequest):
+    type: Literal['shipping', LineItemType.SHIPPING]
     shipping: ShippingDetailsInput
 
-class _ShippingDetailsInputOptional(TypedDict, total=False):
-    id: str
-    tax_code: str
-    custom_data: dict[str, Any]
-
-class ShippingDetailsInput(_ShippingDetailsInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ShippingDetailsInput(ApiRequest):
+    id: str | UnsetType = field(default=UNSET)
+    tax_code: str | UnsetType = field(default=UNSET)
+    custom_data: dict[str, Any] | UnsetType = field(default=UNSET)
     fee: MoneyInput
 
-class _BillingDetailsInputOptional(TypedDict, total=False):
-    address: AddressInput
-
-class BillingDetailsInput(_BillingDetailsInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class BillingDetailsInput(ApiRequest):
+    address: AddressInput | UnsetType = field(default=UNSET)
     name: str
     email_address: str
     phone_number: str
 
-class _AddressInputOptional(TypedDict, total=False):
-    line2: str
-    region: str
-    district: str
-    post_code: str
-
-class AddressInput(_AddressInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class AddressInput(ApiRequest):
+    line2: str | UnsetType = field(default=UNSET)
+    region: str | UnsetType = field(default=UNSET)
+    district: str | UnsetType = field(default=UNSET)
+    post_code: str | UnsetType = field(default=UNSET)
     name: str
     phone_number: str
     line1: str
     town: str
     country: str
 
-class ShippingInput(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ShippingInput(ApiRequest):
     address: AddressInput
 
-class _CreateOrderExistingCustomerInputOptional(TypedDict, total=False):
-    payment_method_id: str
-    receipt_number: str
-    statement_descriptor: str
-    statement_descriptor_prefix: str
-    execute_payment: bool
-    finalize: bool
-    request_meta: CreateOrderExistingCustomerInputRequestMeta
-    checkout_settings: CreateOrderExistingCustomerInputCheckoutSettings
-    invoice_settings: InvoiceSettingsInput
-    payout_settings: OrderPayoutSettingsRequest
-    custom_data: dict[str, str]
-    billing_details: BillingDetailsInput
-    shipping: ShippingInput
-
-class CreateOrderExistingCustomerInput(_CreateOrderExistingCustomerInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateOrderExistingCustomerInput(ApiRequest):
+    payment_method_id: str | UnsetType = field(default=UNSET)
+    payment_method_data: PaymentMethodDataInput | UnsetType = field(default=UNSET)
+    receipt_number: str | UnsetType = field(default=UNSET)
+    statement_descriptor: str | UnsetType = field(default=UNSET)
+    statement_descriptor_prefix: str | UnsetType = field(default=UNSET)
+    execute_payment: bool | UnsetType = field(default=UNSET)
+    finalize: bool | UnsetType = field(default=UNSET)
+    request_meta: CreateOrderExistingCustomerInputRequestMeta | UnsetType = field(default=UNSET)
+    checkout_settings: CreateOrderExistingCustomerInputCheckoutSettings | UnsetType = field(default=UNSET)
+    invoice_settings: InvoiceSettingsInput | UnsetType = field(default=UNSET)
+    payout_settings: OrderPayoutSettingsRequest | UnsetType = field(default=UNSET)
+    custom_data: dict[str, str] | UnsetType = field(default=UNSET)
+    billing_details: BillingDetailsInput | UnsetType = field(default=UNSET)
+    shipping: ShippingInput | UnsetType = field(default=UNSET)
     customer_id: str
     line_items: list[LineItemInput]
 
-class CreateOrderExistingCustomerInputRequestMeta(TypedDict, total=False):
-    idempotency_key: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateOrderExistingCustomerInputRequestMeta(ApiRequest):
+    idempotency_key: str | UnsetType = field(default=UNSET)
 
-class CreateOrderExistingCustomerInputCheckoutSettings(TypedDict, total=False):
-    redirect_url: str
-    cancel_url: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateOrderExistingCustomerInputCheckoutSettings(ApiRequest):
+    redirect_url: str | UnsetType = field(default=UNSET)
+    cancel_url: str | UnsetType = field(default=UNSET)
 
-class LookupOrderRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupOrderRequest(ApiRequest):
     order_id: str
 
-class _UpdateOrderRequestOptional(TypedDict, total=False):
-    clear_payment_method: bool
-    custom_data: dict[str, str]
-    invoice_settings: InvoiceSettingsInput
-    finalize: bool
-    line_items: list[LineItemInput]
-    number: str
-    receipt_number: str
-    payment_method_data: UpdateOrderRequestPaymentMethodData
-    payment_method_id: str
-    statement_descriptor: str
-    statement_descriptor_prefix: str
-
-class UpdateOrderRequest(_UpdateOrderRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdateOrderRequest(ApiRequest):
+    clear_payment_method: bool | UnsetType = field(default=UNSET)
+    custom_data: dict[str, str] | UnsetType = field(default=UNSET)
+    invoice_settings: InvoiceSettingsInput | UnsetType = field(default=UNSET)
+    finalize: bool | UnsetType = field(default=UNSET)
+    line_items: list[LineItemInput] | UnsetType = field(default=UNSET)
+    number: str | UnsetType = field(default=UNSET)
+    receipt_number: str | UnsetType = field(default=UNSET)
+    payment_method_data: UpdateOrderRequestPaymentMethodData | UnsetType = field(default=UNSET)
+    payment_method_id: str | UnsetType = field(default=UNSET)
+    statement_descriptor: str | UnsetType = field(default=UNSET)
+    statement_descriptor_prefix: str | UnsetType = field(default=UNSET)
     order_id: str
 
-class _UpdateOrderRequestPaymentMethodDataOptional(TypedDict, total=False):
-    mobile_money: UpdateOrderRequestPaymentMethodDataMobileMoney
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdateOrderRequestPaymentMethodData(ApiRequest):
+    mobile_money: UpdateOrderRequestPaymentMethodDataMobileMoney | UnsetType = field(default=UNSET)
+    type: Literal['mobile_money', PaymentMethodType.MOBILE_MONEY]
 
-class UpdateOrderRequestPaymentMethodData(_UpdateOrderRequestPaymentMethodDataOptional):
-    type: Literal['mobile_money']
-
-class UpdateOrderRequestPaymentMethodDataMobileMoney(TypedDict):
-    network: Literal['airtel', 'mtn', 'telecel', 'vodafone']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdateOrderRequestPaymentMethodDataMobileMoney(ApiRequest):
+    network: Literal['airtel', 'mtn', 'telecel', 'vodafone', MobileMoneyNetwork.AIRTEL, MobileMoneyNetwork.MTN, MobileMoneyNetwork.TELECEL, MobileMoneyNetwork.VODAFONE]
     account_number: str
 
-class _PayOrderRequestOptional(TypedDict, total=False):
-    payment_method_data: PaymentMethodDataInput
-    payment_method_id: str
-    paid_out_of_band: bool
-
-class PayOrderRequest(_PayOrderRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PayOrderRequest(ApiRequest):
+    payment_method_data: PaymentMethodDataInput | UnsetType = field(default=UNSET)
+    payment_method_id: str | UnsetType = field(default=UNSET)
+    paid_out_of_band: bool | UnsetType = field(default=UNSET)
     order_id: str
 
-class _PaymentMethodDataInputOptional(TypedDict, total=False):
-    mobile_money: PaymentMethodDataInputMobileMoney
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PaymentMethodDataInput(ApiRequest):
+    mobile_money: PaymentMethodDataInputMobileMoney | UnsetType = field(default=UNSET)
+    type: Literal['mobile_money', PaymentMethodType.MOBILE_MONEY]
 
-class PaymentMethodDataInput(_PaymentMethodDataInputOptional):
-    type: Literal['mobile_money']
-
-class PaymentMethodDataInputMobileMoney(TypedDict):
-    network: Literal['airtel', 'mtn', 'telecel', 'vodafone']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PaymentMethodDataInputMobileMoney(ApiRequest):
+    network: Literal['airtel', 'mtn', 'telecel', 'vodafone', MobileMoneyNetwork.AIRTEL, MobileMoneyNetwork.MTN, MobileMoneyNetwork.TELECEL, MobileMoneyNetwork.VODAFONE]
     account_number: str
 
-class ConfirmPaymentRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ConfirmPaymentRequest(ApiRequest):
     order_id: str
     payment_id: str
     confirmation_id: str
     token: str
 
-class RequestConfirmationRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class RequestConfirmationRequest(ApiRequest):
     order_id: str
 
-class _CancelOrderRequestOptional(TypedDict, total=False):
-    reason: str
-    execute_refund: bool
-
-class CancelOrderRequest(_CancelOrderRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CancelOrderRequest(ApiRequest):
+    reason: str | UnsetType = field(default=UNSET)
+    execute_refund: bool | UnsetType = field(default=UNSET)
     order_id: str
 
-class FinalizeOrderRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinalizeOrderRequest(ApiRequest):
     order_id: str
 
-class _CompleteOrderRequestOptional(TypedDict, total=False):
-    paid_out_of_band: bool
-
-class CompleteOrderRequest(_CompleteOrderRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CompleteOrderRequest(ApiRequest):
+    paid_out_of_band: bool | UnsetType = field(default=UNSET)
     order_id: str
 
-class OrderDocumentDeliveryRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class OrderDocumentDeliveryRequest(ApiRequest):
     order_id: str
 
-class _PageOrdersRequestOptional(TypedDict, total=False):
-    page_number: int
-    customer_id: str
-
-class PageOrdersRequest(_PageOrdersRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PageOrdersRequest(ApiRequest):
+    page_number: int | UnsetType = field(default=UNSET)
+    customer_id: str | UnsetType = field(default=UNSET)
     page_size: int
 
-class _CreateRefundRequestOptional(TypedDict, total=False):
-    custom_data: dict[str, str]
-    reason_details: str
-    reference: str
-    request_meta: RefundRequestMetaInput
-
-class CreateRefundRequest(_CreateRefundRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateRefundRequest(ApiRequest):
+    custom_data: dict[str, str] | UnsetType = field(default=UNSET)
+    reason_details: str | UnsetType = field(default=UNSET)
+    reference: str | UnsetType = field(default=UNSET)
+    request_meta: RefundRequestMetaInput | UnsetType = field(default=UNSET)
     line_items: list[CreateRefundLineItemInput]
     order_id: str
     reason: RefundReasonInput
 
-class _CreateRefundLineItemInputOptional(TypedDict, total=False):
-    reason: RefundReasonInput
-    reason_details: str
-
-class CreateRefundLineItemInput(_CreateRefundLineItemInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateRefundLineItemInput(ApiRequest):
+    reason: RefundReasonInput | UnsetType = field(default=UNSET)
+    reason_details: str | UnsetType = field(default=UNSET)
     order_line_item_id: str
     refund_amount: RefundMoneyInput
 
-class RefundMoneyInput(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class RefundMoneyInput(ApiRequest):
     currency: str
     value: int
 
-class RefundRequestMetaInput(TypedDict, total=False):
-    idempotency_key: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class RefundRequestMetaInput(ApiRequest):
+    idempotency_key: str | UnsetType = field(default=UNSET)
 
-class _CancelRefundRequestOptional(TypedDict, total=False):
-    request_meta: RefundRequestMetaInput
-
-class CancelRefundRequest(_CancelRefundRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CancelRefundRequest(ApiRequest):
+    request_meta: RefundRequestMetaInput | UnsetType = field(default=UNSET)
     refund_id: str
 
-class LookupRefundRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupRefundRequest(ApiRequest):
     refund_id: str
 
-class _PageRefundsRequestOptional(TypedDict, total=False):
-    page_size: int
-
-class PageRefundsRequest(_PageRefundsRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PageRefundsRequest(ApiRequest):
+    page_size: int | UnsetType = field(default=UNSET)
     page_number: int
 
-class _CreateApplicationRequestOptional(TypedDict, total=False):
-    alias: str
-    description: str
-    legal_entity_type: str
-    placement_parent_application_id: str
-    relationship_policy: CreateApplicationRequestRelationshipPolicy
-
-class CreateApplicationRequest(_CreateApplicationRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateApplicationRequest(ApiRequest):
+    alias: str | UnsetType = field(default=UNSET)
+    description: str | UnsetType = field(default=UNSET)
+    legal_entity_type: str | UnsetType = field(default=UNSET)
+    placement_parent_application_id: str | UnsetType = field(default=UNSET)
+    relationship_policy: CreateApplicationRequestRelationshipPolicy | UnsetType = field(default=UNSET)
     name: str
 
-class CreateApplicationRequestRelationshipPolicy(TypedDict, total=False):
-    child_standing: str
-    management: Literal['parent', 'child']
-    credentials: Literal['child', 'parent']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateApplicationRequestRelationshipPolicy(ApiRequest):
+    child_standing: str | UnsetType = field(default=UNSET)
+    management: Literal['parent', 'child', AppManagementRole.PARENT, AppManagementRole.CHILD] | UnsetType = field(default=UNSET)
+    credentials: Literal['child', 'parent', AppCredentialOwner.CHILD, AppCredentialOwner.PARENT] | UnsetType = field(default=UNSET)
 
-class UpdateApplicationRequest(TypedDict, total=False):
-    name: str
-    alias: str
-    description: str
-    legal_entity_type: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdateApplicationRequest(ApiRequest):
+    name: str | UnsetType = field(default=UNSET)
+    alias: str | UnsetType = field(default=UNSET)
+    description: str | UnsetType = field(default=UNSET)
+    legal_entity_type: str | UnsetType = field(default=UNSET)
 
-class GenerateSecretKeyRequest(TypedDict, total=False):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class GenerateSecretKeyRequest(ApiRequest):
+    label: str | UnsetType = field(default=UNSET)
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PageSecretKeysRequest(ApiRequest):
+    page: int | UnsetType = field(default=UNSET)
+    number: int | UnsetType = field(default=UNSET)
+    size: int | UnsetType = field(default=UNSET)
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupSecretKeyRequest(ApiRequest):
+    secret_key_id: str
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdateSecretKeyRequest(ApiRequest):
     label: str
-
-class PageSecretKeysRequest(TypedDict, total=False):
-    page: int
-    number: int
-    size: int
-
-class LookupSecretKeyRequest(TypedDict):
     secret_key_id: str
 
-class UpdateSecretKeyRequest(TypedDict):
-    label: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class DestroySecretKeyRequest(ApiRequest):
     secret_key_id: str
 
-class DestroySecretKeyRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class SecretKeyUsageRequest(ApiRequest):
+    number: int | UnsetType = field(default=UNSET)
+    page: int | UnsetType = field(default=UNSET)
+    size: int | UnsetType = field(default=UNSET)
     secret_key_id: str
 
-class _SecretKeyUsageRequestOptional(TypedDict, total=False):
-    number: int
-    page: int
-    size: int
-
-class SecretKeyUsageRequest(_SecretKeyUsageRequestOptional):
-    secret_key_id: str
-
-class _FinancialAccountWalletRequestOptional(TypedDict, total=False):
-    custom_data: dict[str, Any]
-    description: str
-    pull_configuration: FinancialAccountWalletRequestPullConfiguration
-    push_configuration: FinancialAccountWalletRequestPushConfiguration
-
-class FinancialAccountWalletRequest(_FinancialAccountWalletRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountWalletRequest(ApiRequest):
+    custom_data: dict[str, Any] | UnsetType = field(default=UNSET)
+    description: str | UnsetType = field(default=UNSET)
+    pull_configuration: FinancialAccountWalletRequestPullConfiguration | UnsetType = field(default=UNSET)
+    push_configuration: FinancialAccountWalletRequestPushConfiguration | UnsetType = field(default=UNSET)
     currency: str
     label: str
     owner: FinancialAccountOwnerInput
     reference: str
-    type: Literal['wallet']
+    type: Literal['wallet', FinancialAccountType.WALLET]
     wallet: FinancialAccountWalletRequestWallet
 
-class FinancialAccountOwnerInput(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountOwnerInput(ApiRequest):
     name: str
     address: FinancialAccountOwnerInputAddress
 
-class _FinancialAccountOwnerInputAddressOptional(TypedDict, total=False):
-    city: str
-    line_1: str
-    line_2: str
-    name: str
-    phone: str
-    post_code: str
-    region: str
-
-class FinancialAccountOwnerInputAddress(_FinancialAccountOwnerInputAddressOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountOwnerInputAddress(ApiRequest):
+    city: str | UnsetType = field(default=UNSET)
+    line_1: str | UnsetType = field(default=UNSET)
+    line_2: str | UnsetType = field(default=UNSET)
+    name: str | UnsetType = field(default=UNSET)
+    phone: str | UnsetType = field(default=UNSET)
+    post_code: str | UnsetType = field(default=UNSET)
+    region: str | UnsetType = field(default=UNSET)
     country: str
 
-class FinancialAccountWalletRequestPullConfiguration(TypedDict, total=False):
-    enabled: bool
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountWalletRequestPullConfiguration(ApiRequest):
+    enabled: bool | UnsetType = field(default=UNSET)
 
-class FinancialAccountWalletRequestPushConfiguration(TypedDict, total=False):
-    enabled: bool
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountWalletRequestPushConfiguration(ApiRequest):
+    enabled: bool | UnsetType = field(default=UNSET)
 
-class FinancialAccountWalletRequestWallet(TypedDict):
-    type: Literal['mobile_money']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountWalletRequestWallet(ApiRequest):
+    type: Literal['mobile_money', WalletType.MOBILE_MONEY]
     mobile_money: FinancialAccountWalletRequestWalletMobileMoney
 
-class FinancialAccountWalletRequestWalletMobileMoney(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountWalletRequestWalletMobileMoney(ApiRequest):
     account_number: str
-    network: Literal['airtel', 'mtn', 'telecel', 'vodafone']
+    network: Literal['airtel', 'mtn', 'telecel', 'vodafone', MobileMoneyNetwork.AIRTEL, MobileMoneyNetwork.MTN, MobileMoneyNetwork.TELECEL, MobileMoneyNetwork.VODAFONE]
 
-class _FinancialAccountBankRequestOptional(TypedDict, total=False):
-    custom_data: dict[str, Any]
-    description: str
-    owner: FinancialAccountOwnerInput
-    pull_configuration: FinancialAccountBankRequestPullConfiguration
-    push_configuration: FinancialAccountBankRequestPushConfiguration
-
-class FinancialAccountBankRequest(_FinancialAccountBankRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountBankRequest(ApiRequest):
+    custom_data: dict[str, Any] | UnsetType = field(default=UNSET)
+    description: str | UnsetType = field(default=UNSET)
+    owner: FinancialAccountOwnerInput | UnsetType = field(default=UNSET)
+    pull_configuration: FinancialAccountBankRequestPullConfiguration | UnsetType = field(default=UNSET)
+    push_configuration: FinancialAccountBankRequestPushConfiguration | UnsetType = field(default=UNSET)
     currency: str
     label: str
     reference: str
-    type: Literal['bank_account']
+    type: Literal['bank_account', FinancialAccountType.BANK_ACCOUNT]
     bank_account: FinancialAccountBankRequestBankAccount
 
-class FinancialAccountBankRequestPullConfiguration(TypedDict, total=False):
-    enabled: bool
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountBankRequestPullConfiguration(ApiRequest):
+    enabled: bool | UnsetType = field(default=UNSET)
 
-class FinancialAccountBankRequestPushConfiguration(TypedDict, total=False):
-    enabled: bool
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountBankRequestPushConfiguration(ApiRequest):
+    enabled: bool | UnsetType = field(default=UNSET)
 
-class FinancialAccountBankRequestBankAccount(TypedDict):
-    type: Literal['ghana_bank_account']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountBankRequestBankAccount(ApiRequest):
+    type: Literal['ghana_bank_account', BankAccountType.GHANA_BANK_ACCOUNT]
     ghana_bank_account: Any | Any
 
-class _FinancialAccountDoshRequestOptional(TypedDict, total=False):
-    custom_data: dict[str, Any]
-    description: str
-    pull_configuration: FinancialAccountDoshRequestPullConfiguration
-    push_configuration: FinancialAccountDoshRequestPushConfiguration
-
-class FinancialAccountDoshRequest(_FinancialAccountDoshRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountDoshRequest(ApiRequest):
+    custom_data: dict[str, Any] | UnsetType = field(default=UNSET)
+    description: str | UnsetType = field(default=UNSET)
+    pull_configuration: FinancialAccountDoshRequestPullConfiguration | UnsetType = field(default=UNSET)
+    push_configuration: FinancialAccountDoshRequestPushConfiguration | UnsetType = field(default=UNSET)
     currency: str
     label: str
     owner: FinancialAccountOwnerInput
     reference: str
-    type: Literal['dosh_account']
+    type: Literal['dosh_account', FinancialAccountType.DOSH_ACCOUNT]
     dosh_account: dict[str, Any]
 
-class FinancialAccountDoshRequestPullConfiguration(TypedDict, total=False):
-    enabled: bool
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountDoshRequestPullConfiguration(ApiRequest):
+    enabled: bool | UnsetType = field(default=UNSET)
 
-class FinancialAccountDoshRequestPushConfiguration(TypedDict, total=False):
-    enabled: bool
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountDoshRequestPushConfiguration(ApiRequest):
+    enabled: bool | UnsetType = field(default=UNSET)
 
-class FinancialAccountIDRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountIDRequest(ApiRequest):
     account_id: str
 
-class _FinancialAccountPageRequestOptional(TypedDict, total=False):
-    page_size: int
-
-class FinancialAccountPageRequest(_FinancialAccountPageRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountPageRequest(ApiRequest):
+    page_size: int | UnsetType = field(default=UNSET)
     page_number: int
 
-class _FinancialAccountUpdateRequestOptional(TypedDict, total=False):
-    custom_data: dict[str, Any]
-    description: str
-    label: str
-    owner: FinancialAccountOwnerUpdateInput
-    reference: str
-
-class FinancialAccountUpdateRequest(_FinancialAccountUpdateRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountUpdateRequest(ApiRequest):
+    custom_data: dict[str, Any] | UnsetType = field(default=UNSET)
+    description: str | UnsetType = field(default=UNSET)
+    label: str | UnsetType = field(default=UNSET)
+    owner: FinancialAccountOwnerUpdateInput | UnsetType = field(default=UNSET)
+    reference: str | UnsetType = field(default=UNSET)
     account_id: str
 
-class FinancialAccountOwnerUpdateInput(TypedDict, total=False):
-    name: str
-    address: FinancialAccountOwnerUpdateInputAddress
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountOwnerUpdateInput(ApiRequest):
+    name: str | UnsetType = field(default=UNSET)
+    address: FinancialAccountOwnerUpdateInputAddress | UnsetType = field(default=UNSET)
 
-class FinancialAccountOwnerUpdateInputAddress(TypedDict, total=False):
-    city: str
-    country: str
-    line_1: str
-    line_2: str
-    name: str
-    phone: str
-    post_code: str
-    region: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountOwnerUpdateInputAddress(ApiRequest):
+    city: str | UnsetType = field(default=UNSET)
+    country: str | UnsetType = field(default=UNSET)
+    line_1: str | UnsetType = field(default=UNSET)
+    line_2: str | UnsetType = field(default=UNSET)
+    name: str | UnsetType = field(default=UNSET)
+    phone: str | UnsetType = field(default=UNSET)
+    post_code: str | UnsetType = field(default=UNSET)
+    region: str | UnsetType = field(default=UNSET)
 
-class _FinancialAccountDisableRequestOptional(TypedDict, total=False):
-    unset_as_payout_destination: bool
-
-class FinancialAccountDisableRequest(_FinancialAccountDisableRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountDisableRequest(ApiRequest):
+    unset_as_payout_destination: bool | UnsetType = field(default=UNSET)
     account_id: str
 
-class _FinancialAccountEnablePullRequestOptional(TypedDict, total=False):
-    ip_address: str
-    user_agent: str
-
-class FinancialAccountEnablePullRequest(_FinancialAccountEnablePullRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountEnablePullRequest(ApiRequest):
+    ip_address: str | UnsetType = field(default=UNSET)
+    user_agent: str | UnsetType = field(default=UNSET)
     account_id: str
 
-class LookupBalancesRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupBalancesRequest(ApiRequest):
     pass
 
-class LookupBalanceTransactionRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupBalanceTransactionRequest(ApiRequest):
     transaction_id: str
 
-class PageBalanceTransactionsRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PageBalanceTransactionsRequest(ApiRequest):
     page_number: int
     page_size: int
 
-class _SchedulePayoutRequestOptional(TypedDict, total=False):
-    execute_after: str
-    max_amount: int
-
-class SchedulePayoutRequest(_SchedulePayoutRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class SchedulePayoutRequest(ApiRequest):
+    execute_after: str | UnsetType = field(default=UNSET)
+    max_amount: int | UnsetType = field(default=UNSET)
     destination_id: str
     reference: str
 
-class LookupPayoutRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupPayoutRequest(ApiRequest):
     payout_id: str
 
-class SetPayoutDestinationsRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class SetPayoutDestinationsRequest(ApiRequest):
     destinations: dict[str, str]
 
-class GetPayoutSettingsRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class GetPayoutSettingsRequest(ApiRequest):
     pass
 
-class DisableAutomaticPayoutsRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class DisableAutomaticPayoutsRequest(ApiRequest):
     pass
 
-class EnableAutomaticPayoutsRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class EnableAutomaticPayoutsRequest(ApiRequest):
     pass
 
-class _PagePayoutsRequestOptional(TypedDict, total=False):
-    page_size: int
-
-class PagePayoutsRequest(_PagePayoutsRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PagePayoutsRequest(ApiRequest):
+    page_size: int | UnsetType = field(default=UNSET)
     page_number: int
 
-class CancelPayoutRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CancelPayoutRequest(ApiRequest):
     payout_id: str
 
-class LookupFileRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupFileRequest(ApiRequest):
     file_id: str
 
-class PageFilesRequest(TypedDict, total=False):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PageFilesRequest(ApiRequest):
+    purpose: str | UnsetType = field(default=UNSET)
+    status: Literal['uploading', 'processing', 'available', 'failed', 'deleted', FileStatus.UPLOADING, FileStatus.PROCESSING, FileStatus.AVAILABLE, FileStatus.FAILED, FileStatus.DELETED] | UnsetType = field(default=UNSET)
+    page_number: int | UnsetType = field(default=UNSET)
+    page_size: int | UnsetType = field(default=UNSET)
+    created_after: str | UnsetType = field(default=UNSET)
+    created_before: str | UnsetType = field(default=UNSET)
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FileContentsRequest(ApiRequest):
+    disposition: Literal['attachment', 'inline', FileDisposition.ATTACHMENT, FileDisposition.INLINE] | UnsetType = field(default=UNSET)
+    delivery: Literal['stream', 'redirect', FileDelivery.STREAM, FileDelivery.REDIRECT] | UnsetType = field(default=UNSET)
+    file_id: str
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class DeleteFileRequest(ApiRequest):
+    file_id: str
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateFileLinkRequest(ApiRequest):
+    delivery: FileLinkDeliveryInput | UnsetType = field(default=UNSET)
+    access: FileLinkAccessRequest | UnsetType = field(default=UNSET)
+    created_by: FileActorInput | UnsetType = field(default=UNSET)
+    custom_data: dict[str, str] | UnsetType = field(default=UNSET)
+    expires_at: str | UnsetType = field(default=UNSET)
+    file_id: str
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FileLinkDeliveryInput(ApiRequest):
+    mode: Literal['redirect', 'download', 'inline', FileLinkDeliveryMode.REDIRECT, FileLinkDeliveryMode.DOWNLOAD, FileLinkDeliveryMode.INLINE] | UnsetType = field(default=UNSET)
+    filename: str | UnsetType = field(default=UNSET)
+    content_type: str | UnsetType = field(default=UNSET)
+    disposition: str | UnsetType = field(default=UNSET)
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FileLinkAccessRequest(ApiRequest):
+    max_accesses: int | UnsetType = field(default=UNSET)
+    allow_download: bool | UnsetType = field(default=UNSET)
+    allowed_origins: list[str] | UnsetType = field(default=UNSET)
+    allowed_ip_ranges: list[str] | UnsetType = field(default=UNSET)
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FileActorInput(ApiRequest):
+    email: str | UnsetType = field(default=UNSET)
+    id: str | UnsetType = field(default=UNSET)
+    name: str | UnsetType = field(default=UNSET)
+    type: str | UnsetType = field(default=UNSET)
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupFileLinkRequest(ApiRequest):
+    id: str
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PageFileLinksRequest(ApiRequest):
+    file_id: str | UnsetType = field(default=UNSET)
+    status: Literal['active', 'revoked', 'expired', 'disabled', FileLinkStatus.ACTIVE, FileLinkStatus.REVOKED, FileLinkStatus.EXPIRED, FileLinkStatus.DISABLED] | UnsetType = field(default=UNSET)
+    page_number: int | UnsetType = field(default=UNSET)
+    page_size: int | UnsetType = field(default=UNSET)
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class RevokeFileLinkRequest(ApiRequest):
+    revoked_by: FileActorInput | UnsetType = field(default=UNSET)
+    id: str
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateUploadRequestRequest(ApiRequest):
+    constraints: UploadRequestConstraintsInput | UnsetType = field(default=UNSET)
+    display: UploadRequestDisplayInput | UnsetType = field(default=UNSET)
+    subject: FilePartyInput | UnsetType = field(default=UNSET)
+    recipient: FilePartyInput | UnsetType = field(default=UNSET)
+    resource: FileResourceInput | UnsetType = field(default=UNSET)
+    requester: FileActorInput | UnsetType = field(default=UNSET)
+    attempts: UploadRequestAttemptsRequest | UnsetType = field(default=UNSET)
+    custom_data: dict[str, str] | UnsetType = field(default=UNSET)
+    expires_at: str | UnsetType = field(default=UNSET)
     purpose: str
-    status: Literal['uploading', 'processing', 'available', 'failed', 'deleted']
-    page_number: int
-    page_size: int
-    created_after: str
-    created_before: str
 
-class _FileContentsRequestOptional(TypedDict, total=False):
-    disposition: Literal['attachment', 'inline']
-    delivery: Literal['stream', 'redirect']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UploadRequestConstraintsInput(ApiRequest):
+    min_size: int | UnsetType = field(default=UNSET)
+    max_size: int | UnsetType = field(default=UNSET)
+    exact_size: int | UnsetType = field(default=UNSET)
+    content_types: list[str] | UnsetType = field(default=UNSET)
+    extensions: list[str] | UnsetType = field(default=UNSET)
+    filename: str | UnsetType = field(default=UNSET)
 
-class FileContentsRequest(_FileContentsRequestOptional):
-    file_id: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UploadRequestDisplayInput(ApiRequest):
+    title: str | UnsetType = field(default=UNSET)
+    description: str | UnsetType = field(default=UNSET)
+    help_text: str | UnsetType = field(default=UNSET)
 
-class DeleteFileRequest(TypedDict):
-    file_id: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FilePartyInput(ApiRequest):
+    type: str | UnsetType = field(default=UNSET)
+    id: str | UnsetType = field(default=UNSET)
+    name: str | UnsetType = field(default=UNSET)
+    email: str | UnsetType = field(default=UNSET)
 
-class _CreateFileLinkRequestOptional(TypedDict, total=False):
-    delivery: FileLinkDeliveryInput
-    access: FileLinkAccessRequest
-    created_by: FileActorInput
-    custom_data: dict[str, str]
-    expires_at: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FileResourceInput(ApiRequest):
+    type: str | UnsetType = field(default=UNSET)
+    id: str | UnsetType = field(default=UNSET)
+    name: str | UnsetType = field(default=UNSET)
 
-class CreateFileLinkRequest(_CreateFileLinkRequestOptional):
-    file_id: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UploadRequestAttemptsRequest(ApiRequest):
+    max_attempts: int | UnsetType = field(default=UNSET)
 
-class FileLinkDeliveryInput(TypedDict, total=False):
-    mode: Literal['redirect', 'download', 'inline']
-    filename: str
-    content_type: str
-    disposition: str
-
-class FileLinkAccessRequest(TypedDict, total=False):
-    max_accesses: int
-    allow_download: bool
-    allowed_origins: list[str]
-    allowed_ip_ranges: list[str]
-
-class FileActorInput(TypedDict, total=False):
-    email: str
-    id: str
-    name: str
-    type: str
-
-class LookupFileLinkRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupUploadRequestRequest(ApiRequest):
     id: str
 
-class PageFileLinksRequest(TypedDict, total=False):
-    file_id: str
-    status: Literal['active', 'revoked', 'expired', 'disabled']
-    page_number: int
-    page_size: int
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PageUploadRequestsRequest(ApiRequest):
+    purpose: str | UnsetType = field(default=UNSET)
+    status: Literal['pending', 'uploading', 'fulfilled', 'expired', 'canceled', 'failed', UploadRequestStatus.PENDING, UploadRequestStatus.UPLOADING, UploadRequestStatus.FULFILLED, UploadRequestStatus.EXPIRED, UploadRequestStatus.CANCELED, UploadRequestStatus.FAILED] | UnsetType = field(default=UNSET)
+    resource: FileResourceInput | UnsetType = field(default=UNSET)
+    page_number: int | UnsetType = field(default=UNSET)
+    page_size: int | UnsetType = field(default=UNSET)
 
-class _RevokeFileLinkRequestOptional(TypedDict, total=False):
-    revoked_by: FileActorInput
-
-class RevokeFileLinkRequest(_RevokeFileLinkRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CancelUploadRequestRequest(ApiRequest):
+    canceled_by: FileActorInput | UnsetType = field(default=UNSET)
     id: str
 
-class _CreateUploadRequestRequestOptional(TypedDict, total=False):
-    constraints: UploadRequestConstraintsInput
-    display: UploadRequestDisplayInput
-    subject: FilePartyInput
-    recipient: FilePartyInput
-    resource: FileResourceInput
-    requester: FileActorInput
-    attempts: UploadRequestAttemptsRequest
-    custom_data: dict[str, str]
-    expires_at: str
-
-class CreateUploadRequestRequest(_CreateUploadRequestRequestOptional):
-    purpose: str
-
-class UploadRequestConstraintsInput(TypedDict, total=False):
-    min_size: int
-    max_size: int
-    exact_size: int
-    content_types: list[str]
-    extensions: list[str]
-    filename: str
-
-class UploadRequestDisplayInput(TypedDict, total=False):
-    title: str
-    description: str
-    help_text: str
-
-class FilePartyInput(TypedDict, total=False):
-    type: str
-    id: str
-    name: str
-    email: str
-
-class FileResourceInput(TypedDict, total=False):
-    type: str
-    id: str
-    name: str
-
-class UploadRequestAttemptsRequest(TypedDict, total=False):
-    max_attempts: int
-
-class LookupUploadRequestRequest(TypedDict):
-    id: str
-
-class PageUploadRequestsRequest(TypedDict, total=False):
-    purpose: str
-    status: Literal['pending', 'uploading', 'fulfilled', 'expired', 'canceled', 'failed']
-    resource: FileResourceInput
-    page_number: int
-    page_size: int
-
-class _CancelUploadRequestRequestOptional(TypedDict, total=False):
-    canceled_by: FileActorInput
-
-class CancelUploadRequestRequest(_CancelUploadRequestRequestOptional):
-    id: str
-
-class _ReviewUploadRequestAttemptByIDRequestOptional(TypedDict, total=False):
-    public_message: str
-    reasons: list[UploadRequestReviewReasonInput]
-
-class ReviewUploadRequestAttemptByIDRequest(_ReviewUploadRequestAttemptByIDRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ReviewUploadRequestAttemptByIDRequest(ApiRequest):
+    public_message: str | UnsetType = field(default=UNSET)
+    reasons: list[UploadRequestReviewReasonInput] | UnsetType = field(default=UNSET)
     attempt_id: str
-    decision: Literal['approved', 'rejected']
+    decision: Literal['approved', 'rejected', UploadReviewDecision.APPROVED, UploadReviewDecision.REJECTED]
     id: str
 
-class _UploadRequestReviewReasonInputOptional(TypedDict, total=False):
-    param: str
-
-class UploadRequestReviewReasonInput(_UploadRequestReviewReasonInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UploadRequestReviewReasonInput(ApiRequest):
+    param: str | UnsetType = field(default=UNSET)
     code: str
     message: str
 
-class _ReviewUploadRequestAttemptByOrdinalRequestOptional(TypedDict, total=False):
-    public_message: str
-    reasons: list[UploadRequestReviewReasonInput]
-
-class ReviewUploadRequestAttemptByOrdinalRequest(_ReviewUploadRequestAttemptByOrdinalRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ReviewUploadRequestAttemptByOrdinalRequest(ApiRequest):
+    public_message: str | UnsetType = field(default=UNSET)
+    reasons: list[UploadRequestReviewReasonInput] | UnsetType = field(default=UNSET)
     attempt_ordinal: int
-    decision: Literal['approved', 'rejected']
+    decision: Literal['approved', 'rejected', UploadReviewDecision.APPROVED, UploadReviewDecision.REJECTED]
     id: str
 
-class _FileReferenceReconcileRequestOptional(TypedDict, total=False):
-    references: list[FileReferenceInput]
-
-class FileReferenceReconcileRequest(_FileReferenceReconcileRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FileReferenceReconcileRequest(ApiRequest):
+    references: list[FileReferenceInput] | UnsetType = field(default=UNSET)
     resource_type: str
     resource_id: str
 
-class _FileReferenceInputOptional(TypedDict, total=False):
-    reference: str
-    reference_kind: str
-    purpose: str
-
-class FileReferenceInput(_FileReferenceInputOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class FileReferenceInput(ApiRequest):
+    reference: str | UnsetType = field(default=UNSET)
+    reference_kind: str | UnsetType = field(default=UNSET)
+    purpose: str | UnsetType = field(default=UNSET)
     file_id: str
     field: str
 
-class _TokenizeMobileMoneyPaymentMethodRequestOptional(TypedDict, total=False):
-    custom_data: dict[str, str]
-
-class TokenizeMobileMoneyPaymentMethodRequest(_TokenizeMobileMoneyPaymentMethodRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class TokenizeMobileMoneyPaymentMethodRequest(ApiRequest):
+    custom_data: dict[str, str] | UnsetType = field(default=UNSET)
     customer_id: str
-    type: Literal['mobile_money']
+    type: Literal['mobile_money', PaymentMethodType.MOBILE_MONEY]
     mobile_money: TokenizeMobileMoneyPaymentMethodRequestMobileMoney
     owner: PaymentMethodOwnerInput
 
-class TokenizeMobileMoneyPaymentMethodRequestMobileMoney(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class TokenizeMobileMoneyPaymentMethodRequestMobileMoney(ApiRequest):
     account_number: str
-    network: Literal['airtel', 'mtn', 'telecel', 'vodafone']
+    network: Literal['airtel', 'mtn', 'telecel', 'vodafone', MobileMoneyNetwork.AIRTEL, MobileMoneyNetwork.MTN, MobileMoneyNetwork.TELECEL, MobileMoneyNetwork.VODAFONE]
 
-class PaymentMethodOwnerInput(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PaymentMethodOwnerInput(ApiRequest):
     address: PaymentMethodOwnerInputAddress
     name: str
 
-class _PaymentMethodOwnerInputAddressOptional(TypedDict, total=False):
-    city: str
-    line1: str
-    line2: str
-    name: str
-    phone_number: str
-    post_code: str
-    region: str
-
-class PaymentMethodOwnerInputAddress(_PaymentMethodOwnerInputAddressOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PaymentMethodOwnerInputAddress(ApiRequest):
+    city: str | UnsetType = field(default=UNSET)
+    line1: str | UnsetType = field(default=UNSET)
+    line2: str | UnsetType = field(default=UNSET)
+    name: str | UnsetType = field(default=UNSET)
+    phone_number: str | UnsetType = field(default=UNSET)
+    post_code: str | UnsetType = field(default=UNSET)
+    region: str | UnsetType = field(default=UNSET)
     country: str
 
-class LookupPaymentMethodRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupPaymentMethodRequest(ApiRequest):
     payment_method_id: str
 
-class PaymentMethodPageRequest(TypedDict, total=False):
-    customer_id: str
-    page_number: int
-    page_size: int
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PaymentMethodPageRequest(ApiRequest):
+    customer_id: str | UnsetType = field(default=UNSET)
+    page_number: int | UnsetType = field(default=UNSET)
+    page_size: int | UnsetType = field(default=UNSET)
 
-class _UpdatePaymentMethodRequestOptional(TypedDict, total=False):
-    custom_data: dict[str, str | None]
-    active: bool
-    archived: bool
-    owner: UpdatePaymentMethodRequestOwner
-
-class UpdatePaymentMethodRequest(_UpdatePaymentMethodRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdatePaymentMethodRequest(ApiRequest):
+    custom_data: dict[str, str | None] | UnsetType = field(default=UNSET)
+    active: bool | UnsetType = field(default=UNSET)
+    archived: bool | UnsetType = field(default=UNSET)
+    owner: UpdatePaymentMethodRequestOwner | UnsetType = field(default=UNSET)
     payment_method_id: str
 
-class UpdatePaymentMethodRequestOwner(TypedDict, total=False):
-    name: str
-    address: UpdatePaymentMethodRequestOwnerAddress
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdatePaymentMethodRequestOwner(ApiRequest):
+    name: str | UnsetType = field(default=UNSET)
+    address: UpdatePaymentMethodRequestOwnerAddress | UnsetType = field(default=UNSET)
 
-class UpdatePaymentMethodRequestOwnerAddress(TypedDict, total=False):
-    city: str
-    country: str
-    line1: str
-    line2: str
-    name: str
-    phone_number: str
-    post_code: str
-    region: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdatePaymentMethodRequestOwnerAddress(ApiRequest):
+    city: str | UnsetType = field(default=UNSET)
+    country: str | UnsetType = field(default=UNSET)
+    line1: str | UnsetType = field(default=UNSET)
+    line2: str | UnsetType = field(default=UNSET)
+    name: str | UnsetType = field(default=UNSET)
+    phone_number: str | UnsetType = field(default=UNSET)
+    post_code: str | UnsetType = field(default=UNSET)
+    region: str | UnsetType = field(default=UNSET)
 
-class ActivatePaymentMethodRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ActivatePaymentMethodRequest(ApiRequest):
     payment_method_id: str
 
-class DisactivatePaymentMethodRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class DisactivatePaymentMethodRequest(ApiRequest):
     payment_method_id: str
 
-class ArchivePaymentMethodRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ArchivePaymentMethodRequest(ApiRequest):
     payment_method_id: str
 
-class UnarchivePaymentMethodRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UnarchivePaymentMethodRequest(ApiRequest):
     payment_method_id: str
 
-class GetPaymentMethodSettingsRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class GetPaymentMethodSettingsRequest(ApiRequest):
     pass
 
-class _CreateProductRequestOptional(TypedDict, total=False):
-    reference: str
-    description: str
-    about: str
-    tax_code: str
-    category: str
-    shipment: ProductShipmentInput
-    dimensions: ProductDimensionsInput
-    unit_dimension: str
-    media: ProductMediaInput
-    attributes: list[ProductAttributeInput]
-    publish: bool
-    custom_data: dict[str, str]
-
-class CreateProductRequest(_CreateProductRequestOptional):
-    type: Literal['physical', 'digital', 'service', 'voucher', 'custom', 'cause']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreateProductRequest(ApiRequest):
+    reference: str | UnsetType = field(default=UNSET)
+    description: str | UnsetType = field(default=UNSET)
+    about: str | UnsetType = field(default=UNSET)
+    tax_code: str | UnsetType = field(default=UNSET)
+    category: str | UnsetType = field(default=UNSET)
+    shipment: ProductShipmentInput | UnsetType = field(default=UNSET)
+    dimensions: ProductDimensionsInput | UnsetType = field(default=UNSET)
+    unit_dimension: str | UnsetType = field(default=UNSET)
+    media: ProductMediaInput | UnsetType = field(default=UNSET)
+    attributes: list[ProductAttributeInput] | UnsetType = field(default=UNSET)
+    publish: bool | UnsetType = field(default=UNSET)
+    custom_data: dict[str, str] | UnsetType = field(default=UNSET)
+    type: Literal['physical', 'digital', 'service', 'voucher', 'custom', 'cause', ProductType.PHYSICAL, ProductType.DIGITAL, ProductType.SERVICE, ProductType.VOUCHER, ProductType.CUSTOM, ProductType.CAUSE]
     name: str
 
-class ProductShipmentInput(TypedDict):
-    type: Literal['delivery', 'download', 'render', 'stream']
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProductShipmentInput(ApiRequest):
+    type: Literal['delivery', 'download', 'render', 'stream', ProductShipmentInputType.DELIVERY, ProductShipmentInputType.DOWNLOAD, ProductShipmentInputType.RENDER, ProductShipmentInputType.STREAM]
 
-class ProductDimensionsInput(TypedDict, total=False):
-    physical: ProductDimensionsInputPhysical
-    digital: ProductDimensionsInputDigital
-    custom: ProductDimensionsInputCustom
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProductDimensionsInput(ApiRequest):
+    physical: ProductDimensionsInputPhysical | UnsetType = field(default=UNSET)
+    digital: ProductDimensionsInputDigital | UnsetType = field(default=UNSET)
+    custom: ProductDimensionsInputCustom | UnsetType = field(default=UNSET)
 
-class ProductDimensionsInputPhysical(TypedDict, total=False):
-    weight_unit: str
-    weight: float
-    size: float
-    volume_unit: str
-    volume: float
-    length: float
-    height: float
-    width: float
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProductDimensionsInputPhysical(ApiRequest):
+    weight_unit: str | UnsetType = field(default=UNSET)
+    weight: float | UnsetType = field(default=UNSET)
+    size: float | UnsetType = field(default=UNSET)
+    volume_unit: str | UnsetType = field(default=UNSET)
+    volume: float | UnsetType = field(default=UNSET)
+    length: float | UnsetType = field(default=UNSET)
+    height: float | UnsetType = field(default=UNSET)
+    width: float | UnsetType = field(default=UNSET)
 
-class ProductDimensionsInputDigital(TypedDict, total=False):
-    bytes: float
-    size_unit: str
-    size: float
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProductDimensionsInputDigital(ApiRequest):
+    bytes: float | UnsetType = field(default=UNSET)
+    size_unit: str | UnsetType = field(default=UNSET)
+    size: float | UnsetType = field(default=UNSET)
 
-class ProductDimensionsInputCustom(TypedDict, total=False):
-    size_unit: str
-    size: float
-    details: dict[str, str]
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProductDimensionsInputCustom(ApiRequest):
+    size_unit: str | UnsetType = field(default=UNSET)
+    size: float | UnsetType = field(default=UNSET)
+    details: dict[str, str] | UnsetType = field(default=UNSET)
 
-class ProductMediaInput(TypedDict, total=False):
-    hero_image: str
-    thumbnail: str
-    web_page_url: str
-    brand_logo: str
-    infographic: str
-    promo_video: str
-    demo_video: str
-    gallery: list[str]
-    downloads: list[str]
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProductMediaInput(ApiRequest):
+    hero_image: str | UnsetType = field(default=UNSET)
+    thumbnail: str | UnsetType = field(default=UNSET)
+    web_page_url: str | UnsetType = field(default=UNSET)
+    brand_logo: str | UnsetType = field(default=UNSET)
+    infographic: str | UnsetType = field(default=UNSET)
+    promo_video: str | UnsetType = field(default=UNSET)
+    demo_video: str | UnsetType = field(default=UNSET)
+    gallery: list[str] | UnsetType = field(default=UNSET)
+    downloads: list[str] | UnsetType = field(default=UNSET)
 
-class ProductAttributeInput(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProductAttributeInput(ApiRequest):
     name: str
     value: str
 
-class _AddProductPriceRequestOptional(TypedDict, total=False):
-    label: str
-    about: str
-
-class AddProductPriceRequest(_AddProductPriceRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class AddProductPriceRequest(ApiRequest):
+    label: str | UnsetType = field(default=UNSET)
+    about: str | UnsetType = field(default=UNSET)
     product_id: str
     amount: AddProductPriceRequestAmount
 
-class AddProductPriceRequestAmount(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class AddProductPriceRequestAmount(ApiRequest):
     currency: str
     value: int
 
-class LookupProductRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupProductRequest(ApiRequest):
     product_id: str
 
-class _UpdateProductRequestOptional(TypedDict, total=False):
-    type: Literal['physical', 'digital', 'service', 'voucher', 'custom', 'cause']
-    name: str
-    description: str
-    about: str
-    tax_code: str
-    category: str
-    shipment: ProductShipmentInput
-    dimensions: ProductDimensionsInput
-    unit_dimension: str
-    media: ProductMediaInput
-    images: list[str]
-    attributes: list[ProductAttributeInput]
-    custom_data: dict[str, str]
-
-class UpdateProductRequest(_UpdateProductRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdateProductRequest(ApiRequest):
+    type: Literal['physical', 'digital', 'service', 'voucher', 'custom', 'cause', ProductType.PHYSICAL, ProductType.DIGITAL, ProductType.SERVICE, ProductType.VOUCHER, ProductType.CUSTOM, ProductType.CAUSE] | UnsetType = field(default=UNSET)
+    name: str | UnsetType = field(default=UNSET)
+    description: str | UnsetType = field(default=UNSET)
+    about: str | UnsetType = field(default=UNSET)
+    tax_code: str | UnsetType = field(default=UNSET)
+    category: str | UnsetType = field(default=UNSET)
+    shipment: ProductShipmentInput | UnsetType = field(default=UNSET)
+    dimensions: ProductDimensionsInput | UnsetType = field(default=UNSET)
+    unit_dimension: str | UnsetType = field(default=UNSET)
+    media: ProductMediaInput | UnsetType = field(default=UNSET)
+    images: list[str] | UnsetType = field(default=UNSET)
+    attributes: list[ProductAttributeInput] | UnsetType = field(default=UNSET)
+    custom_data: dict[str, str] | UnsetType = field(default=UNSET)
     product_id: str
 
-class ProductActionRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProductActionRequest(ApiRequest):
     product_id: str
 
-class _PageProductsRequestOptional(TypedDict, total=False):
-    page_size: int
-
-class PageProductsRequest(_PageProductsRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PageProductsRequest(ApiRequest):
+    page_size: int | UnsetType = field(default=UNSET)
     page_number: int
 
-class _CreatePurchaseIntentRequestOptional(TypedDict, total=False):
-    product: CreatePurchaseIntentRequestProduct
-    product_id: str
-    price: CreatePurchaseIntentRequestPrice
-    price_id: str
-    usage: CreatePurchaseIntentRequestUsage
-    expires_at: str
-
-class CreatePurchaseIntentRequest(_CreatePurchaseIntentRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreatePurchaseIntentRequest(ApiRequest):
+    product: CreatePurchaseIntentRequestProduct | UnsetType = field(default=UNSET)
+    product_id: str | UnsetType = field(default=UNSET)
+    price: CreatePurchaseIntentRequestPrice | UnsetType = field(default=UNSET)
+    price_id: str | UnsetType = field(default=UNSET)
+    usage: CreatePurchaseIntentRequestUsage | UnsetType = field(default=UNSET)
+    expires_at: str | UnsetType = field(default=UNSET)
     quantity: CreatePurchaseIntentRequestQuantity
 
-class _CreatePurchaseIntentRequestProductOptional(TypedDict, total=False):
-    variant_set_id: str
-
-class CreatePurchaseIntentRequestProduct(_CreatePurchaseIntentRequestProductOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreatePurchaseIntentRequestProduct(ApiRequest):
+    variant_set_id: str | UnsetType = field(default=UNSET)
     id: str
 
-class CreatePurchaseIntentRequestPrice(TypedDict, total=False):
-    id: str
-    nominal: CreatePurchaseIntentRequestPriceNominal
-    original: CreatePurchaseIntentRequestPriceOriginal
-    original_id: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreatePurchaseIntentRequestPrice(ApiRequest):
+    id: str | UnsetType = field(default=UNSET)
+    nominal: CreatePurchaseIntentRequestPriceNominal | UnsetType = field(default=UNSET)
+    original: CreatePurchaseIntentRequestPriceOriginal | UnsetType = field(default=UNSET)
+    original_id: str | UnsetType = field(default=UNSET)
 
-class CreatePurchaseIntentRequestPriceNominal(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreatePurchaseIntentRequestPriceNominal(ApiRequest):
     currency: str
     value: int
 
-class CreatePurchaseIntentRequestPriceOriginal(TypedDict, total=False):
-    id: str
-    nominal: CreatePurchaseIntentRequestPriceOriginalNominal
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreatePurchaseIntentRequestPriceOriginal(ApiRequest):
+    id: str | UnsetType = field(default=UNSET)
+    nominal: CreatePurchaseIntentRequestPriceOriginalNominal | UnsetType = field(default=UNSET)
 
-class CreatePurchaseIntentRequestPriceOriginalNominal(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreatePurchaseIntentRequestPriceOriginalNominal(ApiRequest):
     currency: str
     value: int
 
-class _CreatePurchaseIntentRequestQuantityOptional(TypedDict, total=False):
-    max: int
-
-class CreatePurchaseIntentRequestQuantity(_CreatePurchaseIntentRequestQuantityOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreatePurchaseIntentRequestQuantity(ApiRequest):
+    max: int | UnsetType = field(default=UNSET)
     min: int
 
-class CreatePurchaseIntentRequestUsage(TypedDict, total=False):
-    single_use: bool
-    multi_use: bool
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreatePurchaseIntentRequestUsage(ApiRequest):
+    single_use: bool | UnsetType = field(default=UNSET)
+    multi_use: bool | UnsetType = field(default=UNSET)
 
-class UpdatePurchaseIntentRequest(TypedDict, total=False):
-    expires_at: str | None
-    id: str
-    quantity: UpdatePurchaseIntentRequestQuantity
-    purchase_intent_id: str
-    reactivate: bool
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdatePurchaseIntentRequest(ApiRequest):
+    expires_at: str | None | UnsetType = field(default=UNSET)
+    id: str | UnsetType = field(default=UNSET)
+    quantity: UpdatePurchaseIntentRequestQuantity | UnsetType = field(default=UNSET)
+    purchase_intent_id: str | UnsetType = field(default=UNSET)
+    reactivate: bool | UnsetType = field(default=UNSET)
 
-class _UpdatePurchaseIntentRequestQuantityOptional(TypedDict, total=False):
-    max: int
-
-class UpdatePurchaseIntentRequestQuantity(_UpdatePurchaseIntentRequestQuantityOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdatePurchaseIntentRequestQuantity(ApiRequest):
+    max: int | UnsetType = field(default=UNSET)
     min: int
 
-class CancelPurchaseIntentRequest(TypedDict, total=False):
-    id: str
-    purchase_intent_id: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CancelPurchaseIntentRequest(ApiRequest):
+    id: str | UnsetType = field(default=UNSET)
+    purchase_intent_id: str | UnsetType = field(default=UNSET)
 
-class LookupPurchaseIntentRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupPurchaseIntentRequest(ApiRequest):
     id: str
 
-class PagePurchaseIntentsRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PagePurchaseIntentsRequest(ApiRequest):
     page_number: int
     page_size: int
 
-class _CreatePriceRequestOptional(TypedDict, total=False):
-    product_id: str
-    label: str
-    about: str
-
-class CreatePriceRequest(_CreatePriceRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CreatePriceRequest(ApiRequest):
+    product_id: str | UnsetType = field(default=UNSET)
+    label: str | UnsetType = field(default=UNSET)
+    about: str | UnsetType = field(default=UNSET)
     amount: MoneyInput
 
-class LookupPriceRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LookupPriceRequest(ApiRequest):
     price_id: str
 
-class PricePageRequest(TypedDict, total=False):
-    page_number: int
-    page_size: int
-    product_id: str
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PricePageRequest(ApiRequest):
+    page_number: int | UnsetType = field(default=UNSET)
+    page_size: int | UnsetType = field(default=UNSET)
+    product_id: str | UnsetType = field(default=UNSET)
 
-class _UpdatePriceRequestOptional(TypedDict, total=False):
-    label: str
-    about: str
-
-class UpdatePriceRequest(_UpdatePriceRequestOptional):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UpdatePriceRequest(ApiRequest):
+    label: str | UnsetType = field(default=UNSET)
+    about: str | UnsetType = field(default=UNSET)
     price_id: str
 
-class PriceActionRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PriceActionRequest(ApiRequest):
     price_id: str
 
-class ListCountrySpecsRequest(TypedDict):
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ListCountrySpecsRequest(ApiRequest):
     pass
 
 ChimeInlineRecipientInput: TypeAlias = ChimeInlineRecipientInputVariant1 | ChimeInlineRecipientInputVariant2
@@ -1212,7 +1296,26 @@ CreateMessageTemplateRequest: TypeAlias = CreateSMSMessageTemplateRequest | Crea
 ProductDetailsInput: TypeAlias = InlineProductDetailsInput | CatalogProductWithPriceDataInput | CatalogProductWithPriceReferenceInput
 LineItemInput: TypeAlias = ProductLineItemInput | FeeLineItemInput | ShippingLineItemInput
 CreateOrderRequest: TypeAlias = CreateOrderNewCustomerInput | CreateOrderExistingCustomerInput
-RefundReasonInput: TypeAlias = Literal['requested_by_customer', 'duplicate', 'fraudulent', 'order_canceled', 'item_returned', 'item_damaged', 'item_not_received', 'item_not_as_described', 'custom']
+RefundReasonInput: TypeAlias = Literal[
+    'requested_by_customer',
+    'duplicate',
+    'fraudulent',
+    'order_canceled',
+    'item_returned',
+    'item_damaged',
+    'item_not_received',
+    'item_not_as_described',
+    'custom',
+    RefundReason.REQUESTED_BY_CUSTOMER,
+    RefundReason.DUPLICATE,
+    RefundReason.FRAUDULENT,
+    RefundReason.ORDER_CANCELED,
+    RefundReason.ITEM_RETURNED,
+    RefundReason.ITEM_DAMAGED,
+    RefundReason.ITEM_NOT_RECEIVED,
+    RefundReason.ITEM_NOT_AS_DESCRIBED,
+    RefundReason.CUSTOM,
+]
 FinancialAccountCreateRequest: TypeAlias = FinancialAccountWalletRequest | FinancialAccountBankRequest | FinancialAccountDoshRequest
 ReviewUploadRequestAttemptRequest: TypeAlias = ReviewUploadRequestAttemptByIDRequest | ReviewUploadRequestAttemptByOrdinalRequest
 

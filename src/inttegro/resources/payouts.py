@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from ..http_client import HttpClient
+from ..request_types import SetPayoutDestinationsRequest
 
 
 class Payouts:
@@ -27,7 +28,10 @@ class Payouts:
         """Initialize Payouts resource with HTTP client."""
         self.http = http
 
-    def set_destinations(self, destinations: dict):
+    def set_destinations(
+        self,
+        destinations: SetPayoutDestinationsRequest | dict[str, str],
+    ):
         """
         Configure where funds should be sent for each currency.
 
@@ -108,6 +112,8 @@ class Payouts:
             - settings(): View current payout configuration
             - https://studio.inttegro.com/set-up-financial-account
         """
+        if isinstance(destinations, SetPayoutDestinationsRequest):
+            return self.http.post("/payouts/set_destinations", destinations)
         return self.http.post("/payouts/set_destinations", {"destinations": destinations})
 
     def settings(self):

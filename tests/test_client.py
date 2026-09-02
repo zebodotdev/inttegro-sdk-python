@@ -9,6 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+import inttegro
 from inttegro import AuthenticationError, Order, OrderDocumentDeliveryResult, OrderPage, Refund
 from inttegro.client import InttegroClient
 
@@ -437,6 +438,47 @@ class InttegroClientTest(unittest.TestCase):
 
         body = json.loads(recorder.requests[0].data.decode("utf-8"))
         self.assertNotIn("idempotency_key", body)
+        self.assertRegex(body["request_meta"]["idempotency_key"], UUID_V7_RE)
+
+    def test_typed_request_objects_serialize_nested_values_and_omit_unset_fields(self):
+        recorder = TransportRecorder()
+        client = InttegroClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
+        request = inttegro.orders.CreateRequest(
+            customer_data=inttegro.orders.Customer(
+                name="Akua Mensah",
+                email_address="akua@example.com",
+                phone_number="+233544998605",
+            ),
+            payment_method_data=inttegro.orders.PaymentMethod(
+                type=inttegro.PaymentMethodType.MOBILE_MONEY,
+                mobile_money=inttegro.orders.MobileMoney(
+                    network=inttegro.MobileMoneyNetwork.MTN,
+                    account_number="0544998605",
+                ),
+            ),
+            line_items=[
+                inttegro.orders.ProductLineItem(
+                    type=inttegro.LineItemType.PRODUCT,
+                    product=inttegro.orders.Product(
+                        name="Monthly subscription",
+                        price=inttegro.orders.Money(currency="ghs", value=5000),
+                        quantity=1,
+                        type=inttegro.ProductType.DIGITAL,
+                    ),
+                )
+            ],
+            finalize=True,
+        )
+
+        order = client.orders.create(request)
+
+        body = json.loads(recorder.requests[0].data.decode("utf-8"))
+        self.assertEqual("or_123", order.id)
+        self.assertEqual("Akua Mensah", body["customer_data"]["name"])
+        self.assertEqual("mobile_money", body["payment_method_data"]["type"])
+        self.assertEqual("mtn", body["payment_method_data"]["mobile_money"]["network"])
+        self.assertEqual(5000, body["line_items"][0]["product"]["price"]["value"])
+        self.assertNotIn("billing_details", body)
         self.assertRegex(body["request_meta"]["idempotency_key"], UUID_V7_RE)
 
     def test_read_style_posts_do_not_generate_idempotency_metadata(self):

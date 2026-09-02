@@ -7,7 +7,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from inttegro import BalanceTransactionResponse, InttegroClient, RefundResponse
+from inttegro import (
+    BalanceTransactionResponse,
+    ChimeEmailMailboxInput,
+    ChimeEmailMessageInput,
+    InttegroClient,
+    RefundResponse,
+)
 
 
 class StaticTransport:
@@ -20,6 +26,25 @@ class StaticTransport:
 
 
 class TypedModelTest(unittest.TestCase):
+    def test_request_objects_are_frozen_and_preserve_wire_field_names(self):
+        request = ChimeEmailMessageInput(
+            subject="Payment receipt",
+            text="Your payment succeeded.",
+            from_=ChimeEmailMailboxInput(address="billing@example.com"),
+        )
+
+        self.assertTrue(is_dataclass(request))
+        self.assertEqual(
+            {
+                "subject": "Payment receipt",
+                "text": "Your payment succeeded.",
+                "from": {"address": "billing@example.com"},
+            },
+            request.to_dict(),
+        )
+        with self.assertRaises(FrozenInstanceError):
+            request.subject = "Changed"
+
     def test_endpoint_returns_nested_dataclass_models(self):
         client = InttegroClient(
             api_key="test",
