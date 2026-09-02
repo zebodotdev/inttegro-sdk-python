@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [2.1.0] - 2026-09-03
+
 - Replaced dictionary-shaped request contracts with immutable, keyword-only request dataclasses.
 - Added resource request namespaces such as `inttegro.orders.CreateRequest` and recursively serialize nested request objects.
 - Preserved dictionary payload support for backwards compatibility.
