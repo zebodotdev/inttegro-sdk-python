@@ -6,7 +6,7 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1 PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 COPY pyproject.toml README.md ./
 COPY src ./src
 COPY tests ./tests
-RUN pip install --no-cache-dir poetry build
+RUN pip install --no-cache-dir poetry==2.4.2 build==1.6.0
 RUN poetry config virtualenvs.create false
 RUN poetry install --with dev --no-interaction --no-ansi
 
