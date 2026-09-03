@@ -461,7 +461,7 @@ class InttegroClientTest(unittest.TestCase):
                     type=inttegro.LineItemType.PRODUCT,
                     product=inttegro.orders.Product(
                         name="Monthly subscription",
-                        price=inttegro.orders.Money(currency="ghs", value=5000),
+                        price=inttegro.PriceParams(currency=inttegro.Currency.GHS, value=5000),
                         quantity=1,
                         type=inttegro.ProductType.DIGITAL,
                     ),

@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, TypeAlias
 
 from ._model_base import ApiModel
+from .money import Amount
+from .price_types import Price
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class InitiateOTPResponse(ApiModel):
@@ -444,12 +446,7 @@ class Customer(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class CustomerBalanceValue(ApiModel):
     as_of: str = field(init=False)
-    available: Money = field(init=False)
-
-@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class Money(ApiModel):
-    currency: str = field(init=False)
-    value: int = field(init=False)
+    available: Amount = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class CustomerAddress(ApiModel):
@@ -505,7 +502,7 @@ class Order(ApiModel):
     status: Literal['preparing', 'requires_payment', 'paid', 'completed', 'canceled', 'expired', 'unknown'] = field(init=False)
     sealed_at: str | None = field(init=False)
     line_item_group: OrderLineItemGroup | None = field(init=False)
-    payment: OrderPayment | None = field(init=False)
+    payment: Payment | None = field(init=False)
     paid_at: str | None = field(init=False)
     payment_due_at: str | None = field(init=False)
     payout_settings: dict[str, Any] | None = field(init=False)
@@ -574,21 +571,16 @@ class Refund(ApiModel):
     reference: str | None = field(init=False)
     status: Literal['canceled', 'failed', 'pending', 'processing', 'succeeded'] = field(init=False)
     succeeded_at: str | None = field(init=False)
-    total: RefundMoney = field(init=False)
+    total: Amount = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class RefundLineItem(ApiModel):
     id: str = field(init=False)
     order_line_item_id: str = field(init=False)
-    original_amount_paid: RefundMoney = field(init=False)
+    original_amount_paid: Amount = field(init=False)
     reason: RefundReasonValue | None = field(init=False)
     reason_details: str | None = field(init=False)
-    refund_amount: RefundMoney = field(init=False)
-
-@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class RefundMoney(ApiModel):
-    currency: str = field(init=False)
-    value: int = field(init=False)
+    refund_amount: Amount = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class InvoiceSettings(ApiModel):
@@ -600,7 +592,7 @@ class InvoiceSettings(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class OrderLineItemGroup(ApiModel):
     line_items: list[OrderLineItem] = field(init=False)
-    total: Money = field(init=False)
+    total: Amount = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class OrderProductLineItem(ApiModel):
@@ -619,7 +611,7 @@ class OrderProductLineItemProduct(ApiModel):
     name: str = field(init=False)
     category: str | None = field(init=False)
     type: str | None = field(init=False)
-    price: Money = field(init=False)
+    price: Price = field(init=False)
     quantity: int = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -632,7 +624,7 @@ class OrderFeeLineItemFee(ApiModel):
     id: str = field(init=False)
     description: str | None = field(init=False)
     tax_code: str | None = field(init=False)
-    amount: Money = field(init=False)
+    amount: Amount = field(init=False)
     label: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -645,17 +637,17 @@ class OrderShippingLineItemShipping(ApiModel):
     id: str = field(init=False)
     tax_code: str | None = field(init=False)
     label: str | None = field(init=False)
-    fee: Money = field(init=False)
+    fee: Amount = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class OrderPayment(ApiModel):
+class Payment(ApiModel):
     id: str = field(init=False)
     status: Literal['initiated', 'requires_action', 'overdue', 'executed', 'paid', 'canceled', 'expired', 'failed', 'unknown'] = field(init=False)
     statement_descriptor: str = field(init=False)
-    amount: Money = field(init=False)
+    amount: Amount = field(init=False)
     balance_transaction: BalanceTransaction | None = field(init=False)
-    payment_method: OrderPaymentMethod | None = field(init=False)
-    latest_attempt: OrderPaymentLatestAttempt | None = field(init=False)
+    payment_method: PaymentMethodSnapshot | None = field(init=False)
+    latest_attempt: PaymentAttempt | None = field(init=False)
     next_action: PaymentNextAction | None = field(init=False)
     initiated_at: str = field(init=False)
     executed_at: str | None = field(init=False)
@@ -666,7 +658,7 @@ class OrderPayment(ApiModel):
     failed_at: str | None = field(init=False)
     paid_offline: bool | None = field(init=False)
     payment_method_types: list[str] | None = field(init=False)
-    payout_configuration: OrderPaymentPayoutConfiguration | None = field(init=False)
+    payout_configuration: PaymentPayoutConfiguration | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class BalanceTransaction(ApiModel):
@@ -688,25 +680,25 @@ class BalanceTransactionAmount(ApiModel):
     value: int = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class OrderPaymentMethod(ApiModel):
+class PaymentMethodSnapshot(ApiModel):
     id: str = field(init=False)
-    bank_account: OrderPaymentMethodBankAccount | None = field(init=False)
+    bank_account: PaymentMethodSnapshotBankAccount | None = field(init=False)
     card: dict[str, Any] | None = field(init=False)
     created_at: str = field(init=False)
     customer_id: str = field(init=False)
-    mobile_money: OrderPaymentMethodMobileMoney | None = field(init=False)
-    owner: OrderPaymentMethodOwner | None = field(init=False)
+    mobile_money: PaymentMethodSnapshotMobileMoney | None = field(init=False)
+    owner: PaymentMethodSnapshotOwner | None = field(init=False)
     type: Literal['mobile_money', 'bank_account', 'card', 'motito'] = field(init=False)
     verified: bool = field(init=False)
     verified_at: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class OrderPaymentMethodBankAccount(ApiModel):
+class PaymentMethodSnapshotBankAccount(ApiModel):
     type: str = field(init=False)
-    ghana_bank_account: OrderPaymentMethodBankAccountGhanaBankAccount | None = field(init=False)
+    ghana_bank_account: PaymentMethodSnapshotGhanaBankAccount | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class OrderPaymentMethodBankAccountGhanaBankAccount(ApiModel):
+class PaymentMethodSnapshotGhanaBankAccount(ApiModel):
     account_number: str = field(init=False)
     branch: str | None = field(init=False)
     name: str | None = field(init=False)
@@ -714,18 +706,18 @@ class OrderPaymentMethodBankAccountGhanaBankAccount(ApiModel):
     swift_code: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class OrderPaymentMethodMobileMoney(ApiModel):
+class PaymentMethodSnapshotMobileMoney(ApiModel):
     network: Literal['airtel', 'mtn', 'telecel', 'vodafone'] = field(init=False)
     account_number: str = field(init=False)
     last4: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class OrderPaymentMethodOwner(ApiModel):
+class PaymentMethodSnapshotOwner(ApiModel):
     name: str = field(init=False)
     address: OrderAddress | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class OrderPaymentLatestAttempt(ApiModel):
+class PaymentAttempt(ApiModel):
     payment_method_type: str | None = field(init=False)
     payment_method_id: str | None = field(init=False)
     reference: str | None = field(init=False)
@@ -786,12 +778,12 @@ class PaymentNextActionAuthorize(ApiModel):
     expires_at: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class OrderPaymentPayoutConfiguration(ApiModel):
+class PaymentPayoutConfiguration(ApiModel):
     enable_fx: Literal[False] | None = field(init=False)
-    destination: OrderPaymentPayoutConfigurationDestination | None = field(init=False)
+    destination: PaymentPayoutConfigurationDestination | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class OrderPaymentPayoutConfigurationDestination(ApiModel):
+class PaymentPayoutConfigurationDestination(ApiModel):
     financial_account_id: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -1368,7 +1360,7 @@ class SchedulePayoutResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class Payout(ApiModel):
-    amount: Money | None = field(init=False)
+    amount: Amount | None = field(init=False)
     balance_transactions: list[str] | None = field(init=False)
     canceled_at: str | None = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
@@ -1381,7 +1373,7 @@ class Payout(ApiModel):
     id: str = field(init=False)
     initiated_at: str = field(init=False)
     initiated_by: str | None = field(init=False)
-    max_amount: Money = field(init=False)
+    max_amount: Amount = field(init=False)
     reference: str | None = field(init=False)
     schedule_id: str | None = field(init=False)
     scheduled_at: str | None = field(init=False)
@@ -1969,12 +1961,7 @@ class ProductPriceSummary(ApiModel):
     id: str = field(init=False)
     active: bool = field(init=False)
     label: str | None = field(init=False)
-    nominal: ProductPriceSummaryNominal = field(init=False)
-
-@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class ProductPriceSummaryNominal(ApiModel):
-    currency: str = field(init=False)
-    value: int = field(init=False)
+    nominal: Amount = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class ProductShipment(ApiModel):
@@ -2033,25 +2020,8 @@ class ProductDimensionsCustom(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class AddProductPriceResponse(ApiModel):
-    price: ProductPriceNominal | None = field(init=False)
+    price: CatalogPrice | None = field(init=False)
     error: Error | None = field(init=False)
-
-@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class ProductPriceNominal(ApiModel):
-    id: str = field(init=False)
-    product_id: str | None = field(init=False)
-    label: str | None = field(init=False)
-    about: str | None = field(init=False)
-    active: bool = field(init=False)
-    nominal: ProductPriceNominalNominal = field(init=False)
-    created_at: str = field(init=False)
-    updated_at: str | None = field(init=False)
-    archived_at: str | None = field(init=False)
-
-@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class ProductPriceNominalNominal(ApiModel):
-    currency: str = field(init=False)
-    value: int = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class UpdateProductResponse(ApiModel):
@@ -2122,20 +2092,15 @@ class PurchaseIntentPrice(ApiModel):
     active: bool = field(init=False)
     id: str | None = field(init=False)
     label: str | None = field(init=False)
-    nominal: PurchaseIntentMoney = field(init=False)
+    nominal: Amount = field(init=False)
     original: PurchaseIntentOriginalPrice | None = field(init=False)
-
-@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PurchaseIntentMoney(ApiModel):
-    currency: str = field(init=False)
-    value: int = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PurchaseIntentOriginalPrice(ApiModel):
     active: bool = field(init=False)
     id: str | None = field(init=False)
     label: str | None = field(init=False)
-    nominal: PurchaseIntentMoney = field(init=False)
+    nominal: Amount = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PurchaseIntentProduct(ApiModel):
@@ -2220,25 +2185,20 @@ class PurchaseIntentPage(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PriceResponse(ApiModel):
-    price: Price | None = field(init=False)
+    price: CatalogPrice | None = field(init=False)
     error: Error | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class Price(ApiModel):
+class CatalogPrice(ApiModel):
     id: str = field(init=False)
     label: str | None = field(init=False)
     about: str | None = field(init=False)
     active: bool = field(init=False)
-    nominal: PriceNominal = field(init=False)
+    nominal: Amount = field(init=False)
     product: PriceEmbeddedProduct | None = field(init=False)
     created_at: str = field(init=False)
     updated_at: str | None = field(init=False)
     archived_at: str | None = field(init=False)
-
-@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PriceNominal(ApiModel):
-    currency: str = field(init=False)
-    value: int = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PriceEmbeddedProduct(ApiModel):
@@ -2318,7 +2278,7 @@ class CountryBankBranch(ApiModel):
 MessageTemplateAttachmentIDs: TypeAlias = list[str]
 RefundReasonValue: TypeAlias = Literal['requested_by_customer', 'duplicate', 'fraudulent', 'order_canceled', 'item_returned', 'item_damaged', 'item_not_received', 'item_not_as_described', 'custom']
 OrderLineItem: TypeAlias = OrderProductLineItem | OrderFeeLineItem | OrderShippingLineItem
-PricePageItem: TypeAlias = Price
+PricePageItem: TypeAlias = CatalogPrice
 
 def _is_public_model(value: Any) -> bool:
     try:

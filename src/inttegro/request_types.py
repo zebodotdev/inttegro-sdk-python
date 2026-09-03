@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, TypeAlias
 
 from ._request_base import ApiRequest, UNSET, UnsetType
+from .money import AmountParams
+from .price_types import PriceParams
 from .enums import (
     AppCredentialOwner,
     AppManagementRole,
@@ -364,18 +366,13 @@ class InlineProductDetailsInput(ApiRequest):
     reference: str | UnsetType = field(default=UNSET)
     tax_code: str | UnsetType = field(default=UNSET)
     name: str
-    price: MoneyInput
+    price: PriceParams
     quantity: int
     type: Literal['physical', 'digital', 'service', 'voucher', 'custom', 'cause', ProductType.PHYSICAL, ProductType.DIGITAL, ProductType.SERVICE, ProductType.VOUCHER, ProductType.CUSTOM, ProductType.CAUSE]
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class MoneyInput(ApiRequest):
-    currency: str
-    value: int
-
-@dataclass(frozen=True, slots=True, kw_only=True)
 class CatalogProductWithPriceDataInput(ApiRequest):
-    price: MoneyInput
+    price: PriceParams
     product_id: str
     quantity: int
 
@@ -397,7 +394,7 @@ class FeeDetailsInput(ApiRequest):
     tax_code: str | UnsetType = field(default=UNSET)
     description: str | UnsetType = field(default=UNSET)
     custom_data: dict[str, Any] | UnsetType = field(default=UNSET)
-    amount: MoneyInput
+    amount: AmountParams
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ShippingLineItemInput(ApiRequest):
@@ -409,7 +406,7 @@ class ShippingDetailsInput(ApiRequest):
     id: str | UnsetType = field(default=UNSET)
     tax_code: str | UnsetType = field(default=UNSET)
     custom_data: dict[str, Any] | UnsetType = field(default=UNSET)
-    fee: MoneyInput
+    fee: AmountParams
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BillingDetailsInput(ApiRequest):
@@ -559,12 +556,7 @@ class CreateRefundLineItemInput(ApiRequest):
     reason: RefundReasonInput | UnsetType = field(default=UNSET)
     reason_details: str | UnsetType = field(default=UNSET)
     order_line_item_id: str
-    refund_amount: RefundMoneyInput
-
-@dataclass(frozen=True, slots=True, kw_only=True)
-class RefundMoneyInput(ApiRequest):
-    currency: str
-    value: int
+    refund_amount: AmountParams
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class RefundRequestMetaInput(ApiRequest):
@@ -1146,12 +1138,7 @@ class AddProductPriceRequest(ApiRequest):
     label: str | UnsetType = field(default=UNSET)
     about: str | UnsetType = field(default=UNSET)
     product_id: str
-    amount: AddProductPriceRequestAmount
-
-@dataclass(frozen=True, slots=True, kw_only=True)
-class AddProductPriceRequestAmount(ApiRequest):
-    currency: str
-    value: int
+    amount: AmountParams
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LookupProductRequest(ApiRequest):
@@ -1201,24 +1188,14 @@ class CreatePurchaseIntentRequestProduct(ApiRequest):
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreatePurchaseIntentRequestPrice(ApiRequest):
     id: str | UnsetType = field(default=UNSET)
-    nominal: CreatePurchaseIntentRequestPriceNominal | UnsetType = field(default=UNSET)
+    nominal: PriceParams | UnsetType = field(default=UNSET)
     original: CreatePurchaseIntentRequestPriceOriginal | UnsetType = field(default=UNSET)
     original_id: str | UnsetType = field(default=UNSET)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class CreatePurchaseIntentRequestPriceNominal(ApiRequest):
-    currency: str
-    value: int
-
-@dataclass(frozen=True, slots=True, kw_only=True)
 class CreatePurchaseIntentRequestPriceOriginal(ApiRequest):
     id: str | UnsetType = field(default=UNSET)
-    nominal: CreatePurchaseIntentRequestPriceOriginalNominal | UnsetType = field(default=UNSET)
-
-@dataclass(frozen=True, slots=True, kw_only=True)
-class CreatePurchaseIntentRequestPriceOriginalNominal(ApiRequest):
-    currency: str
-    value: int
+    nominal: PriceParams | UnsetType = field(default=UNSET)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreatePurchaseIntentRequestQuantity(ApiRequest):
@@ -1258,11 +1235,11 @@ class PagePurchaseIntentsRequest(ApiRequest):
     page_size: int
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class CreatePriceRequest(ApiRequest):
+class CatalogPriceParams(ApiRequest):
     product_id: str | UnsetType = field(default=UNSET)
     label: str | UnsetType = field(default=UNSET)
     about: str | UnsetType = field(default=UNSET)
-    amount: MoneyInput
+    amount: AmountParams
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LookupPriceRequest(ApiRequest):
@@ -1322,7 +1299,6 @@ ReviewUploadRequestAttemptRequest: TypeAlias = ReviewUploadRequestAttemptByIDReq
 __all__ = [
     'ActivatePaymentMethodRequest',
     'AddProductPriceRequest',
-    'AddProductPriceRequestAmount',
     'AddressInput',
     'ArchivePaymentMethodRequest',
     'BillingDetailsInput',
@@ -1361,13 +1337,11 @@ __all__ = [
     'CreateOrderNewCustomerInputCheckoutSettings',
     'CreateOrderNewCustomerInputRequestMeta',
     'CreateOrderRequest',
-    'CreatePriceRequest',
+    'CatalogPriceParams',
     'CreateProductRequest',
     'CreatePurchaseIntentRequest',
     'CreatePurchaseIntentRequestPrice',
-    'CreatePurchaseIntentRequestPriceNominal',
     'CreatePurchaseIntentRequestPriceOriginal',
-    'CreatePurchaseIntentRequestPriceOriginalNominal',
     'CreatePurchaseIntentRequestProduct',
     'CreatePurchaseIntentRequestQuantity',
     'CreatePurchaseIntentRequestUsage',
@@ -1450,7 +1424,6 @@ __all__ = [
     'MessageTemplateVariableInput',
     'MessageTemplateVariableItemInput',
     'MessageTemplateVariablesInput',
-    'MoneyInput',
     'OrderDocumentDeliveryRequest',
     'OrderPayoutSettingsRequest',
     'OrderPayoutSettingsRequestDestination',
@@ -1485,7 +1458,6 @@ __all__ = [
     'ProductLineItemInput',
     'ProductMediaInput',
     'ProductShipmentInput',
-    'RefundMoneyInput',
     'RefundReasonInput',
     'RefundRequestMetaInput',
     'RenderMessageTemplatePreviewRequest',

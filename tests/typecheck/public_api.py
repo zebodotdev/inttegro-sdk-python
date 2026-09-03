@@ -9,7 +9,7 @@ def refund(client: InttegroClient) -> tuple[str, int]:
         line_items=[
             inttegro.refunds.LineItem(
                 order_line_item_id="oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
-                refund_amount=inttegro.refunds.Money(currency="ghs", value=2500),
+                refund_amount=inttegro.AmountParams(currency=inttegro.Currency.GHS, value=2500),
             )
         ],
     )
@@ -42,7 +42,7 @@ def create_order(client: InttegroClient) -> str:
                 type=inttegro.LineItemType.PRODUCT,
                 product=inttegro.orders.Product(
                     name="Monthly subscription",
-                    price=inttegro.orders.Money(currency="ghs", value=5000),
+                    price=inttegro.PriceParams(currency=inttegro.Currency.GHS, value=5000),
                     quantity=1,
                     type=inttegro.ProductType.DIGITAL,
                 ),

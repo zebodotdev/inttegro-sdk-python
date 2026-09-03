@@ -1,4 +1,20 @@
-"""Typed request objects for chime and broadcast operations."""
+"""Chime, broadcast, and schedule domain objects."""
+
+from ._models import (
+    BroadcastCancelDetail as CanceledBroadcast,
+    BroadcastCreationDetail as CreatedBroadcast,
+    BroadcastDetail as Broadcast,
+    BroadcastError,
+    Chime,
+    ChimeEmailEvent as EmailEvent,
+    ChimeEmailMessage as EmailContent,
+    ChimePage as Page,
+    ChimeTransmission as Transmission,
+    ScheduleCancelDetail as CanceledSchedule,
+    ScheduleCreationDetail as ScheduledChime,
+    ScheduleDetail as Schedule,
+    ScheduleError,
+)
 
 from .request_types import (
     BroadcastRequest,
@@ -19,19 +35,32 @@ from .request_types import (
 )
 
 __all__ = [
+    "Broadcast",
+    "BroadcastError",
     "BroadcastRequest",
     "BroadcastRequestMeta",
+    "CanceledBroadcast",
+    "CanceledSchedule",
+    "Chime",
+    "CreatedBroadcast",
     "Email",
+    "EmailContent",
+    "EmailEvent",
     "EmailMailbox",
     "EmailMessage",
     "EmailRecipient",
     "PageRequest",
+    "Page",
     "Phone",
     "PhoneRecipient",
     "SavedCustomerRecipient",
+    "Schedule",
+    "ScheduleError",
     "ScheduleRequest",
     "ScheduleRequestMeta",
+    "ScheduledChime",
     "SendRequest",
     "SendRequestMeta",
     "TemplateReference",
+    "Transmission",
 ]

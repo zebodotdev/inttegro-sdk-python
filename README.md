@@ -58,7 +58,7 @@ try:
                     type=ProductType.DIGITAL,
                     name="Monthly subscription",
                     quantity=1,
-                    price=inttegro.orders.Money(currency="ghs", value=5000),
+                    price=inttegro.PriceParams(currency=inttegro.Currency.GHS, value=5000),
                 ),
             ),
         ],
@@ -104,7 +104,7 @@ request = inttegro.refunds.CreateRequest(
     line_items=[
         inttegro.refunds.LineItem(
             order_line_item_id="oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
-            refund_amount=inttegro.refunds.Money(currency="ghs", value=2500),
+            refund_amount=inttegro.AmountParams(currency=inttegro.Currency.GHS, value=2500),
         ),
     ],
 )
@@ -121,7 +121,7 @@ The GitHub release for each version is the canonical record. It contains the exa
 
 ```bash
 sha256sum --check SHA256SUMS
-gh attestation verify inttegro-3.0.1-py3-none-any.whl \
+gh attestation verify inttegro-4.0.0-py3-none-any.whl \
   --repo zebodotdev/inttegro-sdk-python
 ```
 

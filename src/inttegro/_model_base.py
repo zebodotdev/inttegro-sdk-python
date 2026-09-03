@@ -3,6 +3,7 @@ from __future__ import annotations
 import types
 from collections.abc import Iterator, Mapping
 from dataclasses import fields
+from enum import Enum
 from typing import Any, Literal, TypeVar, Union, cast, get_args, get_origin, get_type_hints
 
 
@@ -134,6 +135,12 @@ def decode_value(annotation: Any, value: Any) -> Any:
         object.__setattr__(instance, "_extra", {key: item for key, item in value.items() if key not in consumed})
         return instance
 
+    if isinstance(annotation, type) and issubclass(annotation, Enum):
+        try:
+            return annotation(value)
+        except ValueError as error:
+            raise ModelDecodeError(f"{value!r} is not valid for {annotation.__name__}") from error
+
     if annotation is float:
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             raise ModelDecodeError(f"expected float, got {type(value).__name__}")
@@ -150,6 +157,8 @@ def encode_value(value: Any) -> Any:
 
     if isinstance(value, ApiModel):
         return value.to_dict()
+    if isinstance(value, Enum):
+        return value.value
     if isinstance(value, list):
         return [encode_value(item) for item in value]
     if isinstance(value, tuple):

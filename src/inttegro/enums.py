@@ -275,7 +275,7 @@ class OrderStatus(WireEnum):
     UNKNOWN = "unknown"
 
 
-class OrderPaymentStatus(WireEnum):
+class PaymentStatus(WireEnum):
     INITIATED = "initiated"
     REQUIRES_ACTION = "requires_action"
     OVERDUE = "overdue"

@@ -5,8 +5,8 @@ from .request_types import (
     CreateRefundLineItemInput as LineItem,
     CreateRefundRequest as CreateRequest,
     PageRefundsRequest as PageRequest,
-    RefundMoneyInput as Money,
     RefundRequestMetaInput as RequestMeta,
 )
+from .money import AmountParams
 
-__all__ = ["CancelRequest", "CreateRequest", "LineItem", "Money", "PageRequest", "RequestMeta"]
+__all__ = ["AmountParams", "CancelRequest", "CreateRequest", "LineItem", "PageRequest", "RequestMeta"]

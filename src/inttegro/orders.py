@@ -16,7 +16,6 @@ from .request_types import (
     FeeLineItemInput as FeeLineItem,
     InlineProductDetailsInput as Product,
     InvoiceSettingsInput as InvoiceSettings,
-    MoneyInput as Money,
     OrderDocumentDeliveryRequest as DocumentDeliveryRequest,
     OrderPayoutSettingsRequest as PayoutSettings,
     OrderPayoutSettingsRequestDestination as PayoutDestination,
@@ -30,6 +29,8 @@ from .request_types import (
     ShippingLineItemInput as ShippingLineItem,
     UpdateOrderRequest as UpdateRequest,
 )
+from .money import AmountParams
+from .price_types import PriceParams
 
 __all__ = [
     "Address",
@@ -47,7 +48,8 @@ __all__ = [
     "FeeLineItem",
     "InvoiceSettings",
     "MobileMoney",
-    "Money",
+    "AmountParams",
+    "PriceParams",
     "PageRequest",
     "PayRequest",
     "PaymentMethod",

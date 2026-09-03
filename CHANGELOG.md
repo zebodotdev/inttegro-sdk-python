@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [4.0.0] - 2026-09-03
+
+- Breaking: renamed order-prefixed payment models to semantic `Payment`, `PaymentAttempt`, `PaymentMethodSnapshot`, and `PaymentPayoutConfiguration` types.
+- Added focused `inttegro.payments`, `inttegro.chimes`, and `inttegro.money` modules for related domain and request objects.
+- Separated request and response amount and price dataclasses while preserving typed dictionary serialization at the transport boundary.
+
 ## [3.0.1] - 2026-09-03
 
 - Corrected README examples and terminology to show direct domain return values.

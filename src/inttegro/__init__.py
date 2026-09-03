@@ -13,6 +13,8 @@ from ._models import *  # noqa: F401,F403
 from ._models import __all__ as _model_exports
 from .request_types import *  # noqa: F401,F403
 from .request_types import __all__ as _request_type_exports
+from .money import Amount, AmountParams, Currency
+from .price_types import Price, PriceParams
 from . import (
     apps,
     balance_transactions,
@@ -26,6 +28,7 @@ from . import (
     message_templates,
     orders,
     otp,
+    payments,
     payment_methods,
     payouts,
     prices,
@@ -42,6 +45,11 @@ __all__ = [
     "TimeoutError",
     "APIError",
     "AuthenticationError",
+    "Amount",
+    "AmountParams",
+    "Currency",
+    "Price",
+    "PriceParams",
     "RateLimitError",
     "apps",
     "balance_transactions",
@@ -55,6 +63,7 @@ __all__ = [
     "message_templates",
     "orders",
     "otp",
+    "payments",
     "payment_methods",
     "payouts",
     "prices",

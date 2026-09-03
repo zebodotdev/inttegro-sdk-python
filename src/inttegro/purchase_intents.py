@@ -4,9 +4,7 @@ from .request_types import (
     CancelPurchaseIntentRequest as CancelRequest,
     CreatePurchaseIntentRequest as CreateRequest,
     CreatePurchaseIntentRequestPrice as Price,
-    CreatePurchaseIntentRequestPriceNominal as NominalPrice,
     CreatePurchaseIntentRequestPriceOriginal as OriginalPrice,
-    CreatePurchaseIntentRequestPriceOriginalNominal as OriginalNominalPrice,
     CreatePurchaseIntentRequestProduct as Product,
     CreatePurchaseIntentRequestQuantity as Quantity,
     CreatePurchaseIntentRequestUsage as Usage,
@@ -14,6 +12,9 @@ from .request_types import (
     UpdatePurchaseIntentRequest as UpdateRequest,
     UpdatePurchaseIntentRequestQuantity as UpdateQuantity,
 )
+from .price_types import PriceParams as NominalPrice
+
+OriginalNominalPrice = NominalPrice
 
 __all__ = [
     "CancelRequest",

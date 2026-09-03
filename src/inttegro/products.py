@@ -2,7 +2,6 @@
 
 from .request_types import (
     AddProductPriceRequest as AddPriceRequest,
-    AddProductPriceRequestAmount as PriceAmount,
     CreateProductRequest as CreateRequest,
     ProductAttributeInput as Attribute,
     ProductDimensionsInput as Dimensions,
@@ -14,6 +13,7 @@ from .request_types import (
     PageProductsRequest as PageRequest,
     UpdateProductRequest as UpdateRequest,
 )
+from .money import AmountParams
 
 __all__ = [
     "AddPriceRequest",
@@ -25,7 +25,7 @@ __all__ = [
     "Media",
     "PageRequest",
     "PhysicalDimensions",
-    "PriceAmount",
+    "AmountParams",
     "Shipment",
     "UpdateRequest",
 ]
