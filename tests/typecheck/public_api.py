@@ -1,5 +1,5 @@
 import inttegro
-from inttegro import InttegroClient, RefundResponse
+from inttegro import InttegroClient, Refund
 
 
 def refund(client: InttegroClient) -> tuple[str, int]:
@@ -13,14 +13,14 @@ def refund(client: InttegroClient) -> tuple[str, int]:
             )
         ],
     )
-    response: RefundResponse = client.refunds.create(request)
+    response: Refund = client.refunds.create(request)
     invalid_request = inttegro.refunds.CreateRequest(  # type: ignore[call-arg]
         order_id="or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
     )
     wrong_response: str = client.refunds.create(request)  # type: ignore[assignment]
-    wrong_total: str = response.refund.total.value  # type: ignore[assignment]
+    wrong_total: str = response.total.value  # type: ignore[assignment]
     del invalid_request, wrong_response, wrong_total
-    return response.refund.id, response.refund.total.value
+    return response.id, response.total.value
 
 
 def create_order(client: InttegroClient) -> str:

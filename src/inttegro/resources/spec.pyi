@@ -3,10 +3,9 @@
 from typing import Any
 
 from ..http_client import HttpClient
-from .._models import *
+from .._models import CountrySpecification
 from ..request_types import *
-from ..response_object import ResponseObject
 
 class Spec:
     def __init__(self, http: HttpClient) -> None: ...
-    def countries(self) -> ListCountrySpecsResponse: ...
+    def countries(self) -> dict[str, CountrySpecification]: ...

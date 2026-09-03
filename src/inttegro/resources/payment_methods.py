@@ -53,7 +53,7 @@ class PaymentMethods:
                 - verify_immediately: Send verification OTP immediately (default: false)
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - payment_method: Created payment method with id, type, and status
                 - requires_verification: Whether verification is needed before use (typically true)
 
@@ -74,11 +74,11 @@ class PaymentMethods:
                 }
             })
 
-            pm = result.data["payment_method"]
+            pm = result
             print(f"Payment method created: {pm['id']}")
 
             # Verify if needed
-            if result.data.get("requires_verification"):
+            if result.verified_at is None:
                 print("Verification required before use")
                 client.payment_methods.verify(pm['id'])
 
@@ -96,10 +96,10 @@ class PaymentMethods:
             })
 
             # OTP is sent immediately, prompt customer
-            if result.data.get("requires_verification"):
+            if result.verified_at is None:
                 otp = input("Enter OTP: ")
                 client.payment_methods.confirm_verification({
-                    "payment_method_id": result.data["payment_method"]["id"],
+                    "payment_method_id": result.id,
                     "token": otp
                 })
             ```
@@ -131,7 +131,7 @@ class PaymentMethods:
             request_meta: Request controls such as idempotency_key
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - payment_method: Updated payment method with verification status
                 - message: Confirmation that OTP was sent
 
@@ -152,10 +152,10 @@ class PaymentMethods:
                 }
             })
 
-            pm_id = result.data["payment_method"]["id"]
+            pm_id = result.id
 
             # Initiate verification
-            if result.data.get("requires_verification"):
+            if result.verified_at is None:
                 verify_result = client.payment_methods.verify(pm_id)
                 print("OTP sent to customer's phone")
 
@@ -198,7 +198,7 @@ class PaymentMethods:
                 - token: The OTP code from customer (required, 6 digits)
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - payment_method: Verified payment method ready for use
                 - status: Verification status
 
@@ -219,10 +219,10 @@ class PaymentMethods:
                 }
             })
 
-            pm_id = tokenize_result.data["payment_method"]["id"]
+            pm_id = tokenize_result.id
 
             # Step 2: Initiate verification
-            if tokenize_result.data.get("requires_verification"):
+            if tokenize_result.verified_at is None:
                 client.payment_methods.verify(pm_id)
                 print("OTP sent. Check your phone.")
 
@@ -235,7 +235,7 @@ class PaymentMethods:
                     "token": otp
                 })
 
-                if result.data["payment_method"]["verified"]:
+                if result.verified:
                     print("Payment method verified! Ready to use.")
 
                     # Now you can charge it
@@ -264,7 +264,7 @@ class PaymentMethods:
             payment_method_id: The payment method ID (e.g., "pm_xyz789")
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - payment_method: Payment method details including:
                     - id: Payment method ID
                     - type: Payment type ("mobile_money", "card", etc.)
@@ -281,7 +281,7 @@ class PaymentMethods:
             ```python
             # Look up payment method
             result = client.payment_methods.lookup("pm_xyz789")
-            pm = result.data["payment_method"]
+            pm = result
 
             print(f"Type: {pm['type']}")
             print(f"Verified: {pm['verified']}")
@@ -297,7 +297,7 @@ class PaymentMethods:
             print("Saved payment methods:")
             for pm_id in pm_ids:
                 result = client.payment_methods.lookup(pm_id)
-                pm = result.data["payment_method"]
+                pm = result
                 print(f"  - {pm['masked_details']}")
             ```
 
@@ -316,7 +316,7 @@ class PaymentMethods:
             payload: Optional page_number, page_size, and customer_id filters.
 
         Returns:
-            ResponseObject containing a page of payment methods.
+            domain object containing a page of payment methods.
         """
         return self.http.post("/payment_methods/page", payload or {})
 
@@ -328,7 +328,7 @@ class PaymentMethods:
             payload: Update parameters including payment_method_id.
 
         Returns:
-            ResponseObject containing the updated payment method.
+            domain object containing the updated payment method.
         """
         return self.http.post("/payment_methods/update", payload)
 
@@ -365,7 +365,7 @@ class PaymentMethods:
             request_meta: Request controls such as idempotency_key
 
         Returns:
-            ResponseObject confirming deletion:
+            domain object confirming deletion:
                 - deleted: True if deletion succeeded
                 - payment_method_id: ID of deleted payment method
 
@@ -376,13 +376,13 @@ class PaymentMethods:
             ```python
             # Delete a payment method
             result = client.payment_methods.delete("pm_xyz789")
-            print(f"Payment method deleted: {result.data['payment_method_id']}")
+            print(f"Payment method deleted: {result.payment_method_id}")
 
             # Customer removes saved card flow
             def remove_payment_method(customer_id, pm_id):
                 # Verify customer owns this payment method
                 pm_result = client.payment_methods.lookup(pm_id)
-                pm = pm_result.data["payment_method"]
+                pm = pm_result
 
                 if pm["customer_id"] != customer_id:
                     raise ValueError("Payment method doesn't belong to customer")
@@ -393,7 +393,7 @@ class PaymentMethods:
                 # Remove from your database
                 delete_from_database(pm_id)
 
-                return result.data["deleted"]
+                return result.deleted
 
             # Cleanup unused payment methods
             for pm_id in old_payment_methods:
@@ -432,7 +432,7 @@ class PaymentMethods:
         dynamically build payment forms based on what's enabled for your account.
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - settings: Payment configuration including:
                     - enabled_types: List of enabled payment types
                     - mobile_money: Mobile money configuration:
@@ -445,7 +445,7 @@ class PaymentMethods:
             ```python
             # Get payment settings
             result = client.payment_methods.settings()
-            settings = result.data["settings"]
+            settings = result
 
             # Check what's enabled
             enabled_types = settings["enabled_types"]
@@ -460,7 +460,7 @@ class PaymentMethods:
             # Dynamic payment form
             def build_payment_form():
                 result = client.payment_methods.settings()
-                settings = result.data["settings"]
+                settings = result
 
                 form = {"payment_types": []}
 

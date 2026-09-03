@@ -7,7 +7,7 @@ class WireEnum(str, Enum):
     """A JSON-compatible string enum used on the Inttegro API wire."""
 
     def __str__(self) -> str:
-        return self.value
+        return str(self.value)
 
 
 class AppManagementRole(WireEnum):
@@ -305,7 +305,7 @@ class CheckoutPaymentStatus(WireEnum):
     CANCELLED = "cancelled"
 
 
-class PaymentResponseStatus(WireEnum):
+class PaymentResultStatus(WireEnum):
     PENDING = "pending"
     REQUIRES_CONFIRMATION = "requires_confirmation"
     PROCESSING = "processing"

@@ -31,7 +31,7 @@ class Otp:
             payload: Initiation parameters including recipient, sender, and service_name
 
         Returns:
-            ResponseObject containing the OTP transaction with id and expiry information
+            domain object containing the OTP transaction with id and expiry information
 
         Example:
             ```python
@@ -41,7 +41,7 @@ class Otp:
                 "service_name": "Acme Bank",
                 "request_meta": {"idempotency_key": "otp_login_1700000000"}
             })
-            txn_id = result.data["transaction"]["id"]
+            txn_id = result.id
             ```
 
         See Also:
@@ -60,7 +60,7 @@ class Otp:
             payload: Verification parameters including transaction_id, recipient, and token
 
         Returns:
-            ResponseObject containing the OTP session with updated status and verified flag
+            domain object containing the OTP session with updated status and verified flag
 
         Example:
             ```python
@@ -69,7 +69,7 @@ class Otp:
                 "recipient": "+233241234567",
                 "token": "123456"
             })
-            if result.data.get("transaction", {}).get("status") == "verified":
+            if result.status == "verified":
                 print("OTP verified!")
             ```
 
@@ -89,12 +89,12 @@ class Otp:
             payload: Lookup parameters including transaction_id
 
         Returns:
-            ResponseObject containing the OTP session details
+            domain object containing the OTP session details
 
         Example:
             ```python
             result = client.otp.lookup({"transaction_id": "ot_abc123"})
-            print(f"Status: {result.data['transaction']['status']}")
+            print(f"Status: {result.status}")
             ```
 
         See Also:
@@ -113,7 +113,7 @@ class Otp:
             payload: Cancellation parameters including transaction_id and reason
 
         Returns:
-            ResponseObject containing the cancelled OTP session
+            domain object containing the cancelled OTP session
 
         Example:
             ```python

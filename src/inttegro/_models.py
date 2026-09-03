@@ -31,7 +31,7 @@ class OTPTransmission(ApiModel):
     status: Literal['delivered', 'failed', 'submitted'] | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class VerifyOTPResponse(ApiModel):
+class OTPVerification(ApiModel):
     transaction: OTPTransaction = field(init=False)
     verification_attempt: OTPVerificationAttempt = field(init=False)
 
@@ -66,7 +66,7 @@ class Chime(ApiModel):
     id: str = field(init=False)
     idempotency_key: str | None = field(init=False)
     purpose: str | None = field(init=False)
-    recipient: ChimeRecipientResponse = field(init=False)
+    recipient: ChimeRecipient = field(init=False)
     sender_id: str = field(init=False)
     transmission: ChimeTransmission | None = field(init=False)
 
@@ -111,18 +111,18 @@ class ChimeEmailSchemaMarkup(ApiModel):
     json_ld: dict[str, Any] | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class ChimeRecipientResponse(ApiModel):
+class ChimeRecipient(ApiModel):
     type: Literal['phone', 'email'] = field(init=False)
     name: str | None = field(init=False)
-    phone: ChimeRecipientResponsePhone | None = field(init=False)
-    email: ChimeRecipientResponseEmail | None = field(init=False)
+    phone: ChimeRecipientPhone | None = field(init=False)
+    email: ChimeRecipientEmail | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class ChimeRecipientResponsePhone(ApiModel):
+class ChimeRecipientPhone(ApiModel):
     number: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class ChimeRecipientResponseEmail(ApiModel):
+class ChimeRecipientEmail(ApiModel):
     address: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -167,10 +167,10 @@ class ChimeEmailEvent(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PageChimesResponse(ApiModel):
-    page: PageChimesResponsePage | None = field(init=False)
+    page: ChimePage | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PageChimesResponsePage(ApiModel):
+class ChimePage(ApiModel):
     number: int = field(init=False)
     size: int = field(init=False)
     chimes: list[Chime] = field(init=False)
@@ -375,7 +375,7 @@ class MessageTemplatesPage(ApiModel):
     message_templates: list[MessageTemplate] = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class RenderMessageTemplatePreviewResponse(ApiModel):
+class MessageTemplatePreview(ApiModel):
     message_template: MessageTemplate = field(init=False)
     rendered: RenderedMessageTemplate = field(init=False)
 
@@ -853,27 +853,29 @@ class RefundPage(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class CreateApplicationResponse(ApiModel):
-    app: CreateApplicationResponseApp = field(init=False)
+    app: Application = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class CreateApplicationResponseApp(ApiModel):
+class Application(ApiModel):
     id: str = field(init=False)
     name: str = field(init=False)
     alias: str | None = field(init=False)
     description: str | None = field(init=False)
     created_at: str = field(init=False)
-    secret_key: CreateApplicationResponseAppSecretKey | None = field(init=False)
-    relationship: CreateApplicationResponseAppRelationship | None = field(init=False)
+    updated_at: str | None = field(init=False)
+    archived_at: str | None = field(init=False)
+    secret_key: ApplicationSecretKey | None = field(init=False)
+    relationship: ApplicationRelationship | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class CreateApplicationResponseAppSecretKey(ApiModel):
+class ApplicationSecretKey(ApiModel):
     id: str | None = field(init=False)
     token_type: str | None = field(init=False)
     issued_at: str | None = field(init=False)
     token: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class CreateApplicationResponseAppRelationship(ApiModel):
+class ApplicationRelationship(ApiModel):
     id: str = field(init=False)
     kind: Literal['placement'] = field(init=False)
     policy_version: str = field(init=False)
@@ -884,12 +886,12 @@ class CreateApplicationResponseAppRelationship(ApiModel):
     subject_app_id: str = field(init=False)
     child_app_id: str = field(init=False)
     child_standing: str = field(init=False)
-    relationship_policy: CreateApplicationResponseAppRelationshipRelationshipPolicy = field(init=False)
+    relationship_policy: ApplicationRelationshipPolicy = field(init=False)
     retained_creator_authority_exists: bool = field(init=False)
     created_at: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class CreateApplicationResponseAppRelationshipRelationshipPolicy(ApiModel):
+class ApplicationRelationshipPolicy(ApiModel):
     child_standing: str = field(init=False)
     management: Literal['parent', 'child'] = field(init=False)
     credentials: Literal['child', 'parent'] = field(init=False)
@@ -973,7 +975,7 @@ class DestroySecretKeyResponse(ApiModel):
     key: SecretKey = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class SecretKeyUsageResponse(ApiModel):
+class SecretKeyUsage(ApiModel):
     key: SecretKey = field(init=False)
     usage: SecretKeyUsagePage = field(init=False)
 
@@ -1017,7 +1019,7 @@ class FinancialAccountCreateResponse(ApiModel):
     verification: dict[str, Any] | None = field(init=False)
     bank_account: FinancialAccountBankCreateResponse | None = field(init=False)
     owner: FinancialAccountOwnerCreateResponse | None = field(init=False)
-    wallet: FinancialAccountWalletResponse | None = field(init=False)
+    wallet: FinancialAccountWallet | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialInstitution(ApiModel):
@@ -1105,13 +1107,13 @@ class FinancialAccountAddressCreateResponse(ApiModel):
     region: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class FinancialAccountWalletResponse(ApiModel):
+class FinancialAccountWallet(ApiModel):
     id: str = field(init=False)
     type: Literal['mobile_money'] = field(init=False)
-    mobile_money: FinancialAccountWalletResponseMobileMoney | None = field(init=False)
+    mobile_money: FinancialAccountWalletMobileMoney | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class FinancialAccountWalletResponseMobileMoney(ApiModel):
+class FinancialAccountWalletMobileMoney(ApiModel):
     account_number: str = field(init=False)
     network: Literal['airtel', 'mtn', 'telecel', 'vodafone'] = field(init=False)
 
@@ -1138,33 +1140,33 @@ class FinancialAccount(ApiModel):
     type: Literal['wallet', 'bank_account', 'dosh_account'] = field(init=False)
     universal_fingerprint: str | None = field(init=False)
     verification: dict[str, Any] | None = field(init=False)
-    bank_account: FinancialAccountBankResponse | None = field(init=False)
+    bank_account: FinancialAccountBank | None = field(init=False)
     disconnected_at: str | None = field(init=False)
     dosh_account: dict[str, Any] | None = field(init=False)
-    owner: FinancialAccountOwnerResponse | None = field(init=False)
-    wallet: FinancialAccountWalletResponse | None = field(init=False)
+    owner: FinancialAccountOwner | None = field(init=False)
+    wallet: FinancialAccountWallet | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class FinancialAccountBankResponse(ApiModel):
+class FinancialAccountBank(ApiModel):
     type: Literal['ghana_bank_account'] = field(init=False)
-    ghana_bank_account: GhanaBankAccountResponse | None = field(init=False)
+    ghana_bank_account: GhanaBankAccount | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class GhanaBankAccountResponse(ApiModel):
+class GhanaBankAccount(ApiModel):
     branch: str | None = field(init=False)
-    holder: FinancialAccountOwnerResponse = field(init=False)
+    holder: FinancialAccountOwner = field(init=False)
     name: str | None = field(init=False)
     number: str = field(init=False)
     sort_code: str | None = field(init=False)
     swift_code: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class FinancialAccountOwnerResponse(ApiModel):
-    address: FinancialAccountAddressResponse = field(init=False)
+class FinancialAccountOwner(ApiModel):
+    address: FinancialAccountAddress = field(init=False)
     name: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class FinancialAccountAddressResponse(ApiModel):
+class FinancialAccountAddress(ApiModel):
     city: str = field(init=False)
     country: str = field(init=False)
     line_1: str = field(init=False)
@@ -1207,10 +1209,10 @@ class FinancialAccountConnectedResponse(ApiModel):
     type: Literal['wallet', 'bank_account', 'dosh_account'] = field(init=False)
     universal_fingerprint: str | None = field(init=False)
     verification: dict[str, Any] | None = field(init=False)
-    bank_account: FinancialAccountBankResponse | None = field(init=False)
+    bank_account: FinancialAccountBank | None = field(init=False)
     dosh_account: dict[str, Any] | None = field(init=False)
-    owner: FinancialAccountOwnerResponse | None = field(init=False)
-    wallet: FinancialAccountWalletResponse | None = field(init=False)
+    owner: FinancialAccountOwner | None = field(init=False)
+    wallet: FinancialAccountWallet | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class UpdateFinancialAccountResponse(ApiModel):
@@ -1250,7 +1252,7 @@ class FinancialAccountBankUpdateResponse(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class GhanaBankAccountUpdateResponse(ApiModel):
     branch: str | None = field(init=False)
-    holder: FinancialAccountOwnerResponse = field(init=False)
+    holder: FinancialAccountOwner = field(init=False)
     name: str = field(init=False)
     number: str = field(init=False)
     sort_code: str | None = field(init=False)
@@ -1352,10 +1354,10 @@ class BalanceTransactionResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class BalanceTransactionPageResponse(ApiModel):
-    page: BalanceTransactionPageResponsePage = field(init=False)
+    page: BalanceTransactionPage = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class BalanceTransactionPageResponsePage(ApiModel):
+class BalanceTransactionPage(ApiModel):
     number: int = field(init=False)
     size: int = field(init=False)
     transactions: list[BalanceTransaction] | None = field(init=False)
@@ -1462,10 +1464,10 @@ class EnableAutomaticPayoutsResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PagePayoutsResponse(ApiModel):
-    page: PagePayoutsResponsePage | None = field(init=False)
+    page: PayoutPage | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PagePayoutsResponsePage(ApiModel):
+class PayoutPage(ApiModel):
     number: int = field(init=False)
     size: int = field(init=False)
     payouts: list[Payout] | None = field(init=False)
@@ -1476,10 +1478,10 @@ class CancelPayoutResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FileResponse(ApiModel):
-    file: FileObject = field(init=False)
+    file: File = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class FileObject(ApiModel):
+class File(ApiModel):
     id: str = field(init=False)
     purpose: str = field(init=False)
     status: Literal['uploading', 'processing', 'available', 'failed', 'deleted'] = field(init=False)
@@ -1554,15 +1556,15 @@ class FilePageResponse(ApiModel):
 class FilePage(ApiModel):
     number: int = field(init=False)
     size: int = field(init=False)
-    files: list[FileObject] = field(init=False)
+    files: list[File] = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class CreateFileLinkResponse(ApiModel):
-    file_link: FileLinkObject = field(init=False)
+class FileLinkCreation(ApiModel):
+    file_link: FileLink = field(init=False)
     url: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class FileLinkObject(ApiModel):
+class FileLink(ApiModel):
     id: str = field(init=False)
     kind: Literal['public'] = field(init=False)
     file_id: str = field(init=False)
@@ -1604,7 +1606,7 @@ class FileLinkActor(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FileLinkResponse(ApiModel):
-    file_link: FileLinkObject = field(init=False)
+    file_link: FileLink = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FileLinkPageResponse(ApiModel):
@@ -1614,14 +1616,14 @@ class FileLinkPageResponse(ApiModel):
 class FileLinkPage(ApiModel):
     number: int = field(init=False)
     size: int = field(init=False)
-    file_links: list[FileLinkObject] = field(init=False)
+    file_links: list[FileLink] = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class UploadRequestResponse(ApiModel):
-    upload_request: UploadRequestObject = field(init=False)
+    upload_request: UploadRequest = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class UploadRequestObject(ApiModel):
+class UploadRequest(ApiModel):
     id: str = field(init=False)
     purpose: str = field(init=False)
     status: Literal['pending', 'uploading', 'fulfilled', 'expired', 'canceled', 'failed'] = field(init=False)
@@ -1646,6 +1648,7 @@ class UploadRequestObject(ApiModel):
     fulfilled_at: str | None = field(init=False)
     expired_at: str | None = field(init=False)
     canceled_at: str | None = field(init=False)
+    attempt: UploadRequestAttempt | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class UploadRequestConstraints(ApiModel):
@@ -1769,11 +1772,11 @@ class UploadRequestPageResponse(ApiModel):
 class UploadRequestPage(ApiModel):
     number: int = field(init=False)
     size: int = field(init=False)
-    upload_requests: list[UploadRequestObject] = field(init=False)
+    upload_requests: list[UploadRequest] = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class FulfillUploadRequestResponse(ApiModel):
-    upload_request: UploadRequestWithAttemptObject = field(init=False)
+class UploadFulfillment(ApiModel):
+    upload_request: UploadRequest = field(init=False)
     file: FileUploadReceipt = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -1787,41 +1790,41 @@ class FileUploadReceipt(ApiModel):
     status: Literal['uploading', 'processing', 'available', 'failed', 'deleted'] = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class FileReferenceReconcileResponse(ApiModel):
+class FileReferenceReconciliation(ApiModel):
     reconciled: Literal[True] = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class TokenizePaymentMethodResponse(ApiModel):
-    payment_method: PaymentMethodObject | None = field(init=False)
+    payment_method: PaymentMethod | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PaymentMethodObject(ApiModel):
+class PaymentMethod(ApiModel):
     active: bool = field(init=False)
     app_customer_local_fingerprint: str | None = field(init=False)
     app_local_fingerprint: str | None = field(init=False)
     archived_at: str | None = field(init=False)
-    bank_account: PaymentMethodObjectBankAccount | None = field(init=False)
+    bank_account: PaymentMethodBankAccount | None = field(init=False)
     created_at: str = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     customer_id: str = field(init=False)
     ephemeral: bool | None = field(init=False)
     expires_on: str | None = field(init=False)
     id: str = field(init=False)
-    mobile_money: PaymentMethodObjectMobileMoney | None = field(init=False)
-    owner: PaymentMethodObjectOwner | None = field(init=False)
+    mobile_money: PaymentMethodMobileMoney | None = field(init=False)
+    owner: PaymentMethodOwner | None = field(init=False)
     type: Literal['mobile_money', 'bank_account', 'card', 'motito'] = field(init=False)
-    supplied: PaymentMethodObjectSupplied | None = field(init=False)
+    supplied: PaymentMethodSupplied | None = field(init=False)
     universal_fingerprint: str | None = field(init=False)
-    verification: PaymentMethodObjectVerification | None = field(init=False)
+    verification: PaymentMethodVerification | None = field(init=False)
     verified_at: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PaymentMethodObjectBankAccount(ApiModel):
-    ghana_bank_account: PaymentMethodObjectBankAccountGhanaBankAccount | None = field(init=False)
+class PaymentMethodBankAccount(ApiModel):
+    ghana_bank_account: PaymentMethodBankAccountGhanaBankAccount | None = field(init=False)
     type: Literal['ghana_bank_account'] = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PaymentMethodObjectBankAccountGhanaBankAccount(ApiModel):
+class PaymentMethodBankAccountGhanaBankAccount(ApiModel):
     branch: str | None = field(init=False)
     name: str | None = field(init=False)
     account_number: str = field(init=False)
@@ -1829,18 +1832,18 @@ class PaymentMethodObjectBankAccountGhanaBankAccount(ApiModel):
     swift_code: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PaymentMethodObjectMobileMoney(ApiModel):
+class PaymentMethodMobileMoney(ApiModel):
     account_number: str = field(init=False)
     last4: str = field(init=False)
     network: Literal['airtel', 'mtn', 'telecel', 'vodafone'] = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PaymentMethodObjectOwner(ApiModel):
-    address: PaymentMethodObjectOwnerAddress | None = field(init=False)
+class PaymentMethodOwner(ApiModel):
+    address: PaymentMethodOwnerAddress | None = field(init=False)
     name: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PaymentMethodObjectOwnerAddress(ApiModel):
+class PaymentMethodOwnerAddress(ApiModel):
     city: str | None = field(init=False)
     country: str = field(init=False)
     line_1: str | None = field(init=False)
@@ -1851,7 +1854,7 @@ class PaymentMethodObjectOwnerAddress(ApiModel):
     region: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PaymentMethodObjectSupplied(ApiModel):
+class PaymentMethodSupplied(ApiModel):
     attempt_id: str | None = field(init=False)
     by: str = field(init=False)
     channel: str | None = field(init=False)
@@ -1860,7 +1863,7 @@ class PaymentMethodObjectSupplied(ApiModel):
     supplied_at: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PaymentMethodObjectVerification(ApiModel):
+class PaymentMethodVerification(ApiModel):
     completed_at: str | None = field(init=False)
     initiated_at: str = field(init=False)
     mechanism: str | None = field(init=False)
@@ -1869,37 +1872,37 @@ class PaymentMethodObjectVerification(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class LookupPaymentMethodResponse(ApiModel):
-    payment_method: PaymentMethodObject | None = field(init=False)
+    payment_method: PaymentMethod | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentMethodPageResponse(ApiModel):
-    page: PaymentMethodPageResponsePage = field(init=False)
+    page: PaymentMethodPage = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PaymentMethodPageResponsePage(ApiModel):
+class PaymentMethodPage(ApiModel):
     number: int = field(init=False)
-    payment_methods: list[PaymentMethodObject] = field(init=False)
+    payment_methods: list[PaymentMethod] = field(init=False)
     size: int = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class UpdatePaymentMethodResponse(ApiModel):
-    payment_method: PaymentMethodObject | None = field(init=False)
+    payment_method: PaymentMethod | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class ActivatePaymentMethodResponse(ApiModel):
-    payment_method: PaymentMethodObject | None = field(init=False)
+    payment_method: PaymentMethod | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class DisactivatePaymentMethodResponse(ApiModel):
-    payment_method: PaymentMethodObject | None = field(init=False)
+    payment_method: PaymentMethod | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class ArchivePaymentMethodResponse(ApiModel):
-    payment_method: PaymentMethodObject | None = field(init=False)
+    payment_method: PaymentMethod | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class UnarchivePaymentMethodResponse(ApiModel):
-    payment_method: PaymentMethodObject | None = field(init=False)
+    payment_method: PaymentMethod | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class GetPaymentMethodSettingsResponse(ApiModel):
@@ -1919,6 +1922,19 @@ class PaymentMethodTypeSetting(ApiModel):
     description: str | None = field(init=False)
     enabled: bool = field(init=False)
     confirms_use: bool = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class PaymentMethodVerificationSession(ApiModel):
+    payment_method_id: str = field(init=False)
+    status: str = field(init=False)
+    token_sent_at: str | None = field(init=False)
+    expires_at: str | None = field(init=False)
+    delivery: dict[str, Any] | None = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class PaymentMethodDeletion(ApiModel):
+    deleted: bool = field(init=False)
+    payment_method_id: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class ProductResponse(ApiModel):
@@ -2060,10 +2076,10 @@ class UpdatedProduct(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PageProductsResponse(ApiModel):
-    page: PageProductsResponsePage | None = field(init=False)
+    page: ProductPage | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PageProductsResponsePage(ApiModel):
+class ProductPage(ApiModel):
     number: int | None = field(init=False)
     size: int | None = field(init=False)
     products: list[Product] | None = field(init=False)
@@ -2194,10 +2210,10 @@ class PurchaseIntentVariant(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PagePurchaseIntentsResponse(ApiModel):
-    page: PagePurchaseIntentsResponsePage = field(init=False)
+    page: PurchaseIntentPage = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PagePurchaseIntentsResponsePage(ApiModel):
+class PurchaseIntentPage(ApiModel):
     number: int = field(init=False)
     purchase_intents: list[PurchaseIntent] = field(init=False)
     size: int = field(init=False)
@@ -2253,11 +2269,11 @@ class PriceEmbeddedProductAttributesItem(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PricePageResponse(ApiModel):
-    page: PricePageResponsePage | None = field(init=False)
+    page: PricePage | None = field(init=False)
     error: Error | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PricePageResponsePage(ApiModel):
+class PricePage(ApiModel):
     number: int | None = field(init=False)
     size: int | None = field(init=False)
     prices: list[PricePageItem] | None = field(init=False)
@@ -2304,303 +2320,26 @@ RefundReasonValue: TypeAlias = Literal['requested_by_customer', 'duplicate', 'fr
 OrderLineItem: TypeAlias = OrderProductLineItem | OrderFeeLineItem | OrderShippingLineItem
 PricePageItem: TypeAlias = Price
 
-__all__ = [
-    'ActivatePaymentMethodResponse',
-    'AddProductPriceResponse',
-    'ArchivePaymentMethodResponse',
-    'BalanceSnapshotResponse',
-    'BalanceSnapshotResponseBalances',
-    'BalanceTransaction',
-    'BalanceTransactionAmount',
-    'BalanceTransactionPageResponse',
-    'BalanceTransactionPageResponsePage',
-    'BalanceTransactionResponse',
-    'BalanceValue',
-    'BroadcastCancelDetail',
-    'BroadcastCancelResponse',
-    'BroadcastCreationDetail',
-    'BroadcastDetail',
-    'BroadcastError',
-    'BroadcastResponse',
-    'CancelPayoutResponse',
-    'Chime',
-    'ChimeEmailEvent',
-    'ChimeEmailMailbox',
-    'ChimeEmailMessage',
-    'ChimeEmailSafetyResult',
-    'ChimeEmailScannedLink',
-    'ChimeEmailSchemaMarkup',
-    'ChimeRecipientResponse',
-    'ChimeRecipientResponseEmail',
-    'ChimeRecipientResponsePhone',
-    'ChimeResponse',
-    'ChimeTransmission',
-    'ConnectFinancialAccountResponse',
-    'CountryBank',
-    'CountryBankBranch',
-    'CountryBankDirectory',
-    'CountrySpecification',
-    'CreateApplicationResponse',
-    'CreateApplicationResponseApp',
-    'CreateApplicationResponseAppRelationship',
-    'CreateApplicationResponseAppRelationshipRelationshipPolicy',
-    'CreateApplicationResponseAppSecretKey',
-    'CreateFileLinkResponse',
-    'CreateFinancialAccountResponse',
-    'CurrencyBalanceSnapshot',
-    'CurrencyBalanceSnapshotRefund',
-    'CurrencyBalanceSnapshotReserved',
-    'Customer',
-    'CustomerAddress',
-    'CustomerBalanceValue',
-    'CustomerPage',
-    'CustomerResponse',
-    'DestroySecretKeyResponse',
-    'DisableAutomaticPayoutsResponse',
-    'DisableFinancialAccountPullResponse',
-    'DisableFinancialAccountPushResponse',
-    'DisactivatePaymentMethodResponse',
-    'DisconnectFinancialAccountResponse',
-    'EnableAutomaticPayoutsResponse',
-    'EnableFinancialAccountPullResponse',
-    'EnableFinancialAccountPushResponse',
-    'Error',
-    'FileActor',
-    'FileDeliveryDetails',
-    'FileLatestError',
-    'FileLinkAccess',
-    'FileLinkActor',
-    'FileLinkDelivery',
-    'FileLinkObject',
-    'FileLinkPage',
-    'FileLinkPageResponse',
-    'FileLinkResponse',
-    'FileMedia',
-    'FileObject',
-    'FilePage',
-    'FilePageResponse',
-    'FileParty',
-    'FileReferenceReconcileResponse',
-    'FileResource',
-    'FileResponse',
-    'FileSource',
-    'FileUploadReceipt',
-    'FinancialAccount',
-    'FinancialAccountAddressCreateResponse',
-    'FinancialAccountAddressResponse',
-    'FinancialAccountAddressUpdateResponse',
-    'FinancialAccountBankCreateResponse',
-    'FinancialAccountBankResponse',
-    'FinancialAccountBankUpdateResponse',
-    'FinancialAccountCompactResponse',
-    'FinancialAccountConnectedResponse',
-    'FinancialAccountCreateResponse',
-    'FinancialAccountOwnerCreateResponse',
-    'FinancialAccountOwnerResponse',
-    'FinancialAccountOwnerUpdateResponse',
-    'FinancialAccountPage',
-    'FinancialAccountPullConfiguration',
-    'FinancialAccountPullConfigurationMandate',
-    'FinancialAccountPushConfiguration',
-    'FinancialAccountUpdateResponse',
-    'FinancialAccountWalletRawResponse',
-    'FinancialAccountWalletRawResponseMobileMoney',
-    'FinancialAccountWalletResponse',
-    'FinancialAccountWalletResponseMobileMoney',
-    'FinancialInstitution',
-    'FinancialInstitutionBank',
-    'FinancialInstitutionBankBranch',
-    'FinancialInstitutionMobileMoneyProvider',
-    'FulfillUploadRequestResponse',
-    'GenerateSecretKeyResponse',
-    'GeneratedSecretKey',
-    'GetPaymentMethodSettingsResponse',
-    'GetPayoutSettingsResponse',
-    'GhanaBankAccountCreateResponse',
-    'GhanaBankAccountResponse',
-    'GhanaBankAccountUpdateResponse',
-    'InitiateOTPResponse',
-    'InvoiceSettings',
-    'ListCountrySpecsResponse',
-    'LookupApplicationResponse',
-    'LookupApplicationResponseApp',
-    'LookupBroadcastResponse',
-    'LookupFinancialAccountResponse',
-    'LookupOTPResponse',
-    'LookupPaymentMethodResponse',
-    'LookupPayoutResponse',
-    'LookupSecretKeyResponse',
-    'MessageTemplate',
-    'MessageTemplateAttachmentIDs',
-    'MessageTemplateEmailContent',
-    'MessageTemplateEnvelope',
-    'MessageTemplateMailbox',
-    'MessageTemplateSMSContent',
-    'MessageTemplateSafetyResult',
-    'MessageTemplateScannedLink',
-    'MessageTemplateVariable',
-    'MessageTemplateVariableItem',
-    'MessageTemplatesPage',
-    'MessageTemplatesPageEnvelope',
-    'Money',
-    'OTPTransaction',
-    'OTPTransmission',
-    'OTPVerificationAttempt',
-    'OTPVerificationAttemptResult',
-    'Order',
-    'OrderAddress',
-    'OrderCheckoutSettings',
-    'OrderCreatedFrom',
-    'OrderCustomer',
-    'OrderDocumentDelivery',
-    'OrderDocumentDeliveryAttempt',
-    'OrderDocumentDeliveryFailure',
-    'OrderDocumentDeliveryResult',
-    'OrderDocumentFormat',
-    'OrderFeeLineItem',
-    'OrderFeeLineItemFee',
-    'OrderInvoice',
-    'OrderInvoiceFormat',
-    'OrderLineItem',
-    'OrderLineItemGroup',
-    'OrderPage',
-    'OrderPayment',
-    'OrderPaymentLatestAttempt',
-    'OrderPaymentMethod',
-    'OrderPaymentMethodBankAccount',
-    'OrderPaymentMethodBankAccountGhanaBankAccount',
-    'OrderPaymentMethodMobileMoney',
-    'OrderPaymentMethodOwner',
-    'OrderPaymentPayoutConfiguration',
-    'OrderPaymentPayoutConfigurationDestination',
-    'OrderProductLineItem',
-    'OrderProductLineItemProduct',
-    'OrderShippingLineItem',
-    'OrderShippingLineItemShipping',
-    'PageChimesResponse',
-    'PageChimesResponsePage',
-    'PageCustomersResponse',
-    'PageFinancialAccountsResponse',
-    'PagePayoutsResponse',
-    'PagePayoutsResponsePage',
-    'PageProductsResponse',
-    'PageProductsResponsePage',
-    'PagePurchaseIntentsResponse',
-    'PagePurchaseIntentsResponsePage',
-    'PageSecretKeysResponse',
-    'PaymentMethodObject',
-    'PaymentMethodObjectBankAccount',
-    'PaymentMethodObjectBankAccountGhanaBankAccount',
-    'PaymentMethodObjectMobileMoney',
-    'PaymentMethodObjectOwner',
-    'PaymentMethodObjectOwnerAddress',
-    'PaymentMethodObjectSupplied',
-    'PaymentMethodObjectVerification',
-    'PaymentMethodPageResponse',
-    'PaymentMethodPageResponsePage',
-    'PaymentMethodSettings',
-    'PaymentMethodTypeSetting',
-    'PaymentNextAction',
-    'PaymentNextActionAuthorize',
-    'PaymentNextActionConfirmPayment',
-    'PaymentNextActionConfirmPaymentAttempt',
-    'PaymentNextActionConfirmPaymentRequest',
-    'PaymentNextActionRedirect',
-    'PaymentNextActionRedirectLatestVisit',
-    'Payout',
-    'PayoutError',
-    'PayoutSettingsLookup',
-    'PayoutSettingsLookupSchedule',
-    'PayoutSettingsLookupScheduleAgingSpec',
-    'PayoutSettingsMutation',
-    'PayoutSettingsMutationSchedule',
-    'PayoutSettingsMutationScheduleSpec',
-    'Price',
-    'PriceEmbeddedProduct',
-    'PriceEmbeddedProductAttributesItem',
-    'PriceNominal',
-    'PricePageItem',
-    'PricePageResponse',
-    'PricePageResponsePage',
-    'PriceResponse',
-    'Product',
-    'ProductAttribute',
-    'ProductDimensions',
-    'ProductDimensionsCustom',
-    'ProductDimensionsDigital',
-    'ProductDimensionsPhysical',
-    'ProductMedia',
-    'ProductPriceNominal',
-    'ProductPriceNominalNominal',
-    'ProductPriceSummary',
-    'ProductPriceSummaryNominal',
-    'ProductResponse',
-    'ProductShipment',
-    'PublicFileStorage',
-    'PurchaseIntent',
-    'PurchaseIntentActivity',
-    'PurchaseIntentMerchant',
-    'PurchaseIntentMoney',
-    'PurchaseIntentOriginalPrice',
-    'PurchaseIntentPrice',
-    'PurchaseIntentProduct',
-    'PurchaseIntentProductAttributesItem',
-    'PurchaseIntentQuantity',
-    'PurchaseIntentResponse',
-    'PurchaseIntentUsage',
-    'PurchaseIntentUsageOrder',
-    'PurchaseIntentVariant',
-    'PurchaseIntentVariantAxis',
-    'PurchaseIntentVariantSet',
-    'ReconnectFinancialAccountResponse',
-    'Refund',
-    'RefundLineItem',
-    'RefundMoney',
-    'RefundPage',
-    'RefundPageResponse',
-    'RefundReasonValue',
-    'RefundResponse',
-    'RenderMessageTemplatePreviewResponse',
-    'RenderedEmailMessageTemplate',
-    'RenderedMessageTemplate',
-    'RenderedSMSMessageTemplate',
-    'ResourceSupply',
-    'ScheduleCancelDetail',
-    'ScheduleCancelResponse',
-    'ScheduleCreationDetail',
-    'ScheduleDetail',
-    'ScheduleError',
-    'ScheduleLookupResponse',
-    'SchedulePayoutResponse',
-    'ScheduleResponse',
-    'SecretKey',
-    'SecretKeyPage',
-    'SecretKeyUsagePage',
-    'SecretKeyUsageResponse',
-    'SecretKeyUsageRow',
-    'SetPayoutDestinationsResponse',
-    'TokenizePaymentMethodResponse',
-    'UnarchivePaymentMethodResponse',
-    'UpdateApplicationResponse',
-    'UpdateApplicationResponseApp',
-    'UpdateFinancialAccountResponse',
-    'UpdatePaymentMethodResponse',
-    'UpdateProductResponse',
-    'UpdateSecretKeyResponse',
-    'UpdatedProduct',
-    'UploadRequestActor',
-    'UploadRequestAttempt',
-    'UploadRequestAttempts',
-    'UploadRequestConstraints',
-    'UploadRequestDisplay',
-    'UploadRequestLatestError',
-    'UploadRequestObject',
-    'UploadRequestPage',
-    'UploadRequestPageResponse',
-    'UploadRequestResponse',
-    'UploadRequestReview',
-    'UploadRequestReviewReason',
-    'UploadRequestWithAttemptObject',
-    'UploadRequestWithAttemptResponse',
-    'VerifyOTPResponse',
-]
+def _is_public_model(value: Any) -> bool:
+    try:
+        return isinstance(value, type) and issubclass(value, ApiModel) and value is not ApiModel
+    except TypeError:
+        return False
+
+
+__all__ = sorted(
+    name
+    for name, value in globals().items()
+    if (
+        _is_public_model(value)
+        or name in {
+            "MessageTemplateAttachmentIDs",
+            "OrderLineItem",
+            "PricePageItem",
+            "RefundReasonValue",
+        }
+    )
+    and "Response" not in name
+    and not name.endswith("Envelope")
+    and not name.endswith("Object")
+)

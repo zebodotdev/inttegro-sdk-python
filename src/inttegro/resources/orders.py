@@ -7,18 +7,20 @@ from typing import TypeVar
 from .._model_base import ApiModel
 from ..http_client import HttpClient
 from .._models import Order, OrderPage, Refund
-from ..response_object import ResponseObject
+from .._dynamic_value import DynamicValue
 
 
 ModelT = TypeVar("ModelT", bound=ApiModel)
 
 
-def _resource(response: ApiModel | ResponseObject, field: str, model_type: type[ModelT]) -> ModelT:
+def _resource(response: ApiModel | DynamicValue, field: str, model_type: type[ModelT]) -> ModelT:
     """Extract a domain resource from an internal wire envelope."""
+    if isinstance(response, model_type):
+        return response
     value = getattr(response, field, None)
     if isinstance(value, model_type):
         return value
-    if isinstance(response, ResponseObject):
+    if isinstance(response, DynamicValue):
         payload = response.to_dict()
         if isinstance(payload, dict) and isinstance(payload.get(field), dict):
             return model_type.from_dict(payload[field])

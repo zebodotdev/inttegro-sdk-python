@@ -3,10 +3,9 @@
 from typing import Any
 
 from ..http_client import HttpClient
-from .._models import *
+from .._models import CurrencyBalanceSnapshot
 from ..request_types import *
-from ..response_object import ResponseObject
 
 class Balances:
     def __init__(self, http: HttpClient) -> None: ...
-    def get(self) -> BalanceSnapshotResponse: ...
+    def get(self) -> dict[str, CurrencyBalanceSnapshot]: ...

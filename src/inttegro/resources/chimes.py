@@ -30,7 +30,7 @@ class Chimes:
             payload: Notification parameters including type, recipient, and message
 
         Returns:
-            ResponseObject containing the sent chime with id, status, and sent_at
+            domain object containing the sent chime with id, status, and sent_at
 
         Example:
             ```python
@@ -57,12 +57,12 @@ class Chimes:
             chime_id: The chime ID (e.g., "chm_abc123")
 
         Returns:
-            ResponseObject containing the chime with delivery details
+            domain object containing the chime with delivery details
 
         Example:
             ```python
             result = client.chimes.lookup("chm_abc123")
-            print(f"Status: {result.data['chime']['status']}")
+            print(f"Status: {result.id}")
             ```
 
         See Also:
@@ -78,7 +78,7 @@ class Chimes:
             payload: Optional pagination parameters.
 
         Returns:
-            ResponseObject containing a page of chimes.
+            domain object containing a page of chimes.
         """
         return self.http.post("/chimes/page", payload or {})
 
@@ -93,7 +93,7 @@ class Chimes:
             payload: Scheduling parameters including recipients, message, and send_after
 
         Returns:
-            ResponseObject containing the scheduled chime
+            domain object containing the scheduled chime
 
         Example:
             ```python
@@ -123,6 +123,6 @@ class Chimes:
             payload: Broadcast parameters including recipients and message template
 
         Returns:
-            ResponseObject containing broadcast summary
+            domain object containing broadcast summary
         """
         return self.http.post("/chimes/broadcast", payload)

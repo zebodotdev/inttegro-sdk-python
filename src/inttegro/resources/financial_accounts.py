@@ -37,7 +37,7 @@ class FinancialAccounts:
             payload: Account creation parameters
 
         Returns:
-            ResponseObject with created financial account
+            domain object with created financial account
 
         See Also:
             - connect(): Preferred method for adding financial accounts
@@ -55,12 +55,12 @@ class FinancialAccounts:
             account_id: The financial account ID (e.g., "fa_abc123")
 
         Returns:
-            ResponseObject containing the financial_account object
+            domain object containing the financial_account object
 
         Example:
             ```python
             result = client.financial_accounts.lookup("fa_abc123")
-            account = result.data["financial_account"]
+            account = result
             print(f"Type: {account['type']}, Verified: {account['verified']}")
             ```
 
@@ -116,7 +116,7 @@ class FinancialAccounts:
                 - custom_data: Optional key-value metadata (string-to-string)
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - financial_account: Created financial account with id, type, status, etc.
                 - requires_verification: Whether verification is needed before use
 
@@ -144,11 +144,11 @@ class FinancialAccounts:
                 }
             })
 
-            fa = result.data["financial_account"]
+            fa = result
             print(f"Financial account created: {fa['id']}")
 
             # Verify if needed
-            if result.data.get("requires_verification"):
+            if result.verification is not None:
                 # Initiate verification (sends OTP)
                 client.financial_accounts.verify({"account_id": fa["id"]})
 
@@ -201,7 +201,7 @@ class FinancialAccounts:
             payload: Archive parameters including account_id
 
         Returns:
-            ResponseObject containing the archived financial_account
+            domain object containing the archived financial_account
 
         Example:
             ```python
@@ -224,7 +224,7 @@ class FinancialAccounts:
             payload: Optional pagination parameters and filters
 
         Returns:
-            ResponseObject containing data (list of accounts), has_more, and count
+            domain object containing data (list of accounts), has_more, and count
 
         Example:
             ```python
@@ -247,7 +247,7 @@ class FinancialAccounts:
             payload: Verification parameters including account_id and optionally token
 
         Returns:
-            ResponseObject containing the financial_account with updated verification status
+            domain object containing the financial_account with updated verification status
 
         Example:
             ```python
@@ -275,7 +275,7 @@ class FinancialAccounts:
             payload: Update parameters including account_id and fields to change
 
         Returns:
-            ResponseObject containing the updated financial_account
+            domain object containing the updated financial_account
         """
         return self.http.post("/financial_accounts/update", payload)
 
@@ -315,7 +315,7 @@ class FinancialAccounts:
             account_id: The financial account ID to reconnect.
 
         Returns:
-            ResponseObject containing the reconnected financial account.
+            domain object containing the reconnected financial account.
         """
         return self.http.post("/financial_accounts/reconnect", {"account_id": account_id})
 

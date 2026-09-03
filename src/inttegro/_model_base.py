@@ -3,8 +3,7 @@ from __future__ import annotations
 import types
 from collections.abc import Iterator, Mapping
 from dataclasses import fields
-from functools import lru_cache
-from typing import Any, Literal, TypeVar, Union, get_args, get_origin, get_type_hints
+from typing import Any, Literal, TypeVar, Union, cast, get_args, get_origin, get_type_hints
 
 
 ModelT = TypeVar("ModelT", bound="ApiModel")
@@ -14,10 +13,12 @@ class ModelDecodeError(ValueError):
     """Raised when a wire value cannot be decoded as its declared API type."""
 
 
-class ApiModel(Mapping[str, Any]):
+class ApiModel:
     """Read-only, typed API response with backwards-compatible mapping access."""
 
     __slots__ = ("_extra", "_present_fields")
+    _extra: dict[str, Any]
+    _present_fields: frozenset[str]
 
     @classmethod
     def from_dict(cls: type[ModelT], value: Mapping[str, Any]) -> ModelT:
@@ -36,7 +37,7 @@ class ApiModel(Mapping[str, Any]):
             raise KeyError(key) from None
 
     def __iter__(self) -> Iterator[str]:
-        for model_field in fields(self):
+        for model_field in fields(cast(Any, self)):
             if model_field.name in self._present_fields:
                 yield _wire_name(model_field)
         yield from self._extra
@@ -44,22 +45,26 @@ class ApiModel(Mapping[str, Any]):
     def __len__(self) -> int:
         return len(self._present_fields) + len(self._extra)
 
+    def get(self, key: str, default: Any = None) -> Any:
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
     def __repr__(self) -> str:
-        values = ", ".join(f"{name}={value!r}" for name, value in self.items())
+        values = ", ".join(f"{name}={self[name]!r}" for name in self)
         return f"{type(self).__name__}({values})"
 
     def to_dict(self) -> dict[str, Any]:
-        return {name: encode_value(value) for name, value in self.items()}
+        return {name: encode_value(self[name]) for name in self}
 
 
-@lru_cache(maxsize=None)
 def _model_hints(model_type: type[ApiModel]) -> dict[str, Any]:
     return get_type_hints(model_type)
 
 
-@lru_cache(maxsize=None)
 def _attribute_for_wire_name(model_type: type[ApiModel], wire_name: str) -> str | None:
-    for model_field in fields(model_type):
+    for model_field in fields(cast(Any, model_type)):
         if _wire_name(model_field) == wire_name:
             return model_field.name
     return None
@@ -117,7 +122,7 @@ def decode_value(annotation: Any, value: Any) -> Any:
         hints = _model_hints(annotation)
         present: set[str] = set()
         consumed: set[str] = set()
-        for model_field in fields(annotation):
+        for model_field in fields(cast(Any, annotation)):
             wire_name = _wire_name(model_field)
             if wire_name not in value:
                 continue

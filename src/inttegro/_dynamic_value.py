@@ -4,19 +4,17 @@ from collections.abc import Iterator
 from typing import Any
 
 
-class ResponseObject:
-    """
-    Lightweight wrapper that allows attribute and dict-style access.
-    """
+class DynamicValue:
+    """Internal mapping-and-attribute view for undocumented transport payloads."""
 
     _data: dict[str, Any] | list[Any]
 
     def __init__(self, data: dict[str, Any] | list[Any] | None = None) -> None:
         raw = {} if data is None else data
         if isinstance(raw, dict):
-            self._data = {k: self._wrap(v) for k, v in raw.items()}
-        elif isinstance(raw, list):
-            self._data = [self._wrap(v) for v in raw]
+            self._data = {key: self._wrap(value) for key, value in raw.items()}
+        else:
+            self._data = [self._wrap(value) for value in raw]
 
     def __getattr__(self, name: str) -> Any:
         if isinstance(self._data, dict) and name in self._data:
@@ -27,32 +25,31 @@ class ResponseObject:
         return self._data[key]
 
     def __iter__(self) -> Iterator[Any]:
-        if isinstance(self._data, dict):
-            return iter(self._data)
-        if isinstance(self._data, list):
-            return iter(self._data)
-        return iter([])
+        return iter(self._data)
 
     def __len__(self) -> int:
         return len(self._data)
 
     def to_dict(self) -> dict[str, Any] | list[Any]:
-        return self._unwrap(self._data)
+        value = self._unwrap(self._data)
+        if not isinstance(value, (dict, list)):
+            raise TypeError("dynamic value root must be an object or list")
+        return value
 
     def _wrap(self, value: Any) -> Any:
         if isinstance(value, dict):
-            return ResponseObject(value)
+            return DynamicValue(value)
         if isinstance(value, list):
-            return [self._wrap(v) for v in value]
-        if isinstance(value, ResponseObject):
+            return [self._wrap(item) for item in value]
+        if isinstance(value, DynamicValue):
             return value
         return value
 
     def _unwrap(self, value: Any) -> Any:
         if isinstance(value, dict):
-            return {k: self._unwrap(v) for k, v in value.items()}
+            return {key: self._unwrap(item) for key, item in value.items()}
         if isinstance(value, list):
-            return [self._unwrap(v) for v in value]
-        if isinstance(value, ResponseObject):
+            return [self._unwrap(item) for item in value]
+        if isinstance(value, DynamicValue):
             return value.to_dict()
         return value

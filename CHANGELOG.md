@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [3.0.0] - 2026-09-03
+
+- Breaking: every documented resource method now returns an immutable domain dataclass or page directly.
+- Internalized the dynamic fallback value and removed the public response wrapper module.
+- Renamed `PaymentResponseStatus` to `PaymentResultStatus`.
+
 ## [2.1.0] - 2026-09-03
 
 - Replaced dictionary-shaped request contracts with immutable, keyword-only request dataclasses.

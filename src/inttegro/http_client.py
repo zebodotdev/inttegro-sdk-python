@@ -17,11 +17,11 @@ from ._model_base import ApiModel, ModelDecodeError, decode_value
 from ._request_base import ApiRequest, encode_request_value
 from ._response_types import response_type_for_path
 from .errors import APIError, AuthenticationError, NetworkError, RateLimitError, TimeoutError
-from .response_object import ResponseObject
+from ._dynamic_value import DynamicValue
 from .version import VERSION
 
 
-Transport = Callable[[urllib.request.Request, float | None], tuple[int, Dict[str, str], str]]
+Transport = Callable[[urllib.request.Request, float | None], tuple[int, Dict[str, str], str | bytes]]
 RequestBody = ApiRequest | Mapping[str, Any]
 
 
@@ -48,7 +48,7 @@ class HttpClient:
         self.transport = transport
         self.user_agent = f"inttegro-sdk-python/{VERSION}"
 
-    def get(self, path: str, query: Optional[dict[str, Any]] = None) -> ApiModel | ResponseObject:
+    def get(self, path: str, query: Optional[dict[str, Any]] = None) -> Any:
         return self.request("GET", path, query=query)
 
     def post(
@@ -56,7 +56,7 @@ class HttpClient:
         path: str,
         body: Optional[RequestBody] = None,
         query: Optional[dict[str, Any]] = None,
-    ) -> ApiModel | ResponseObject:
+    ) -> Any:
         return self.request("POST", path, body=body, query=query)
 
     def post_with_headers(
@@ -64,7 +64,7 @@ class HttpClient:
         path: str,
         body: Optional[RequestBody] = None,
         headers: Optional[dict[str, str]] = None,
-    ) -> ApiModel | ResponseObject:
+    ) -> Any:
         request_headers = dict(headers or {})
         request_body = self._without_top_level_idempotency(body or {})
         if self._is_idempotent_mutation_path(path) and not self._has_header(request_headers, "Idempotency-Key"):
@@ -87,7 +87,7 @@ class HttpClient:
         files: dict[str, str],
         headers: Optional[dict[str, str]] = None,
         authenticated: bool = True,
-    ) -> ApiModel | ResponseObject:
+    ) -> Any:
         boundary = "----InttegroBoundary{}".format(uuid.uuid4().hex)
         data = self._encode_multipart(fields, files, boundary)
         req = urllib.request.Request(url=self._build_url(path, None), data=data, method="POST")
@@ -132,7 +132,7 @@ class HttpClient:
         path: str,
         body: Optional[RequestBody] = None,
         query: Optional[dict[str, Any]] = None,
-    ) -> ApiModel | ResponseObject:
+    ) -> Any:
         url = self._build_url(path, query)
         if body is not None:
             body = self._without_top_level_idempotency(body)
@@ -169,7 +169,8 @@ class HttpClient:
         except Exception as e:
             raise NetworkError("Network request failed", e)
 
-        return self._parse_response(status, resp_body, headers, path)
+        text_body = resp_body.decode("utf-8") if isinstance(resp_body, bytes) else resp_body
+        return self._parse_response(status, text_body, headers, path)
 
     def _build_url(self, path: str, query: Optional[dict[str, Any]]) -> str:
         if path.startswith("http://") or path.startswith("https://"):
@@ -256,22 +257,21 @@ class HttpClient:
         body: str,
         headers: dict[str, str],
         path: str | None = None,
-    ) -> ApiModel | ResponseObject:
+    ) -> Any:
         parsed = self._parse_json(body)
         if status < 400:
             payload = parsed if isinstance(parsed, dict) else {}
             normalized_path = urllib.parse.urlparse(path).path if path else ""
-            response_type = response_type_for_path(normalized_path)
-            if response_type is not None:
+            response_shape = response_type_for_path(normalized_path)
+            if response_shape is not None:
                 try:
-                    decoded = decode_value(response_type, payload)
-                    if isinstance(decoded, ApiModel):
-                        return decoded
-                except ModelDecodeError:
-                    # Unknown enum values or a temporarily divergent server response
-                    # retain the legacy dynamic wrapper instead of losing data.
+                    value = payload if response_shape.field is None else payload[response_shape.field]
+                    return decode_value(response_shape.model, value)
+                except (ModelDecodeError, KeyError):
+                    # Preserve unexpected wire data for forward compatibility. Valid
+                    # documented payloads always decode to the endpoint's domain type.
                     pass
-            return ResponseObject(payload)
+            return DynamicValue(payload)
         return self._handle_error(status, headers, body, parsed)
 
     def _parse_json(self, body: str) -> Any:
@@ -288,7 +288,7 @@ class HttpClient:
         headers: dict[str, str],
         raw_body: str,
         parsed_body: Any | None = None,
-    ) -> ResponseObject:
+    ) -> DynamicValue:
         data = parsed_body if parsed_body is not None else self._parse_json(raw_body)
         message = "HTTP {}".format(status)
         payload = data

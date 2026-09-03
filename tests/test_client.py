@@ -186,13 +186,13 @@ class InttegroClientTest(unittest.TestCase):
             transport=BalanceTransactionTransport(),
         )
 
-        payment = client.balance_transactions.lookup("bt_payment").transaction
+        payment = client.balance_transactions.lookup("bt_payment")
         self.assertEqual("payment", payment.type)
         self.assertEqual("py_123", payment.payment_id)
         self.assertFalse(hasattr(payment, "refund_id"))
         self.assertEqual(2500, payment.amount.value)
 
-        refund = client.balance_transactions.page({"page_number": 1}).page.transactions[0]
+        refund = client.balance_transactions.page({"page_number": 1}).transactions[0]
         self.assertEqual("refund", refund.type)
         self.assertEqual("rf_123", refund.refund_id)
         self.assertFalse(hasattr(refund, "payment_id"))

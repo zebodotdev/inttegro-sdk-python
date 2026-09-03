@@ -52,7 +52,7 @@ class Payouts:
                     }
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - settings: Updated payout settings with new destinations
 
         Raises:
@@ -72,7 +72,7 @@ class Payouts:
                 "eur": "fa_bank_eur"
             })
 
-            settings = result.data["settings"]
+            settings = result
             print(f"Destinations configured: {settings['destinations']}")
 
             # Complete setup flow
@@ -88,7 +88,7 @@ class Payouts:
                 }
             })
 
-            fa_id = fa_result.data["financial_account"]["id"]
+            fa_id = fa_result["id"]
 
             # Step 2: Verify financial account
             client.financial_accounts.verify(fa_id)
@@ -125,7 +125,7 @@ class Payouts:
         to display current configuration or verify setup completion.
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - settings: Payout configuration including:
                     - schedule: Payout schedule object:
                         - type: "automatic" or "manual"
@@ -140,7 +140,7 @@ class Payouts:
             ```python
             # Get current settings
             result = client.payouts.settings()
-            settings = result.data["settings"]
+            settings = result
 
             print(f"Schedule: {settings['schedule']['type']}")
             print(f"Destinations: {settings['destinations']}")
@@ -149,7 +149,7 @@ class Payouts:
             # Check if setup is complete
             def is_payout_configured():
                 result = client.payouts.settings()
-                settings = result.data["settings"]
+                settings = result
 
                 has_destinations = bool(settings.get("destinations"))
                 has_schedule = settings.get("schedule", {}).get("type") is not None
@@ -164,7 +164,7 @@ class Payouts:
             # Display settings to user
             def show_payout_settings():
                 result = client.payouts.settings()
-                settings = result.data["settings"]
+                settings = result
 
                 schedule = settings["schedule"]
                 if schedule["type"] == "automatic":
@@ -194,7 +194,7 @@ class Payouts:
                 and optionally execute_after.
 
         Returns:
-            ResponseObject containing the scheduled payout.
+            domain object containing the scheduled payout.
         """
         return self.http.post("/payouts/schedule", payload)
 
@@ -206,7 +206,7 @@ class Payouts:
             payout_id: Payout identifier.
 
         Returns:
-            ResponseObject containing the payout.
+            domain object containing the payout.
         """
         return self.http.post("/payouts/lookup", {"payout_id": payout_id})
 
@@ -223,14 +223,14 @@ class Payouts:
         payout when you're ready to receive funds.
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - settings: Updated payout settings with manual schedule
 
         Example:
             ```python
             # Disable automatic payouts
             result = client.payouts.disable_automatic()
-            settings = result.data["settings"]
+            settings = result
 
             schedule = settings["schedule"]
             print(f"Schedule type: {schedule['type']}")  # "manual"
@@ -273,7 +273,7 @@ class Payouts:
         Re-enable automatic payouts for your application.
 
         Returns:
-            ResponseObject containing the updated payout settings.
+            domain object containing the updated payout settings.
         """
         return self.http.post("/payouts/enable", {})
 
@@ -290,14 +290,14 @@ class Payouts:
         all funds consolidated into one currency, or disable to keep currencies separate.
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - settings: Updated payout settings with FX enabled
 
         Example:
             ```python
             # Enable FX conversion
             result = client.payouts.enable_fx()
-            settings = result.data["settings"]
+            settings = result
 
             print(f"FX enabled: {settings.get('fx_enabled', False)}")
 
@@ -315,7 +315,7 @@ class Payouts:
 
             # Check FX status
             result = client.payouts.settings()
-            if result.data["settings"].get("fx_enabled"):
+            if result.get("fx_enabled"):
                 print("FX conversion is active")
             else:
                 print("Currencies paid out separately")
@@ -345,14 +345,14 @@ class Payouts:
         Disable FX if you want to maintain separate currency balances or avoid conversion fees.
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - settings: Updated payout settings with FX disabled
 
         Example:
             ```python
             # Disable FX conversion
             result = client.payouts.disable_fx()
-            settings = result.data["settings"]
+            settings = result
 
             print(f"FX enabled: {settings.get('fx_enabled', False)}")  # False
 
@@ -372,7 +372,7 @@ class Payouts:
 
             # Check what happens to unmapped currencies
             result = client.payouts.settings()
-            settings = result.data["settings"]
+            settings = result
 
             destinations = settings.get("destinations", {})
             print(f"Configured destinations: {list(destinations.keys())}")
@@ -406,7 +406,7 @@ class Payouts:
                 - page_size: Number of payouts per page (1-256, default: 20)
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - page: Object with:
                     - number: The page number returned
                     - size: Number of payouts in this page
@@ -423,7 +423,7 @@ class Payouts:
             ```python
             # Get recent payouts
             result = client.payouts.page({"page_number": 1, "page_size": 20})
-            page = result.data["page"]
+            page = result
 
             for payout in page["payouts"]:
                 amount = payout["amount"]
@@ -436,7 +436,7 @@ class Payouts:
                     "page_size": 50
                 })
 
-                page = result.data["page"]
+                page = result
                 if page["size"] == 0:
                     break
 
@@ -457,7 +457,7 @@ class Payouts:
                 })
 
                 total_paid = {}
-                for payout in result.data["page"]["payouts"]:
+                for payout in result.payouts:
                     if payout["status"] != "paid":
                         continue
 
@@ -492,7 +492,7 @@ class Payouts:
             payout_id: ID of the scheduled payout to cancel.
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - payout: Updated payout object with `status` set to `canceled`
         """
         return self.http.post("/payouts/cancel", {"payout_id": payout_id})

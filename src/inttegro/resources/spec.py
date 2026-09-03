@@ -30,7 +30,7 @@ class Spec:
         country-specific configuration.
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - countries: List of country objects with:
                     - code: ISO 3166-1 alpha-2 country code (e.g., "GH")
                     - name: Country name
@@ -43,7 +43,7 @@ class Spec:
             ```python
             # Get all supported countries
             result = client.spec.countries()
-            countries = result.data["countries"]
+            countries = result
 
             for country in countries:
                 print(f"{country['name']} ({country['code']})")
@@ -55,12 +55,12 @@ class Spec:
                 result = client.spec.countries()
                 return [
                     {"code": c["code"], "name": c["name"]}
-                    for c in result.data["countries"]
+                    for c in result
                 ]
 
             # Get mobile money issuers for Ghana
             result = client.spec.countries()
-            ghana = next(c for c in result.data["countries"] if c["code"] == "GH")
+            ghana = next(c for c in result if c["code"] == "GH")
             issuers = ghana.get("mobile_money", {}).get("issuers", [])
             print(f"Ghana mobile money: {issuers}")
             ```

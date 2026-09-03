@@ -28,7 +28,7 @@ class BalanceTransactions:
             transaction_id: Balance transaction identifier.
 
         Returns:
-            ResponseObject whose ``transaction`` contains required ``id``, ``type``,
+            domain object whose ``transaction`` contains required ``id``, ``type``,
             ``order_id``, ``amount``, and ``created_at`` fields. Switch on ``type`` to
             read exactly one matching ``payment_id`` or ``refund_id``.
         """
@@ -47,7 +47,7 @@ class BalanceTransactions:
                 - page_size: Number of transactions per page (1-256, default: 20)
 
         Returns:
-            ResponseObject containing:
+            domain object containing:
                 - page: Object with:
                     - number: The page number returned
                     - size: Number of transactions in this page

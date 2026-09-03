@@ -3,8 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from .._models import File, FilePage
 from ..http_client import HttpClient
-from ..response_object import ResponseObject
+from ..request_types import PageFilesRequest
 
 
 class FileDownload:
@@ -31,7 +32,7 @@ class Files:
         title: str | None = None,
         custom_data: dict[str, str] | None = None,
         idempotency_key: str | None = None,
-    ) -> ResponseObject:
+    ) -> File:
         headers = {"Idempotency-Key": idempotency_key} if idempotency_key else {}
         return self.http.post_multipart(
             "/files/create",
@@ -40,10 +41,10 @@ class Files:
             headers=headers,
         )
 
-    def lookup(self, file_id: str) -> ResponseObject:
+    def lookup(self, file_id: str) -> File:
         return self.http.post("/files/lookup", {"file_id": file_id})
 
-    def page(self, payload: dict[str, Any] | None = None) -> ResponseObject:
+    def page(self, payload: PageFilesRequest | None = None) -> FilePage:
         return self.http.post("/files/page", payload or {})
 
     def contents(self, *, file_id: str, disposition: str = "attachment") -> FileDownload:
@@ -53,5 +54,5 @@ class Files:
         )
         return FileDownload(data, headers)
 
-    def delete(self, file_id: str) -> ResponseObject:
+    def delete(self, file_id: str) -> File:
         return self.http.post("/files/delete", {"file_id": file_id})
