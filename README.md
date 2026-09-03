@@ -81,15 +81,15 @@ The SDK covers orders and checkout, customers, products and prices, purchase int
 Python-specific features:
 
 - Standard-library-only runtime with no third-party dependencies.
-- OpenAPI-generated, immutable request and response dataclasses with fully typed nested fields.
+- OpenAPI-generated, immutable request and domain dataclasses with fully typed nested fields.
 - Resource namespaces such as `inttegro.orders.CreateRequest` keep related request objects together.
-- Backwards-compatible mapping access and `to_dict()` conversion on every response model.
+- Backwards-compatible mapping access and `to_dict()` conversion on every domain object.
 - Backwards-compatible dictionary request payloads for integrations migrating to typed objects.
 - JSON-compatible string enums for public API values.
 - Configurable timeout, base URL, and injectable transport for tests or custom networking.
 - Structured authentication, rate-limit, network, timeout, and API exceptions.
 
-Request and response fields are available to editors, Pyright, and mypy without plugins:
+Request and returned domain fields are available to editors, Pyright, and mypy without plugins:
 
 ```python
 import os
@@ -109,8 +109,8 @@ request = inttegro.refunds.CreateRequest(
     ],
 )
 
-response: inttegro.RefundResponse = client.refunds.create(request)
-print(response.refund.id, response.refund.total.value)
+refund: inttegro.Refund = client.refunds.create(request)
+print(refund.id, refund.total.value)
 ```
 
 See the [API reference](https://studio.inttegro.com/api-reference) for request fields and lifecycle rules, [errors](https://studio.inttegro.com/errors) for recovery guidance, and [idempotency](https://studio.inttegro.com/idempotency) for safe retries.
@@ -121,7 +121,7 @@ The GitHub release for each version is the canonical record. It contains the exa
 
 ```bash
 sha256sum --check SHA256SUMS
-gh attestation verify inttegro-2.1.0-py3-none-any.whl \
+gh attestation verify inttegro-3.0.1-py3-none-any.whl \
   --repo zebodotdev/inttegro-sdk-python
 ```
 

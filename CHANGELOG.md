@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [3.0.1] - 2026-09-03
+
+- Corrected README examples and terminology to show direct domain return values.
+
 ## [3.0.0] - 2026-09-03
 
 - Breaking: every documented resource method now returns an immutable domain dataclass or page directly.
