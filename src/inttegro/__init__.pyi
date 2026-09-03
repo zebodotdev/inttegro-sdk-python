@@ -2,6 +2,7 @@
 
 from . import apps as apps
 from . import balance_transactions as balance_transactions
+from . import bank_accounts as bank_accounts
 from . import chimes as chimes
 from . import customers as customers
 from . import file_links as file_links
@@ -21,6 +22,7 @@ from . import products as products
 from . import purchase_intents as purchase_intents
 from . import refunds as refunds
 from . import upload_requests as upload_requests
+from . import wallets as wallets
 from .client import InttegroClient as InttegroClient
 from ._enums import AppCredentialOwner as AppCredentialOwner
 from ._enums import AppManagementRole as AppManagementRole

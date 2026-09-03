@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [6.0.0] - 2026-09-03
+
+- Breaking: moved wallet-specific types into `inttegro.wallets`.
+- Breaking: moved financial-account bank types into `inttegro.bank_accounts`.
+- Kept financial-account lifecycle requests in `inttegro.financial_accounts`.
+- Added a typed `bank_accounts.GhanaBankAccountParams` request dataclass instead of exposing the nested bank payload as `Any`.
+
 ## [5.0.0] - 2026-09-03
 
 - Breaking: made the catch-all enum implementation private and removed `WireEnum` from the public API.

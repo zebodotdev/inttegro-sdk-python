@@ -11,12 +11,14 @@ from inttegro import (
     Currency,
     Price,
     PriceParams,
+    bank_accounts,
     chimes,
     orders,
     payment_methods,
     payments,
     products,
     purchase_intents,
+    wallets,
 )
 from inttegro.money import Amount
 
@@ -87,6 +89,51 @@ class DomainModuleTest(unittest.TestCase):
         self.assertEqual("br_1", broadcast.id)
         self.assertEqual("sch_1", schedule.id)
         self.assertEqual("sms", chimes.ChimeTransport.SMS.value)
+
+    def test_financial_account_variants_have_focused_modules(self) -> None:
+        wallet = wallets.Wallet.from_dict(
+            {
+                "id": "wallet_1",
+                "type": "mobile_money",
+                "mobile_money": {"account_number": "233200000000", "network": "mtn"},
+            }
+        )
+        bank_account = bank_accounts.BankAccount.from_dict(
+            {
+                "type": "ghana_bank_account",
+                "ghana_bank_account": {
+                    "number": "0123456789",
+                    "holder": {
+                        "name": "Yaw Boakye",
+                        "address": {
+                            "country": "GH",
+                            "city": "Accra",
+                            "line_1": "1 Independence Avenue",
+                            "region": "Greater Accra",
+                        },
+                    },
+                },
+            }
+        )
+
+        self.assertEqual("mtn", wallet.mobile_money.network)
+        self.assertEqual("0123456789", bank_account.ghana_bank_account.number)
+
+        bank_params = bank_accounts.Params(
+            type=bank_accounts.BankAccountType.GHANA_BANK_ACCOUNT,
+            ghana_bank_account=bank_accounts.GhanaBankAccountParams(
+                number="0123456789",
+                sort_code="010100",
+                holder=bank_accounts.OwnerParams(
+                    name="Yaw Boakye",
+                    address=bank_accounts.OwnerAddressParams(country="GH"),
+                ),
+            ),
+        )
+        self.assertEqual(
+            "0123456789",
+            bank_params.to_dict()["ghana_bank_account"]["number"],
+        )
 
 
 if __name__ == "__main__":

@@ -1,30 +1,21 @@
 """Typed request objects for financial-account operations."""
 
-from ._enums import BankAccountType, FinancialAccountType, WalletType
+from ._enums import FinancialAccountType
 from .request_types import (
     FinancialAccountBankRequest as CreateBankRequest,
-    FinancialAccountBankRequestBankAccount as BankAccount,
     FinancialAccountBankRequestPullConfiguration as BankPullConfiguration,
     FinancialAccountBankRequestPushConfiguration as BankPushConfiguration,
     FinancialAccountDoshRequest as CreateDoshRequest,
     FinancialAccountDoshRequestPullConfiguration as DoshPullConfiguration,
     FinancialAccountDoshRequestPushConfiguration as DoshPushConfiguration,
-    FinancialAccountOwnerInput as Owner,
-    FinancialAccountOwnerInputAddress as OwnerAddress,
-    FinancialAccountOwnerUpdateInput as OwnerUpdate,
-    FinancialAccountOwnerUpdateInputAddress as OwnerUpdateAddress,
     FinancialAccountPageRequest as PageRequest,
     FinancialAccountUpdateRequest as UpdateRequest,
     FinancialAccountWalletRequest as CreateWalletRequest,
     FinancialAccountWalletRequestPullConfiguration as WalletPullConfiguration,
     FinancialAccountWalletRequestPushConfiguration as WalletPushConfiguration,
-    FinancialAccountWalletRequestWallet as Wallet,
-    FinancialAccountWalletRequestWalletMobileMoney as MobileMoney,
 )
 
 __all__ = [
-    "BankAccountType",
-    "BankAccount",
     "BankPullConfiguration",
     "BankPushConfiguration",
     "CreateBankRequest",
@@ -33,15 +24,8 @@ __all__ = [
     "DoshPullConfiguration",
     "DoshPushConfiguration",
     "FinancialAccountType",
-    "MobileMoney",
-    "Owner",
-    "OwnerAddress",
-    "OwnerUpdate",
-    "OwnerUpdateAddress",
     "PageRequest",
     "UpdateRequest",
-    "Wallet",
-    "WalletType",
     "WalletPullConfiguration",
     "WalletPushConfiguration",
 ]

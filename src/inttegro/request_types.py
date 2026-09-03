@@ -697,9 +697,18 @@ class FinancialAccountBankRequestPushConfiguration(ApiRequest):
     enabled: bool | UnsetType = field(default=UNSET)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
+class FinancialAccountBankRequestBankAccountGhanaBankAccount(ApiRequest):
+    bank_name: str | UnsetType = field(default=UNSET)
+    branch: str | UnsetType = field(default=UNSET)
+    sort_code: str | UnsetType = field(default=UNSET)
+    swift_code: str | UnsetType = field(default=UNSET)
+    holder: FinancialAccountOwnerInput | UnsetType = field(default=UNSET)
+    number: str
+
+@dataclass(frozen=True, slots=True, kw_only=True)
 class FinancialAccountBankRequestBankAccount(ApiRequest):
     type: Literal['ghana_bank_account', BankAccountType.GHANA_BANK_ACCOUNT]
-    ghana_bank_account: Any | Any
+    ghana_bank_account: FinancialAccountBankRequestBankAccountGhanaBankAccount
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class FinancialAccountDoshRequest(ApiRequest):

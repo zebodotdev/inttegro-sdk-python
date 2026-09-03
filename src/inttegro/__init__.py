@@ -18,6 +18,7 @@ from .price_types import Price, PriceParams
 from . import (
     apps,
     balance_transactions,
+    bank_accounts,
     chimes,
     customers,
     file_links,
@@ -36,6 +37,7 @@ from . import (
     purchase_intents,
     refunds,
     upload_requests,
+    wallets,
 )
 
 __all__ = [
@@ -53,6 +55,7 @@ __all__ = [
     "RateLimitError",
     "apps",
     "balance_transactions",
+    "bank_accounts",
     "chimes",
     "customers",
     "file_links",
@@ -71,4 +74,5 @@ __all__ = [
     "purchase_intents",
     "refunds",
     "upload_requests",
+    "wallets",
 ] + _enum_exports + _model_exports + _request_type_exports
