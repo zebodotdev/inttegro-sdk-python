@@ -1,5 +1,6 @@
 """Typed request objects for financial-account operations."""
 
+from ._enums import BankAccountType, FinancialAccountType, WalletType
 from .request_types import (
     FinancialAccountBankRequest as CreateBankRequest,
     FinancialAccountBankRequestBankAccount as BankAccount,
@@ -22,6 +23,7 @@ from .request_types import (
 )
 
 __all__ = [
+    "BankAccountType",
     "BankAccount",
     "BankPullConfiguration",
     "BankPushConfiguration",
@@ -30,6 +32,7 @@ __all__ = [
     "CreateWalletRequest",
     "DoshPullConfiguration",
     "DoshPushConfiguration",
+    "FinancialAccountType",
     "MobileMoney",
     "Owner",
     "OwnerAddress",
@@ -38,6 +41,7 @@ __all__ = [
     "PageRequest",
     "UpdateRequest",
     "Wallet",
+    "WalletType",
     "WalletPullConfiguration",
     "WalletPushConfiguration",
 ]

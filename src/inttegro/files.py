@@ -1,5 +1,13 @@
 """Typed request objects for file operations."""
 
+from ._enums import (
+    FileDelivery,
+    FileDisposition,
+    FileScanStatus,
+    FileSourceType,
+    FileStatus,
+    FileStorageEncoding,
+)
 from .request_types import (
     FileActorInput as Actor,
     FileContentsRequest as ContentsRequest,
@@ -8,4 +16,16 @@ from .request_types import (
     PageFilesRequest as PageRequest,
 )
 
-__all__ = ["Actor", "ContentsRequest", "PageRequest", "Party", "Resource"]
+__all__ = [
+    "Actor",
+    "ContentsRequest",
+    "FileDelivery",
+    "FileDisposition",
+    "FileScanStatus",
+    "FileSourceType",
+    "FileStatus",
+    "FileStorageEncoding",
+    "PageRequest",
+    "Party",
+    "Resource",
+]

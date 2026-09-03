@@ -1,5 +1,6 @@
 """Typed request objects for product operations."""
 
+from ._enums import ProductShipmentInputType, ProductShipmentType, ProductType
 from .request_types import (
     AddProductPriceRequest as AddPriceRequest,
     CreateProductRequest as CreateRequest,
@@ -25,6 +26,9 @@ __all__ = [
     "Media",
     "PageRequest",
     "PhysicalDimensions",
+    "ProductShipmentInputType",
+    "ProductShipmentType",
+    "ProductType",
     "AmountParams",
     "Shipment",
     "UpdateRequest",

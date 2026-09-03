@@ -1,5 +1,6 @@
 """Typed request objects for purchase-intent operations."""
 
+from ._enums import PurchaseIntentActivityType, PurchaseIntentStatus
 from .request_types import (
     CancelPurchaseIntentRequest as CancelRequest,
     CreatePurchaseIntentRequest as CreateRequest,
@@ -25,6 +26,8 @@ __all__ = [
     "PageRequest",
     "Price",
     "Product",
+    "PurchaseIntentActivityType",
+    "PurchaseIntentStatus",
     "Quantity",
     "UpdateQuantity",
     "UpdateRequest",

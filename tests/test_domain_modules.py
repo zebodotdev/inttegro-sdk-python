@@ -5,8 +5,20 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from inttegro import CatalogPrice, CatalogPriceParams, Currency, Price, PriceParams, chimes, payments
-from inttegro.money import Amount, AmountParams
+from inttegro import (
+    CatalogPrice,
+    CatalogPriceParams,
+    Currency,
+    Price,
+    PriceParams,
+    chimes,
+    orders,
+    payment_methods,
+    payments,
+    products,
+    purchase_intents,
+)
+from inttegro.money import Amount
 
 
 class DomainModuleTest(unittest.TestCase):
@@ -18,6 +30,7 @@ class DomainModuleTest(unittest.TestCase):
                 "id": "pr_123",
                 "active": True,
                 "nominal": {"currency": "ghs", "value": 3005},
+                "product_id": "prod_123",
                 "created_at": "2026-09-02T12:00:00Z",
             }
         )
@@ -30,7 +43,10 @@ class DomainModuleTest(unittest.TestCase):
         )
         self.assertIsInstance(catalog_price.nominal, Amount)
         self.assertEqual(Currency.GHS, catalog_price.nominal.currency)
+        self.assertEqual("prod_123", catalog_price.product_id)
         self.assertEqual(Currency.EUR, inline_price.currency)
+        self.assertEqual(Currency.GHS, Currency("GHS"))
+        self.assertIs(PriceParams, purchase_intents.NominalPrice)
 
     def test_payments_module_exposes_payment_lifecycle_types(self) -> None:
         payment = payments.Payment.from_dict(
@@ -40,6 +56,9 @@ class DomainModuleTest(unittest.TestCase):
         self.assertEqual("py_1", payment.id)
         self.assertEqual(5000, payment.amount.value)
         self.assertEqual("initiated", payments.PaymentStatus.INITIATED.value)
+        self.assertEqual("mobile_money", payment_methods.PaymentMethodType.MOBILE_MONEY.value)
+        self.assertEqual("product", orders.LineItemType.PRODUCT.value)
+        self.assertEqual("digital", products.ProductType.DIGITAL.value)
 
     def test_chimes_module_exposes_chimes_broadcasts_and_schedules(self) -> None:
         chime = chimes.Chime.from_dict({"id": "ch_1"})
@@ -67,6 +86,7 @@ class DomainModuleTest(unittest.TestCase):
         self.assertEqual("ch_1", chime.id)
         self.assertEqual("br_1", broadcast.id)
         self.assertEqual("sch_1", schedule.id)
+        self.assertEqual("sms", chimes.ChimeTransport.SMS.value)
 
 
 if __name__ == "__main__":

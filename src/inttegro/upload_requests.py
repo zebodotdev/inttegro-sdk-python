@@ -1,5 +1,6 @@
 """Typed request objects for upload-request operations."""
 
+from ._enums import UploadRequestStatus, UploadReviewDecision, UploadReviewType
 from .request_types import (
     CancelUploadRequestRequest as CancelRequest,
     CreateUploadRequestRequest as CreateRequest,
@@ -22,4 +23,7 @@ __all__ = [
     "ReviewByIDRequest",
     "ReviewByOrdinalRequest",
     "ReviewReason",
+    "UploadRequestStatus",
+    "UploadReviewDecision",
+    "UploadReviewType",
 ]

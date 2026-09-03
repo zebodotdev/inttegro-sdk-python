@@ -13,7 +13,7 @@ from ._models import (
     PaymentNextActionRedirect as RedirectAction,
     PaymentNextActionRedirectLatestVisit as RedirectVisit,
 )
-from .enums import (
+from ._enums import (
     CheckoutPaymentStatus,
     PaymentStatus,
     PaymentAttemptStatus,

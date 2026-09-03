@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 
 from ._model_base import ApiModel
 from ._request_base import ApiRequest
-from .enums import WireEnum
+from ._enums import WireEnum
 
 
 class Currency(WireEnum):
@@ -15,6 +15,15 @@ class Currency(WireEnum):
     GBP = "gbp"
     EUR = "eur"
     CNY = "cny"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "Currency | None":
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            for currency in cls:
+                if currency.value == normalized:
+                    return currency
+        return None
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

@@ -2195,6 +2195,7 @@ class CatalogPrice(ApiModel):
     about: str | None = field(init=False)
     active: bool = field(init=False)
     nominal: Amount = field(init=False)
+    product_id: str | None = field(init=False)
     product: PriceEmbeddedProduct | None = field(init=False)
     created_at: str = field(init=False)
     updated_at: str | None = field(init=False)

@@ -1,5 +1,6 @@
 """Chime, broadcast, and schedule domain objects."""
 
+from ._enums import ChimeEmailSchemaKind, ChimeRecipientType, ChimeTransport
 from ._models import (
     BroadcastCancelDetail as CanceledBroadcast,
     BroadcastCreationDetail as CreatedBroadcast,
@@ -42,6 +43,9 @@ __all__ = [
     "CanceledBroadcast",
     "CanceledSchedule",
     "Chime",
+    "ChimeEmailSchemaKind",
+    "ChimeRecipientType",
+    "ChimeTransport",
     "CreatedBroadcast",
     "Email",
     "EmailContent",

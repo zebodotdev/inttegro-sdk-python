@@ -8,7 +8,7 @@ from typing import Any, Literal, TypeAlias
 from ._request_base import ApiRequest, UNSET, UnsetType
 from .money import AmountParams
 from .price_types import PriceParams
-from .enums import (
+from ._enums import (
     AppCredentialOwner,
     AppManagementRole,
     BankAccountType,

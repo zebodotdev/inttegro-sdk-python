@@ -1,5 +1,6 @@
 """Typed request objects for payment-method operations."""
 
+from ._enums import MobileMoneyNetwork, PaymentMethodType
 from .request_types import (
     PaymentMethodOwnerInput as Owner,
     PaymentMethodOwnerInputAddress as OwnerAddress,
@@ -13,9 +14,11 @@ from .request_types import (
 
 __all__ = [
     "MobileMoney",
+    "MobileMoneyNetwork",
     "Owner",
     "OwnerAddress",
     "PageRequest",
+    "PaymentMethodType",
     "TokenizeMobileMoneyRequest",
     "UpdateOwner",
     "UpdateOwnerAddress",

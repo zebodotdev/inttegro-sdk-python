@@ -1,5 +1,6 @@
 """Typed request objects for refund operations."""
 
+from ._enums import RefundReason, RefundStatus
 from .request_types import (
     CancelRefundRequest as CancelRequest,
     CreateRefundLineItemInput as LineItem,
@@ -9,4 +10,13 @@ from .request_types import (
 )
 from .money import AmountParams
 
-__all__ = ["AmountParams", "CancelRequest", "CreateRequest", "LineItem", "PageRequest", "RequestMeta"]
+__all__ = [
+    "AmountParams",
+    "CancelRequest",
+    "CreateRequest",
+    "LineItem",
+    "PageRequest",
+    "RefundReason",
+    "RefundStatus",
+    "RequestMeta",
+]

@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [5.0.0] - 2026-09-03
+
+- Breaking: made the catch-all enum implementation private and removed `WireEnum` from the public API.
+- Re-exported enum types from their owning domain modules, including `payments`, `chimes`, `orders`, and `products`.
+
+- Normalize legacy uppercase currency values when decoding typed amount responses while keeping lowercase wire values for requests.
+
 ## [4.0.0] - 2026-09-03
 
 - Breaking: renamed order-prefixed payment models to semantic `Payment`, `PaymentAttempt`, `PaymentMethodSnapshot`, and `PaymentPayoutConfiguration` types.

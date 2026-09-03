@@ -1,5 +1,6 @@
 """Typed request objects for file-link operations."""
 
+from ._enums import FileLinkDeliveryMode, FileLinkKind, FileLinkStatus
 from .request_types import (
     CreateFileLinkRequest as CreateRequest,
     FileLinkAccessRequest as Access,
@@ -8,4 +9,13 @@ from .request_types import (
     RevokeFileLinkRequest as RevokeRequest,
 )
 
-__all__ = ["Access", "CreateRequest", "Delivery", "PageRequest", "RevokeRequest"]
+__all__ = [
+    "Access",
+    "CreateRequest",
+    "Delivery",
+    "FileLinkDeliveryMode",
+    "FileLinkKind",
+    "FileLinkStatus",
+    "PageRequest",
+    "RevokeRequest",
+]

@@ -1,4 +1,4 @@
-"""Typed string constants for enums published by the Inttegro API."""
+"""Internal enum definitions re-exported by public domain modules."""
 
 from enum import Enum
 
@@ -397,5 +397,5 @@ class OTPVerificationVerdict(WireEnum):
 __all__ = [
     name
     for name, value in globals().items()
-    if isinstance(value, type) and issubclass(value, WireEnum)
+    if name != "WireEnum" and isinstance(value, type) and issubclass(value, WireEnum)
 ]

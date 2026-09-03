@@ -1,5 +1,12 @@
 """Typed request objects for message-template operations."""
 
+from ._enums import (
+    ContentSafetyStatus,
+    MessageTemplateChannel,
+    MessageTemplateStatus,
+    MessageTemplateVariableItemType,
+    MessageTemplateVariableType,
+)
 from .request_types import (
     CreateEmailMessageTemplateRequest as CreateEmailRequest,
     CreateSMSMessageTemplateRequest as CreateSMSRequest,
@@ -14,10 +21,15 @@ from .request_types import (
 )
 
 __all__ = [
+    "ContentSafetyStatus",
     "CreateEmailRequest",
     "CreateSMSRequest",
     "EmailContent",
     "Mailbox",
+    "MessageTemplateChannel",
+    "MessageTemplateStatus",
+    "MessageTemplateVariableItemType",
+    "MessageTemplateVariableType",
     "PageRequest",
     "RenderPreviewRequest",
     "SMSContent",
