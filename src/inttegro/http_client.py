@@ -18,7 +18,9 @@ from ._request_base import ApiRequest, encode_request_value
 from ._response_types import response_type_for_path
 from .errors import APIError, AuthenticationError, NetworkError, RateLimitError, TimeoutError
 from ._dynamic_value import DynamicValue
+from ._telemetry import Telemetry
 from .version import VERSION
+from opentelemetry.trace import TracerProvider
 
 
 Transport = Callable[[urllib.request.Request, float | None], tuple[int, Dict[str, str], str | bytes]]
@@ -31,6 +33,7 @@ class HttpClient:
     timeout: float
     transport: Transport | None
     user_agent: str
+    telemetry: Telemetry
 
     def __init__(
         self,
@@ -38,6 +41,8 @@ class HttpClient:
         base_url: str = "https://api.inttegro.com",
         timeout: float = 30.0,
         transport: Optional[Transport] = None,
+        telemetry_enabled: bool = True,
+        tracer_provider: TracerProvider | None = None,
     ) -> None:
         if not api_key:
             raise ValueError("api_key is required")
@@ -47,6 +52,11 @@ class HttpClient:
         self.timeout = timeout
         self.transport = transport
         self.user_agent = f"inttegro-sdk-python/{VERSION}"
+        self.telemetry = Telemetry(
+            VERSION,
+            enabled=telemetry_enabled,
+            tracer_provider=tracer_provider,
+        )
 
     def get(self, path: str, query: Optional[dict[str, Any]] = None) -> Any:
         return self.request("GET", path, query=query)
@@ -65,20 +75,25 @@ class HttpClient:
         body: Optional[RequestBody] = None,
         headers: Optional[dict[str, str]] = None,
     ) -> Any:
-        request_headers = dict(headers or {})
-        request_body = self._without_top_level_idempotency(body or {})
-        if self._is_idempotent_mutation_path(path) and not self._has_header(request_headers, "Idempotency-Key"):
-            request_body = self._with_request_meta_idempotency(request_body)
-        data = json.dumps(request_body).encode("utf-8")
-        req = urllib.request.Request(url=self._build_url(path, None), data=data, method="POST")
-        req.add_header("Accept", "application/json")
-        req.add_header("Authorization", f"Bearer {self.api_key}")
-        req.add_header("Content-Type", "application/json")
-        req.add_header("User-Agent", self.user_agent)
-        for key, value in request_headers.items():
-            req.add_header(key, value)
-        status, response_headers, response_body = self._send(req)
-        return self._parse_response(status, response_body.decode("utf-8"), response_headers, path)
+        with self.telemetry.operation(path, "POST", self.base_url, VERSION) as span:
+            request_headers = dict(headers or {})
+            request_body = self._without_top_level_idempotency(body or {})
+            if self._is_idempotent_mutation_path(path) and not self._has_header(request_headers, "Idempotency-Key"):
+                request_body = self._with_request_meta_idempotency(request_body)
+            data = json.dumps(request_body).encode("utf-8")
+            req = urllib.request.Request(url=self._build_url(path, None), data=data, method="POST")
+            req.add_header("Accept", "application/json")
+            req.add_header("Authorization", f"Bearer {self.api_key}")
+            req.add_header("Content-Type", "application/json")
+            req.add_header("User-Agent", self.user_agent)
+            for key, value in request_headers.items():
+                req.add_header(key, value)
+            self.telemetry.prepare(span, req)
+            status, response_headers, response_body = self._send(req)
+            self.telemetry.response(span, status, response_headers, decoded=False)
+            result = self._parse_response(status, response_body.decode("utf-8"), response_headers, path)
+            self.telemetry.decoded(span)
+            return result
 
     def post_multipart(
         self,
@@ -87,44 +102,62 @@ class HttpClient:
         files: dict[str, str],
         headers: Optional[dict[str, str]] = None,
         authenticated: bool = True,
+        operation: str | None = None,
     ) -> Any:
-        boundary = "----InttegroBoundary{}".format(uuid.uuid4().hex)
-        data = self._encode_multipart(fields, files, boundary)
-        req = urllib.request.Request(url=self._build_url(path, None), data=data, method="POST")
-        req.add_header("Accept", "application/json")
-        req.add_header("Content-Type", f"multipart/form-data; boundary={boundary}")
-        req.add_header("User-Agent", self.user_agent)
-        if authenticated:
-            req.add_header("Authorization", f"Bearer {self.api_key}")
-        request_headers = dict(headers or {})
-        if authenticated and self._is_idempotent_mutation_path(path) and not self._has_header(request_headers, "Idempotency-Key"):
-            request_headers["Idempotency-Key"] = generate_idempotency_key()
-        for key, value in request_headers.items():
-            req.add_header(key, value)
+        with self.telemetry.operation(path, "POST", self.base_url, VERSION, operation) as span:
+            boundary = "----InttegroBoundary{}".format(uuid.uuid4().hex)
+            data = self._encode_multipart(fields, files, boundary)
+            req = urllib.request.Request(url=self._build_url(path, None), data=data, method="POST")
+            req.add_header("Accept", "application/json")
+            req.add_header("Content-Type", f"multipart/form-data; boundary={boundary}")
+            req.add_header("User-Agent", self.user_agent)
+            if authenticated:
+                req.add_header("Authorization", f"Bearer {self.api_key}")
+            request_headers = dict(headers or {})
+            if authenticated and self._is_idempotent_mutation_path(path) and not self._has_header(request_headers, "Idempotency-Key"):
+                request_headers["Idempotency-Key"] = generate_idempotency_key()
+            for key, value in request_headers.items():
+                req.add_header(key, value)
 
-        status, response_headers, body = self._send(req)
-        return self._parse_response(status, body.decode("utf-8"), response_headers, path)
+            self.telemetry.prepare(span, req)
+            status, response_headers, response_body = self._send(req)
+            self.telemetry.response(span, status, response_headers, decoded=False)
+            result = self._parse_response(status, response_body.decode("utf-8"), response_headers, path)
+            self.telemetry.decoded(span)
+            return result
 
     def post_binary_json(self, path: str, body: RequestBody) -> tuple[bytes, dict[str, str]]:
-        body = self._without_top_level_idempotency(body)
-        data = json.dumps(body).encode("utf-8")
-        req = urllib.request.Request(url=self._build_url(path, None), data=data, method="POST")
-        req.add_header("Accept", "application/octet-stream")
-        req.add_header("Authorization", f"Bearer {self.api_key}")
-        req.add_header("Content-Type", "application/json")
-        req.add_header("User-Agent", self.user_agent)
-        status, headers, response_body = self._send(req)
-        if status >= 400:
-            self._handle_error(status, headers, response_body.decode("utf-8"))
-        return response_body, headers
+        with self.telemetry.operation(path, "POST", self.base_url, VERSION) as span:
+            body = self._without_top_level_idempotency(body)
+            data = json.dumps(body).encode("utf-8")
+            req = urllib.request.Request(url=self._build_url(path, None), data=data, method="POST")
+            req.add_header("Accept", "application/octet-stream")
+            req.add_header("Authorization", f"Bearer {self.api_key}")
+            req.add_header("Content-Type", "application/json")
+            req.add_header("User-Agent", self.user_agent)
+            self.telemetry.prepare(span, req)
+            status, headers, response_body = self._send(req)
+            self.telemetry.response(span, status, headers, decoded=False)
+            if status >= 400:
+                self._handle_error(status, headers, response_body.decode("utf-8"))
+            self.telemetry.decoded(span)
+            return response_body, headers
 
-    def get_binary_public(self, url: str) -> tuple[bytes, dict[str, str]]:
-        req = urllib.request.Request(url=url, method="GET")
-        req.add_header("User-Agent", self.user_agent)
-        status, headers, response_body = self._send(req)
-        if status >= 400:
-            self._handle_error(status, headers, response_body.decode("utf-8"))
-        return response_body, headers
+    def get_binary_public(
+        self,
+        url: str,
+        operation: str = "file_links.download",
+    ) -> tuple[bytes, dict[str, str]]:
+        with self.telemetry.operation(url, "GET", self.base_url, VERSION, operation) as span:
+            req = urllib.request.Request(url=url, method="GET")
+            req.add_header("User-Agent", self.user_agent)
+            self.telemetry.prepare(span, req)
+            status, headers, response_body = self._send(req)
+            self.telemetry.response(span, status, headers, decoded=False)
+            if status >= 400:
+                self._handle_error(status, headers, response_body.decode("utf-8"))
+            self.telemetry.decoded(span)
+            return response_body, headers
 
     def request(
         self,
@@ -133,44 +166,50 @@ class HttpClient:
         body: Optional[RequestBody] = None,
         query: Optional[dict[str, Any]] = None,
     ) -> Any:
-        url = self._build_url(path, query)
-        if body is not None:
-            body = self._without_top_level_idempotency(body)
-        if method.upper() == "POST" and self._is_idempotent_mutation_path(path):
-            body = self._with_request_meta_idempotency(body or {})
-        data = json.dumps(body).encode("utf-8") if body is not None else None
+        with self.telemetry.operation(path, method, self.base_url, VERSION) as span:
+            url = self._build_url(path, query)
+            if body is not None:
+                body = self._without_top_level_idempotency(body)
+            if method.upper() == "POST" and self._is_idempotent_mutation_path(path):
+                body = self._with_request_meta_idempotency(body or {})
+            data = json.dumps(body).encode("utf-8") if body is not None else None
 
-        req = urllib.request.Request(url=url, data=data, method=method.upper())
-        req.add_header("Accept", "application/json")
-        req.add_header("Authorization", f"Bearer {self.api_key}")
-        req.add_header("User-Agent", self.user_agent)
-        if data is not None:
-            req.add_header("Content-Type", "application/json")
+            req = urllib.request.Request(url=url, data=data, method=method.upper())
+            req.add_header("Accept", "application/json")
+            req.add_header("Authorization", f"Bearer {self.api_key}")
+            req.add_header("User-Agent", self.user_agent)
+            if data is not None:
+                req.add_header("Content-Type", "application/json")
+            self.telemetry.prepare(span, req)
 
-        try:
-            if self.transport:
-                status, headers, resp_body = self.transport(req, self.timeout)
-            else:
-                with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-                    status = resp.status
-                    headers = {k.lower(): v for k, v in resp.headers.items()}
-                    resp_body = resp.read().decode("utf-8")
-        except urllib.error.HTTPError as e:
-            status = e.code
-            headers = {k.lower(): v for k, v in e.headers.items()}
-            resp_body = e.read().decode("utf-8")
-            return self._handle_error(status, headers, resp_body)
-        except urllib.error.URLError as e:
-            if isinstance(e.reason, socket.timeout):
+            try:
+                if self.transport:
+                    status, headers, resp_body = self.transport(req, self.timeout)
+                else:
+                    with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                        status = resp.status
+                        headers = {k.lower(): v for k, v in resp.headers.items()}
+                        resp_body = resp.read().decode("utf-8")
+            except urllib.error.HTTPError as e:
+                status = e.code
+                headers = {k.lower(): v for k, v in e.headers.items()}
+                resp_body = e.read().decode("utf-8")
+                self.telemetry.response(span, status, headers, decoded=False)
+                return self._handle_error(status, headers, resp_body)
+            except urllib.error.URLError as e:
+                if isinstance(e.reason, socket.timeout):
+                    raise TimeoutError("Request timed out", e)
+                raise NetworkError("Network request failed", e)
+            except TimeoutError as e:
                 raise TimeoutError("Request timed out", e)
-            raise NetworkError("Network request failed", e)
-        except TimeoutError as e:
-            raise TimeoutError("Request timed out", e)
-        except Exception as e:
-            raise NetworkError("Network request failed", e)
+            except Exception as e:
+                raise NetworkError("Network request failed", e)
 
-        text_body = resp_body.decode("utf-8") if isinstance(resp_body, bytes) else resp_body
-        return self._parse_response(status, text_body, headers, path)
+            text_body = resp_body.decode("utf-8") if isinstance(resp_body, bytes) else resp_body
+            self.telemetry.response(span, status, headers, decoded=False)
+            result = self._parse_response(status, text_body, headers, path)
+            self.telemetry.decoded(span)
+            return result
 
     def _build_url(self, path: str, query: Optional[dict[str, Any]]) -> str:
         if path.startswith("http://") or path.startswith("https://"):

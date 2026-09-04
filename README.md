@@ -74,13 +74,26 @@ except APIError as error:
 
 Amounts use integer minor units: `5000` GHS is GHS 50.00. Reuse the same idempotency key when retrying the same logical write. If you omit one, the SDK generates a UUIDv7 key for mutating calls.
 
+## Observe SDK operations
+
+The SDK emits vendor-neutral OpenTelemetry spans through your application's provider. It never configures an exporter or sends telemetry by itself. Configure OpenTelemetry at application startup; the global provider is used automatically, or pass `tracer_provider` explicitly:
+
+```python
+client = inttegro.InttegroClient(
+    api_key=os.environ["INTTEGRO_API_KEY"],
+    tracer_provider=tracer_provider,
+)
+```
+
+Spans are named after logical operations such as `inttegro.orders.create`. HTTP attempts, response receipt, and decoding are span events. API keys, bodies, resource IDs, dynamic URLs, and exception messages are never recorded. See [SDK observability](https://studio.inttegro.com/sdk-observability) for the complete contract and set `telemetry_enabled=False` when needed.
+
 ## Work with the API
 
 The SDK covers orders and checkout, customers, products and prices, purchase intents, payment methods, balances, payouts and refunds, notifications, files, application settings, keys, and country specifications. Resources use snake-case attributes such as `purchase_intents` and `payment_methods`.
 
 Python-specific features:
 
-- Standard-library-only runtime with no third-party dependencies.
+- Standard-library HTTP transport with the lightweight OpenTelemetry API for application-owned tracing.
 - OpenAPI-generated, immutable request and domain dataclasses with fully typed nested fields.
 - Resource namespaces such as `inttegro.orders.CreateRequest` keep related request objects together.
 - Backwards-compatible mapping access and `to_dict()` conversion on every domain object.
@@ -121,7 +134,7 @@ The GitHub release for each version is the canonical record. It contains the exa
 
 ```bash
 sha256sum --check SHA256SUMS
-gh attestation verify inttegro-6.0.0-py3-none-any.whl \
+gh attestation verify inttegro-6.1.0-py3-none-any.whl \
   --repo zebodotdev/inttegro-sdk-python
 ```
 

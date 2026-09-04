@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "inttegro"
-version = "6.0.0"
+version = "6.1.0"
 description = "Official Python SDK for the Inttegro API"
 authors = ["Inttegro Engineering <engineering@inttegro.com>"]
 license = "MIT"
@@ -15,11 +15,13 @@ Documentation = "https://studio.inttegro.com/api-reference"
 
 [tool.poetry.dependencies]
 python = ">=3.10"
+opentelemetry-api = ">=1.27,<2"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.6.1"
 mypy = "2.3.1"
 pyright = "1.1.411"
+opentelemetry-sdk = "^1.44.0"
 
 [tool.mypy]
 python_version = "3.10"

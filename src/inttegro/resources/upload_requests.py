@@ -38,4 +38,10 @@ class UploadRequests:
         return self.http.post_with_headers("/upload_requests/review", payload, headers)
 
     def fulfill(self, *, upload_url: str, file: str) -> UploadFulfillment:
-        return self.http.post_multipart(upload_url, {}, {"file": file}, authenticated=False)
+        return self.http.post_multipart(
+            upload_url,
+            {},
+            {"file": file},
+            authenticated=False,
+            operation="upload_requests.upload",
+        )

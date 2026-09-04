@@ -10,8 +10,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import inttegro
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from inttegro import AuthenticationError, Order, OrderDocumentDeliveryResult, OrderPage, Refund
 from inttegro.client import InttegroClient
+from inttegro._telemetry import _request_details
 
 
 UUID_V7_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", re.I)
@@ -158,6 +162,69 @@ def read_openapi_paths(path: Path) -> list[str]:
 
 
 class InttegroClientTest(unittest.TestCase):
+    def test_telemetry_does_not_name_unknown_routes_from_resource_ids(self):
+        operation, route, server_address = _request_details(
+            "/orders/or_private_123", "https://api.inttegro.com", None
+        )
+
+        self.assertEqual("http.request", operation)
+        self.assertIsNone(route)
+        self.assertEqual("api.inttegro.com", server_address)
+
+    def test_emits_redacted_opentelemetry_span_and_propagates_context(self):
+        exporter = InMemorySpanExporter()
+        provider = TracerProvider()
+        provider.add_span_processor(SimpleSpanProcessor(exporter))
+        recorder = TransportRecorder()
+        client = InttegroClient(
+            api_key="sk_live_must_not_appear",
+            transport=recorder,
+            tracer_provider=provider,
+        )
+
+        client.orders.lookup("ord_private")
+
+        spans = exporter.get_finished_spans()
+        self.assertEqual(1, len(spans))
+        span = spans[0]
+        self.assertEqual("inttegro.orders.lookup", span.name)
+        self.assertEqual("python", span.attributes["inttegro.sdk.language"])
+        self.assertEqual(200, span.attributes["http.response.status_code"])
+        self.assertEqual(
+            [
+                "inttegro.request.prepared",
+                "inttegro.http.attempt.started",
+                "inttegro.response.received",
+                "inttegro.response.decoded",
+            ],
+            [event.name for event in span.events],
+        )
+        request_headers = {key.lower(): value for key, value in recorder.requests[0].header_items()}
+        self.assertIn("traceparent", request_headers)
+        encoded = repr(span.attributes) + repr(span.events)
+        self.assertNotIn("sk_live_must_not_appear", encoded)
+        self.assertNotIn("ord_private", encoded)
+
+    def test_opentelemetry_errors_are_redacted(self):
+        exporter = InMemorySpanExporter()
+        provider = TracerProvider()
+        provider.add_span_processor(SimpleSpanProcessor(exporter))
+        client = InttegroClient(
+            api_key="bad",
+            transport=ErrorTransport(),
+            tracer_provider=provider,
+        )
+
+        with self.assertRaises(AuthenticationError):
+            client.orders.lookup("ord_private")
+
+        span = exporter.get_finished_spans()[0]
+        self.assertEqual("http_401", span.attributes["error.type"])
+        self.assertEqual("ERROR", span.status.status_code.name)
+        encoded = repr(span.attributes) + repr(span.events)
+        self.assertNotIn("invalid", encoded)
+        self.assertNotIn("ord_private", encoded)
+
     def test_orders_return_domain_models_instead_of_wire_envelopes(self):
         recorder = TransportRecorder()
         client = InttegroClient(api_key="test", transport=recorder)

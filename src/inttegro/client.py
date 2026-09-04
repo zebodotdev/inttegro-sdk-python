@@ -24,6 +24,7 @@ from .resources.spec import Spec
 from .resources.balances import Balances
 from .resources.upload_requests import UploadRequests
 from .resources.apps import Apps
+from opentelemetry.trace import TracerProvider
 
 
 class InttegroClient:
@@ -119,6 +120,8 @@ class InttegroClient:
         base_url: str = "https://api.inttegro.com",
         timeout: float = 30.0,
         transport: Transport | None = None,
+        telemetry_enabled: bool = True,
+        tracer_provider: TracerProvider | None = None,
     ) -> None:
         """
         Initialize a new Inttegro client.
@@ -133,6 +136,9 @@ class InttegroClient:
                 long-running operations or slow networks.
             transport: Custom HTTP transport adapter. Pass a requests.Session or
                 custom transport for connection pooling, retries, or proxies.
+            telemetry_enabled: Emit spans to the configured OpenTelemetry provider.
+                Defaults to True. The SDK never configures an exporter.
+            tracer_provider: Optional OpenTelemetry tracer provider override.
 
         Raises:
             ValueError: If api_key is empty or invalid
@@ -155,7 +161,14 @@ class InttegroClient:
             )
             ```
         """
-        self.http = HttpClient(api_key=api_key, base_url=base_url, timeout=timeout, transport=transport)
+        self.http = HttpClient(
+            api_key=api_key,
+            base_url=base_url,
+            timeout=timeout,
+            transport=transport,
+            telemetry_enabled=telemetry_enabled,
+            tracer_provider=tracer_provider,
+        )
 
         self.orders = Orders(self.http)
         self.payment_methods = PaymentMethods(self.http)
