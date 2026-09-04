@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [6.1.1] - 2026-09-04
+
+- Fixed the release version check so it does not import runtime dependencies before installation.
+
 ## [6.1.0] - 2026-09-04
 
 - Added vendor-neutral OpenTelemetry spans for logical SDK operations, HTTP attempts, response receipt, decoding, and safe failure categories.
