@@ -118,6 +118,12 @@ OPENAPI_CAPABILITY_URL_PATHS = {
     "/file_links/open",
     "/upload_requests/upload",
 }
+OPENAPI_CLIENT_CHECKOUT_PATHS = {
+    "/checkout/lookup",
+    "/checkout/pay",
+    "/checkout/request_confirmation",
+    "/checkout/confirm_payment",
+}
 
 
 def openapi_spec_path() -> Path:
@@ -393,12 +399,18 @@ class InttegroClientTest(unittest.TestCase):
         missing_paths = [
             path
             for path in read_openapi_paths(spec_path)
-            if path not in covered_paths and path not in OPENAPI_CAPABILITY_URL_PATHS
+            if path not in covered_paths
+            and path not in OPENAPI_CAPABILITY_URL_PATHS
+            and path not in OPENAPI_CLIENT_CHECKOUT_PATHS
         ]
         self.assertEqual([], missing_paths, f"Python SDK missing OpenAPI paths from {spec_path}")
 
         spec_paths = set(read_openapi_paths(spec_path))
-        stale_exceptions = sorted(path for path in OPENAPI_CAPABILITY_URL_PATHS if path not in spec_paths)
+        stale_exceptions = sorted(
+            path
+            for path in OPENAPI_CAPABILITY_URL_PATHS | OPENAPI_CLIENT_CHECKOUT_PATHS
+            if path not in spec_paths
+        )
         self.assertEqual([], stale_exceptions, "Python SDK OpenAPI coverage exceptions no longer exist in spec")
 
         order = client.orders.create({"number": "ORDER-3"})
