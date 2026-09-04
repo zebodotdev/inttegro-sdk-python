@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [6.1.2] - 2026-09-04
+
+- Restored a 100% Pyright public type-completeness score by explicitly typing the OpenTelemetry tracer.
+
 ## [6.1.1] - 2026-09-04
 
 - Fixed the release version check so it does not import runtime dependencies before installation.

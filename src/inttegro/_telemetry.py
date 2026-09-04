@@ -7,7 +7,7 @@ from urllib.parse import urljoin, urlparse
 from urllib.request import Request
 
 from opentelemetry import propagate, trace
-from opentelemetry.trace import Span, SpanKind, Status, StatusCode, TracerProvider
+from opentelemetry.trace import Span, SpanKind, Status, StatusCode, Tracer, TracerProvider
 
 from .errors import APIError, NetworkError, TimeoutError
 
@@ -46,7 +46,7 @@ class Telemetry:
         tracer_provider: TracerProvider | None = None,
     ) -> None:
         self.enabled = enabled
-        self.tracer = trace.get_tracer(INSTRUMENTATION_NAME, version, tracer_provider)
+        self.tracer: Tracer = trace.get_tracer(INSTRUMENTATION_NAME, version, tracer_provider)
 
     @contextmanager
     def operation(
