@@ -54,11 +54,15 @@ jobs:
           test "${runtime_version}" = "${package_version}"
           test "$(git rev-list -n 1 "${GITHUB_REF_NAME}")" = "${GITHUB_SHA}"
 
+      - name: Install the locked build environment
+        run: |
+          python -m pip install --disable-pip-version-check --require-hashes -r requirements-bootstrap.txt
+          poetry sync --with dev --no-interaction
+
       - name: Test and build
         run: |
-          python -m pip install --disable-pip-version-check build==1.6.0 "opentelemetry-sdk>=1.44,<2"
-          python -m unittest discover -s tests -p "test_*.py"
-          python -m build
+          poetry run python -m unittest discover -s tests -p "test_*.py"
+          poetry build
 
       - name: Inspect the distributions
         shell: bash
@@ -81,7 +85,7 @@ jobs:
           set -euo pipefail
           mkdir -p artifacts
           cp dist/*.whl dist/*.tar.gz artifacts/
-          cp "${{ steps.attest.outputs.bundle-path }}" artifacts/ATTESTATION.sigstore.jsonl
+          cp "${{ steps.attest.outputs.bundle-path }}" artifacts/ATTESTATIONS.sigstore
           {
             echo "repository=https://github.com/${GITHUB_REPOSITORY}"
             echo "tag=${GITHUB_REF_NAME}"
@@ -90,7 +94,7 @@ jobs:
           } > artifacts/PROVENANCE.txt
           (
             cd artifacts
-            sha256sum ./*.whl ./*.tar.gz ./ATTESTATION.sigstore.jsonl ./PROVENANCE.txt > SHA256SUMS
+            sha256sum ./*.whl ./*.tar.gz ./ATTESTATIONS.sigstore ./PROVENANCE.txt > SHA256SUMS
           )
 
       - name: Create the draft GitHub release

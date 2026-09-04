@@ -37,10 +37,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Poetry
-        run: python -m pip install --disable-pip-version-check poetry==2.4.2
+        run: python -m pip install --disable-pip-version-check --require-hashes -r requirements-bootstrap.txt
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry sync --no-interaction
 
       - name: Run tests
         run: |
