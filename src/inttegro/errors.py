@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from typing import TypeAlias
+from typing import TYPE_CHECKING, TypeAlias
+
+if TYPE_CHECKING:
+    from ._error_report_types import ErrorReport
 
 
 JSONValue: TypeAlias = str | int | float | bool | None | list["JSONValue"] | dict[str, "JSONValue"]
@@ -8,6 +11,12 @@ JSONValue: TypeAlias = str | int | float | bool | None | list["JSONValue"] | dic
 
 class InttegroError(Exception):
     """Base error for the Inttegro SDK."""
+
+    report: "ErrorReport | None"
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+        self.report = None
 
 
 class NetworkError(InttegroError):
@@ -36,6 +45,7 @@ class APIError(InttegroError):
     cause: str | None
     body: str | None
     data: JSONValue
+    request_id: str | None
 
     def __init__(
         self,
@@ -49,6 +59,7 @@ class APIError(InttegroError):
         cause: str | None = None,
         body: str | None = None,
         data: JSONValue = None,
+        request_id: str | None = None,
     ) -> None:
         super().__init__(message)
         self.status = status
@@ -60,6 +71,7 @@ class APIError(InttegroError):
         self.cause = cause
         self.body = body
         self.data = data
+        self.request_id = request_id
 
 
 class AuthenticationError(APIError):
@@ -84,6 +96,7 @@ class RateLimitError(APIError):
         body: str | None = None,
         data: JSONValue = None,
         retry_after: int | None = None,
+        request_id: str | None = None,
     ) -> None:
         super().__init__(
             message,
@@ -96,5 +109,6 @@ class RateLimitError(APIError):
             cause=cause,
             body=body,
             data=data,
+            request_id=request_id,
         )
         self.retry_after = retry_after

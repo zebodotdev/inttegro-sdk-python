@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 from contextlib import contextmanager
 from typing import Generator
 from urllib.parse import urljoin, urlparse
@@ -10,6 +11,13 @@ from opentelemetry import propagate, trace
 from opentelemetry.trace import Span, SpanKind, Status, StatusCode, Tracer, TracerProvider
 
 from .errors import APIError, NetworkError, TimeoutError
+from .error_reporting import (
+    ErrorReporter,
+    ErrorReportingPolicy,
+    create_error_report,
+    should_report,
+)
+from .errors import InttegroError
 
 
 INSTRUMENTATION_NAME = "inttegro"
@@ -44,8 +52,12 @@ class Telemetry:
         *,
         enabled: bool = True,
         tracer_provider: TracerProvider | None = None,
+        error_reporter: ErrorReporter | None = None,
+        error_reporting_policy: ErrorReportingPolicy = "unexpected",
     ) -> None:
         self.enabled = enabled
+        self.error_reporter = error_reporter
+        self.error_reporting_policy = error_reporting_policy
         self.tracer: Tracer = trace.get_tracer(INSTRUMENTATION_NAME, version, tracer_provider)
 
     @contextmanager
@@ -57,11 +69,29 @@ class Telemetry:
         version: str,
         operation_override: str | None = None,
     ) -> Generator[Span | None, None, None]:
-        if not self.enabled:
+        if not self.enabled and self.error_reporter is None:
             yield None
             return
 
         operation, route, server_address = _request_details(path_or_url, base_url, operation_override)
+        started_at = time.monotonic() if self.error_reporter is not None else None
+
+        if not self.enabled:
+            try:
+                yield None
+            except Exception as error:
+                self._report(
+                    error,
+                    operation=operation,
+                    route=route,
+                    server_address=server_address,
+                    method=method,
+                    version=version,
+                    started_at=started_at,
+                    span=None,
+                )
+                raise
+            return
         attributes: dict[str, str] = {
             "inttegro.operation.name": operation,
             "inttegro.sdk.language": "python",
@@ -86,7 +116,54 @@ class Telemetry:
                 span.set_attribute("error.type", error_type)
                 span.set_status(Status(StatusCode.ERROR))
                 span.add_event("inttegro.request.failed", {"error.type": error_type})
+                self._report(
+                    error,
+                    operation=operation,
+                    route=route,
+                    server_address=server_address,
+                    method=method,
+                    version=version,
+                    started_at=started_at,
+                    span=span,
+                )
                 raise
+
+    def _report(
+        self,
+        error: Exception,
+        *,
+        operation: str,
+        route: str | None,
+        server_address: str,
+        method: str,
+        version: str,
+        started_at: float | None,
+        span: Span | None,
+    ) -> None:
+        reporter = self.error_reporter
+        if reporter is None:
+            return
+        try:
+            category = _classify_error(error)
+            if not should_report(error, category, self.error_reporting_policy):
+                return
+            report = create_error_report(
+                error=error,
+                category=category,
+                operation=operation,
+                method=method,
+                route=route,
+                server_address=server_address,
+                version=version,
+                started_at=started_at if started_at is not None else time.monotonic(),
+                span=span,
+            )
+            if isinstance(error, InttegroError):
+                error.report = report
+            reporter(report)
+        except Exception:
+            # A collector failure must never replace the original SDK error.
+            pass
 
     def prepare(self, span: Span | None, request: Request) -> None:
         if self.enabled:

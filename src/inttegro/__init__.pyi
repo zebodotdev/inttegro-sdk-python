@@ -87,6 +87,13 @@ from .errors import InttegroError as InttegroError
 from .errors import NetworkError as NetworkError
 from .errors import RateLimitError as RateLimitError
 from .errors import TimeoutError as TimeoutError
+from .error_reporting import APIErrorReportContext as APIErrorReportContext
+from .error_reporting import ErrorReport as ErrorReport
+from .error_reporting import ErrorReporter as ErrorReporter
+from .error_reporting import ErrorReportingPolicy as ErrorReportingPolicy
+from .error_reporting import HTTPReportContext as HTTPReportContext
+from .error_reporting import SDKReportContext as SDKReportContext
+from .error_reporting import TraceReportContext as TraceReportContext
 from .money import Amount as Amount
 from .money import AmountParams as AmountParams
 from .money import Currency as Currency

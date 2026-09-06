@@ -14,6 +14,15 @@ from ._models import __all__ as _model_exports
 from .request_types import *  # noqa: F401,F403
 from .request_types import __all__ as _request_type_exports
 from .money import Amount, AmountParams, Currency
+from .error_reporting import (
+    APIErrorReportContext,
+    ErrorReport,
+    ErrorReporter,
+    ErrorReportingPolicy,
+    HTTPReportContext,
+    SDKReportContext,
+    TraceReportContext,
+)
 from .price_types import Price, PriceParams
 from . import (
     apps,
@@ -53,6 +62,13 @@ __all__ = [
     "Price",
     "PriceParams",
     "RateLimitError",
+    "APIErrorReportContext",
+    "ErrorReport",
+    "ErrorReporter",
+    "ErrorReportingPolicy",
+    "HTTPReportContext",
+    "SDKReportContext",
+    "TraceReportContext",
     "apps",
     "balance_transactions",
     "bank_accounts",

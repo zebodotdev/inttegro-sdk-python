@@ -13,7 +13,15 @@ import inttegro
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
-from inttegro import AuthenticationError, Order, OrderDocumentDeliveryResult, OrderPage, Refund
+from inttegro import (
+    APIError,
+    AuthenticationError,
+    ErrorReport,
+    Order,
+    OrderDocumentDeliveryResult,
+    OrderPage,
+    Refund,
+)
 from inttegro.client import InttegroClient
 from inttegro._telemetry import _request_details
 
@@ -79,6 +87,28 @@ class ErrorTransport:
                     "detail": "API key is missing or invalid.",
                     "fix_code": "check_api_key",
                     "cause": "authentication_failure",
+                }
+            ),
+        )
+
+
+class ReportingErrorTransport:
+    def __init__(self, status: int) -> None:
+        self.status = status
+
+    def __call__(self, req, timeout):
+        del req, timeout
+        return (
+            self.status,
+            {"content-type": "application/json", "x-request-id": "req_456"},
+            json.dumps(
+                {
+                    "error": {
+                        "type": "transient_error" if self.status >= 500 else "invalid_request_parameter",
+                        "code": "provider_failed",
+                        "fix_code": "repeat_same_request",
+                        "message": "private provider detail",
+                    }
                 }
             ),
         )
@@ -224,6 +254,54 @@ class InttegroClientTest(unittest.TestCase):
         encoded = repr(span.attributes) + repr(span.events)
         self.assertNotIn("invalid", encoded)
         self.assertNotIn("ord_private", encoded)
+
+    def test_reports_one_privacy_safe_final_failure_when_configured(self):
+        reports: list[ErrorReport] = []
+
+        def failing_reporter(report: ErrorReport) -> None:
+            reports.append(report)
+            raise RuntimeError("collector unavailable")
+
+        client = InttegroClient(
+            api_key="sk_live_must_not_appear",
+            transport=ReportingErrorTransport(503),
+            telemetry_enabled=False,
+            error_reporter=failing_reporter,
+        )
+
+        with self.assertRaises(APIError) as raised:
+            client.orders.lookup("ord_private")
+
+        self.assertEqual(1, len(reports))
+        report = reports[0]
+        self.assertEqual("http_503", report.category)
+        self.assertEqual("orders.lookup", report.operation)
+        self.assertEqual("POST", report.http.method)
+        self.assertEqual("/orders/lookup", report.http.route)
+        self.assertEqual(503, report.http.status_code)
+        self.assertEqual("req_456", report.http.request_id)
+        self.assertEqual("transient_error", report.api_error.type if report.api_error else None)
+        self.assertEqual("inttegro:python:orders.lookup:http_503:503", report.fingerprint)
+        self.assertIs(raised.exception.report, report)
+        encoded = repr(report.to_dict())
+        self.assertNotIn("private provider detail", encoded)
+        self.assertNotIn("sk_live_must_not_appear", encoded)
+        self.assertNotIn("ord_private", encoded)
+
+    def test_default_error_reporting_skips_expected_api_errors(self):
+        reports: list[ErrorReport] = []
+        client = InttegroClient(
+            api_key="test",
+            transport=ReportingErrorTransport(400),
+            telemetry_enabled=False,
+            error_reporter=reports.append,
+        )
+
+        with self.assertRaises(APIError) as raised:
+            client.orders.lookup("ord_private")
+
+        self.assertEqual([], reports)
+        self.assertIsNone(raised.exception.report)
 
     def test_orders_return_domain_models_instead_of_wire_envelopes(self):
         recorder = TransportRecorder()
