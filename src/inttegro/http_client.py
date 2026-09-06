@@ -19,6 +19,7 @@ from ._response_types import response_type_for_path
 from .errors import APIError, AuthenticationError, NetworkError, RateLimitError, TimeoutError
 from ._dynamic_value import DynamicValue
 from ._telemetry import Telemetry
+from .error_reporting import ErrorReporter, ErrorReportingPolicy
 from .version import VERSION
 from opentelemetry.trace import TracerProvider
 
@@ -43,6 +44,8 @@ class HttpClient:
         transport: Optional[Transport] = None,
         telemetry_enabled: bool = True,
         tracer_provider: TracerProvider | None = None,
+        error_reporter: ErrorReporter | None = None,
+        error_reporting_policy: ErrorReportingPolicy = "unexpected",
     ) -> None:
         if not api_key:
             raise ValueError("api_key is required")
@@ -56,6 +59,8 @@ class HttpClient:
             VERSION,
             enabled=telemetry_enabled,
             tracer_provider=tracer_provider,
+            error_reporter=error_reporter,
+            error_reporting_policy=error_reporting_policy,
         )
 
     def get(self, path: str, query: Optional[dict[str, Any]] = None) -> Any:
@@ -341,6 +346,10 @@ class HttpClient:
         detail = payload.get("detail") if isinstance(payload, dict) else None
         fix_code = payload.get("fix_code") if isinstance(payload, dict) else None
         cause = payload.get("cause") if isinstance(payload, dict) else None
+        request_id = next(
+            (value for key, value in headers.items() if key.lower() == "x-request-id"),
+            None,
+        )
         if status == 401:
             raise AuthenticationError(
                 message,
@@ -353,6 +362,7 @@ class HttpClient:
                 cause=cause,
                 body=raw_body,
                 data=data,
+                request_id=request_id,
             )
         if status == 429:
             retry_after = headers.get("retry-after")
@@ -369,6 +379,7 @@ class HttpClient:
                 body=raw_body,
                 data=data,
                 retry_after=retry_after_int,
+                request_id=request_id,
             )
         raise APIError(
             message,
@@ -381,6 +392,7 @@ class HttpClient:
             cause=cause,
             body=raw_body,
             data=data,
+            request_id=request_id,
         )
 
 

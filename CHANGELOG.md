@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [6.2.0] - 2026-09-06
+
+- Added opt-in, typed error reporting to application-owned collectors with privacy-safe payloads, stable fingerprints, isolated reporter failures, and no reporting work when unconfigured.
+
 ## [6.1.2] - 2026-09-04
 
 - Restored a 100% Pyright public type-completeness score by explicitly typing the OpenTelemetry tracer.

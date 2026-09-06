@@ -25,6 +25,7 @@ from .resources.balances import Balances
 from .resources.upload_requests import UploadRequests
 from .resources.apps import Apps
 from opentelemetry.trace import TracerProvider
+from .error_reporting import ErrorReporter, ErrorReportingPolicy
 
 
 class InttegroClient:
@@ -122,6 +123,8 @@ class InttegroClient:
         transport: Transport | None = None,
         telemetry_enabled: bool = True,
         tracer_provider: TracerProvider | None = None,
+        error_reporter: ErrorReporter | None = None,
+        error_reporting_policy: ErrorReportingPolicy = "unexpected",
     ) -> None:
         """
         Initialize a new Inttegro client.
@@ -139,6 +142,8 @@ class InttegroClient:
             telemetry_enabled: Emit spans to the configured OpenTelemetry provider.
                 Defaults to True. The SDK never configures an exporter.
             tracer_provider: Optional OpenTelemetry tracer provider override.
+            error_reporter: Optional application-owned callback for privacy-safe final-failure reports.
+            error_reporting_policy: Report unexpected failures by default, or use ``"all"``.
 
         Raises:
             ValueError: If api_key is empty or invalid
@@ -168,6 +173,8 @@ class InttegroClient:
             transport=transport,
             telemetry_enabled=telemetry_enabled,
             tracer_provider=tracer_provider,
+            error_reporter=error_reporter,
+            error_reporting_policy=error_reporting_policy,
         )
 
         self.orders = Orders(self.http)
