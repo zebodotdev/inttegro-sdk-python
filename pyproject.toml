@@ -11,7 +11,7 @@ packages = [{ include = "inttegro", from = "src" }]
 Homepage = "https://studio.inttegro.com"
 Repository = "https://github.com/zebodotdev/inttegro-sdk-python"
 Issues = "https://github.com/zebodotdev/inttegro-sdk-python/issues"
-Documentation = "https://studio.inttegro.com/api-reference"
+Documentation = "https://python.inttegro.dev/"
 
 [tool.poetry.dependencies]
 python = ">=3.10"
