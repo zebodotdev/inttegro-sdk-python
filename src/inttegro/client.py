@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from .http_client import HttpClient, Transport
 from .resources.balance_transactions import BalanceTransactions
 from .resources.chimes import Chimes
@@ -24,8 +26,10 @@ from .resources.spec import Spec
 from .resources.balances import Balances
 from .resources.upload_requests import UploadRequests
 from .resources.apps import Apps
-from opentelemetry.trace import TracerProvider
 from .error_reporting import ErrorReporter, ErrorReportingPolicy
+
+if TYPE_CHECKING:
+    from opentelemetry.trace import TracerProvider
 
 
 class InttegroClient:

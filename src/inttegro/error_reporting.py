@@ -3,19 +3,21 @@ from __future__ import annotations
 import time
 import uuid
 from datetime import datetime, timezone
-
-from opentelemetry.trace import Span
+from typing import TYPE_CHECKING
 
 from ._error_report_types import (
-    APIErrorReportContext,
-    ErrorReport,
+    APIErrorReportContext as APIErrorReportContext,
+    ErrorReport as ErrorReport,
     ErrorReporter as _ErrorReporter,
-    ErrorReportingPolicy,
-    HTTPReportContext,
-    SDKReportContext,
-    TraceReportContext,
+    ErrorReportingPolicy as ErrorReportingPolicy,
+    HTTPReportContext as HTTPReportContext,
+    SDKReportContext as SDKReportContext,
+    TraceReportContext as TraceReportContext,
 )
 from .errors import APIError
+
+if TYPE_CHECKING:
+    from opentelemetry.trace import Span
 
 
 ErrorReporter = _ErrorReporter
