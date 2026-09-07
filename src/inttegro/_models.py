@@ -2062,7 +2062,6 @@ class PurchaseIntentResponse(ApiModel):
 class PurchaseIntent(ApiModel):
     activity: PurchaseIntentActivity | None = field(init=False)
     allow_variants: bool = field(init=False)
-    application_id: str = field(init=False)
     created_at: str = field(init=False)
     expires_at: str | None = field(init=False)
     id: str = field(init=False)
@@ -2082,7 +2081,6 @@ class PurchaseIntentActivity(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PurchaseIntentMerchant(ApiModel):
-    app_id: str | None = field(init=False)
     app_name: str | None = field(init=False)
     organization_id: str | None = field(init=False)
     organization_name: str | None = field(init=False)
