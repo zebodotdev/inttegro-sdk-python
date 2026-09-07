@@ -42,9 +42,11 @@ class AsyncHTTPClient(Protocol):
         headers: Mapping[str, str],
         content: bytes | None,
         timeout: float,
-    ) -> AsyncHTTPResponse: ...
+    ) -> AsyncHTTPResponse:
+        raise NotImplementedError
 
-    async def aclose(self) -> None: ...
+    async def aclose(self) -> None:
+        raise NotImplementedError
 
 
 class AsyncHttpClient:

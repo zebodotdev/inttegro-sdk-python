@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
-
 from .._models import File, FilePage
 from ..http_client import HttpClient
 from ..request_types import PageFilesRequest
