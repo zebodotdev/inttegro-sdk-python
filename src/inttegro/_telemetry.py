@@ -3,12 +3,9 @@ from __future__ import annotations
 import json
 import time
 from contextlib import contextmanager
-from typing import Generator
+from typing import TYPE_CHECKING, Any, Generator
 from urllib.parse import urljoin, urlparse
 from urllib.request import Request
-
-from opentelemetry import propagate, trace
-from opentelemetry.trace import Span, SpanKind, Status, StatusCode, Tracer, TracerProvider
 
 from .errors import APIError, NetworkError, TimeoutError
 from .error_reporting import (
@@ -18,6 +15,9 @@ from .error_reporting import (
     should_report,
 )
 from .errors import InttegroError
+
+if TYPE_CHECKING:
+    from opentelemetry.trace import Span, TracerProvider
 
 
 INSTRUMENTATION_NAME = "inttegro"
@@ -58,7 +58,18 @@ class Telemetry:
         self.enabled = enabled
         self.error_reporter = error_reporter
         self.error_reporting_policy = error_reporting_policy
-        self.tracer: Tracer = trace.get_tracer(INSTRUMENTATION_NAME, version, tracer_provider)
+        # Import OpenTelemetry lazily. Cloudflare snapshots Python Worker modules
+        # outside request context, where opentelemetry.context's UUID setup is
+        # not permitted to request entropy. Client construction happens within
+        # a request and keeps the ordinary server behavior unchanged.
+        from opentelemetry import propagate, trace
+        from opentelemetry.trace import SpanKind, Status, StatusCode
+
+        self.tracer: Any = trace.get_tracer(INSTRUMENTATION_NAME, version, tracer_provider)
+        self._propagate = propagate
+        self._span_kind_client = SpanKind.CLIENT
+        self._status = Status
+        self._status_error = StatusCode.ERROR
 
     @contextmanager
     def operation(
@@ -104,7 +115,7 @@ class Telemetry:
 
         with self.tracer.start_as_current_span(
             f"inttegro.{operation}",
-            kind=SpanKind.CLIENT,
+            kind=self._span_kind_client,
             attributes=attributes,
             record_exception=False,
             set_status_on_exception=False,
@@ -114,7 +125,7 @@ class Telemetry:
             except Exception as error:
                 error_type = _classify_error(error)
                 span.set_attribute("error.type", error_type)
-                span.set_status(Status(StatusCode.ERROR))
+                span.set_status(self._status(self._status_error))
                 span.add_event("inttegro.request.failed", {"error.type": error_type})
                 self._report(
                     error,
@@ -168,7 +179,7 @@ class Telemetry:
     def prepare(self, span: Span | None, request: Request) -> None:
         if self.enabled:
             carrier: dict[str, str] = {}
-            propagate.inject(carrier)
+            self._propagate.inject(carrier)
             for key, value in carrier.items():
                 if not any(existing.lower() == key.lower() for existing, _ in request.header_items()):
                     request.add_header(key, value)

@@ -1,5 +1,5 @@
 import inttegro
-from inttegro import InttegroClient, Refund
+from inttegro import AsyncInttegroClient, InttegroClient, Refund
 
 
 def refund(client: InttegroClient) -> tuple[str, int]:
@@ -50,3 +50,25 @@ def create_order(client: InttegroClient) -> str:
         ],
     )
     return client.orders.create(request).id
+
+
+async def create_order_async(client: AsyncInttegroClient) -> str:
+    request = inttegro.orders.CreateRequest(
+        customer_data=inttegro.orders.Customer(
+            name="Akua Mensah",
+            email_address="akua@example.com",
+            phone_number="+233544998605",
+        ),
+        line_items=[
+            inttegro.orders.ProductLineItem(
+                type=inttegro.LineItemType.PRODUCT,
+                product=inttegro.orders.Product(
+                    name="Monthly subscription",
+                    price=inttegro.PriceParams(currency=inttegro.Currency.GHS, value=5000),
+                    quantity=1,
+                    type=inttegro.ProductType.DIGITAL,
+                ),
+            )
+        ],
+    )
+    return (await client.orders.create(request)).id

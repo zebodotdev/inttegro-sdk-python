@@ -11,7 +11,7 @@ import urllib.parse
 import urllib.request
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional
 
 from ._model_base import ApiModel, ModelDecodeError, decode_value
 from ._request_base import ApiRequest, encode_request_value
@@ -21,7 +21,8 @@ from ._dynamic_value import DynamicValue
 from ._telemetry import Telemetry
 from .error_reporting import ErrorReporter, ErrorReportingPolicy
 from .version import VERSION
-from opentelemetry.trace import TracerProvider
+if TYPE_CHECKING:
+    from opentelemetry.trace import TracerProvider
 
 
 Transport = Callable[[urllib.request.Request, float | None], tuple[int, Dict[str, str], str | bytes]]

@@ -1,4 +1,6 @@
 from .client import InttegroClient
+from .async_client import AsyncInttegroClient
+from .async_http_client import AsyncHTTPClient
 from .errors import (
     InttegroError,
     NetworkError,
@@ -51,6 +53,8 @@ from . import (
 
 __all__ = [
     "InttegroClient",
+    "AsyncInttegroClient",
+    "AsyncHTTPClient",
     "InttegroError",
     "NetworkError",
     "TimeoutError",

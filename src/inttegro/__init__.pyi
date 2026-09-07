@@ -24,6 +24,8 @@ from . import refunds as refunds
 from . import upload_requests as upload_requests
 from . import wallets as wallets
 from .client import InttegroClient as InttegroClient
+from .async_client import AsyncInttegroClient as AsyncInttegroClient
+from .async_http_client import AsyncHTTPClient as AsyncHTTPClient
 from ._enums import AppCredentialOwner as AppCredentialOwner
 from ._enums import AppManagementRole as AppManagementRole
 from ._enums import AppRelationshipKind as AppRelationshipKind

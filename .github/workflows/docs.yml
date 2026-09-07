@@ -45,9 +45,10 @@ jobs:
             --docformat google \
             --footer-text "Inttegro Python SDK $DOC_VERSION" \
             --output-directory build/api-docs \
-            inttegro inttegro.resources \
+            inttegro inttegro.resources inttegro.async_resources \
             '!inttegro\._.*' \
             '!inttegro\.http_client' \
+            '!inttegro\.async_http_client' \
             '!inttegro\.telemetry'
 
       - name: Publish versioned documentation

@@ -2,7 +2,8 @@
 
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/zebodotdev/inttegro-sdk-python/badge)](https://scorecard.dev/viewer/?uri=github.com/zebodotdev/inttegro-sdk-python)
 
-The official Python client for building server-side Inttegro integrations.
+The official Python client for building server-side Inttegro integrations, with
+native asynchronous and synchronous clients.
 
 [API documentation](https://python.inttegro.dev/) · [Integration guides](https://studio.inttegro.com/sdks/python)
 
@@ -26,6 +27,47 @@ export INTTEGRO_API_KEY="your_secret_key"
 
 Never put the key in browser code, a mobile app, or source control. The client uses `https://api.inttegro.com` by default.
 
+## Choose a client
+
+`AsyncInttegroClient` is the default shown in new integration examples. Use it
+in FastAPI, Starlette, Quart, async Django views,
+Python Workers, and other event-loop applications. Its HTTP requests are
+non-blocking and share one connection pool:
+
+```python
+import os
+
+from inttegro import AsyncInttegroClient
+
+async with AsyncInttegroClient(api_key=os.environ["INTTEGRO_API_KEY"]) as client:
+    order = await client.orders.lookup("or_...")
+```
+
+Create one long-lived client during application startup and call `aclose()`
+during shutdown. An `async with` block is useful for scripts and jobs. Every
+resource operation on the async client is awaited.
+
+Use `InttegroClient` in synchronous Django views, Flask, command-line tools, or
+other code without an event loop:
+
+```python
+import os
+
+from inttegro import InttegroClient
+
+client = InttegroClient(api_key=os.environ["INTTEGRO_API_KEY"])
+order = client.orders.lookup("or_...")
+```
+
+The two clients expose the same resources, request types, returned domain
+models, errors, idempotency behavior, and telemetry contract. Do not call the
+synchronous client directly from an async request handler because it blocks
+the event loop. The distinct class name is intentional: silently changing the
+existing `InttegroClient` methods from values to awaitables would break every
+synchronous integration. Version 6.3.0 therefore makes the async client the
+recommended default while preserving the synchronous client as a compatible,
+explicit option for genuinely synchronous applications.
+
 ## Create a hosted checkout
 
 Create and finalize an order, then send the customer to its hosted invoice URL:
@@ -36,9 +78,7 @@ import os
 import inttegro
 from inttegro import APIError, LineItemType, ProductType
 
-client = inttegro.InttegroClient(api_key=os.environ["INTTEGRO_API_KEY"])
-
-try:
+async def create_checkout() -> str:
     request = inttegro.orders.CreateRequest(
         request_meta=inttegro.orders.RequestMeta(
             idempotency_key="checkout-cart-123",
@@ -65,13 +105,15 @@ try:
             ),
         ],
     )
-    order = client.orders.create(request)
-
-    checkout_url = order.invoice.format.web.url
-    print(order.id, checkout_url)
-except APIError as error:
-    print(error.code, error.detail or str(error))
-    raise
+    try:
+        async with inttegro.AsyncInttegroClient(
+            api_key=os.environ["INTTEGRO_API_KEY"],
+        ) as client:
+            order = await client.orders.create(request)
+            return order.invoice.format.web.url
+    except APIError as error:
+        print(error.code, error.detail or str(error))
+        raise
 ```
 
 Amounts use integer minor units: `5000` GHS is GHS 50.00. Reuse the same idempotency key when retrying the same logical write. If you omit one, the SDK generates a UUIDv7 key for mutating calls.
@@ -81,7 +123,7 @@ Amounts use integer minor units: `5000` GHS is GHS 50.00. Reuse the same idempot
 The SDK emits vendor-neutral OpenTelemetry spans through your application's provider. It never configures an exporter or sends telemetry by itself. Configure OpenTelemetry at application startup; the global provider is used automatically, or pass `tracer_provider` explicitly:
 
 ```python
-client = inttegro.InttegroClient(
+client = inttegro.AsyncInttegroClient(
     api_key=os.environ["INTTEGRO_API_KEY"],
     tracer_provider=tracer_provider,
 )
@@ -110,7 +152,7 @@ The SDK covers orders and checkout, customers, products and prices, purchase int
 
 Python-specific features:
 
-- Standard-library HTTP transport with the lightweight OpenTelemetry API for application-owned tracing.
+- Native async HTTP transport powered by HTTPX, plus a dependency-light synchronous standard-library transport.
 - OpenAPI-generated, immutable request and domain dataclasses with fully typed nested fields.
 - Resource namespaces such as `inttegro.orders.CreateRequest` keep related request objects together.
 - Backwards-compatible mapping access and `to_dict()` conversion on every domain object.
@@ -126,7 +168,7 @@ import os
 
 import inttegro
 
-client = inttegro.InttegroClient(api_key=os.environ["INTTEGRO_API_KEY"])
+client = inttegro.AsyncInttegroClient(api_key=os.environ["INTTEGRO_API_KEY"])
 
 request = inttegro.refunds.CreateRequest(
     order_id="or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
@@ -139,7 +181,7 @@ request = inttegro.refunds.CreateRequest(
     ],
 )
 
-refund: inttegro.Refund = client.refunds.create(request)
+refund: inttegro.Refund = await client.refunds.create(request)
 print(refund.id, refund.total.value)
 ```
 
@@ -151,7 +193,7 @@ The GitHub release for each version is the canonical record. It contains the exa
 
 ```bash
 sha256sum --check SHA256SUMS
-gh attestation verify inttegro-6.1.2-py3-none-any.whl \
+gh attestation verify inttegro-6.3.0-py3-none-any.whl \
   --repo zebodotdev/inttegro-sdk-python
 ```
 
@@ -159,5 +201,8 @@ gh attestation verify inttegro-6.1.2-py3-none-any.whl \
 
 ```bash
 poetry install
+poetry run python scripts/generate_async_resources.py --check
 poetry run python -m unittest discover -s tests -p "test_*.py"
+poetry run mypy src
+poetry run pyright
 ```
