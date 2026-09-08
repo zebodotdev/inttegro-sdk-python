@@ -992,8 +992,6 @@ class CreateFinancialAccountResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccountCreateResponse(ApiModel):
-    app_customer_local_fingerprint: str | None = field(init=False)
-    app_local_fingerprint: str | None = field(init=False)
     archived_at: str | None = field(init=False)
     created_at: str = field(init=False)
     currency: str = field(init=False)
@@ -1007,7 +1005,6 @@ class FinancialAccountCreateResponse(ApiModel):
     reference: str | None = field(init=False)
     supplied: ResourceSupply | None = field(init=False)
     type: Literal['wallet', 'bank_account', 'dosh_account'] = field(init=False)
-    universal_fingerprint: str | None = field(init=False)
     verification: dict[str, Any] | None = field(init=False)
     bank_account: FinancialAccountBankCreateResponse | None = field(init=False)
     owner: FinancialAccountOwnerCreateResponse | None = field(init=False)
@@ -1115,8 +1112,6 @@ class LookupFinancialAccountResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccount(ApiModel):
-    app_customer_local_fingerprint: str | None = field(init=False)
-    app_local_fingerprint: str | None = field(init=False)
     archived_at: str | None = field(init=False)
     created_at: str = field(init=False)
     currency: str = field(init=False)
@@ -1130,7 +1125,6 @@ class FinancialAccount(ApiModel):
     reference: str | None = field(init=False)
     supplied: ResourceSupply | None = field(init=False)
     type: Literal['wallet', 'bank_account', 'dosh_account'] = field(init=False)
-    universal_fingerprint: str | None = field(init=False)
     verification: dict[str, Any] | None = field(init=False)
     bank_account: FinancialAccountBank | None = field(init=False)
     disconnected_at: str | None = field(init=False)
@@ -1184,8 +1178,6 @@ class ConnectFinancialAccountResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccountConnectedResponse(ApiModel):
-    app_customer_local_fingerprint: str | None = field(init=False)
-    app_local_fingerprint: str | None = field(init=False)
     archived_at: str | None = field(init=False)
     created_at: str = field(init=False)
     currency: str = field(init=False)
@@ -1199,7 +1191,6 @@ class FinancialAccountConnectedResponse(ApiModel):
     reference: str | None = field(init=False)
     supplied: ResourceSupply | None = field(init=False)
     type: Literal['wallet', 'bank_account', 'dosh_account'] = field(init=False)
-    universal_fingerprint: str | None = field(init=False)
     verification: dict[str, Any] | None = field(init=False)
     bank_account: FinancialAccountBank | None = field(init=False)
     dosh_account: dict[str, Any] | None = field(init=False)
@@ -1212,8 +1203,6 @@ class UpdateFinancialAccountResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccountUpdateResponse(ApiModel):
-    app_customer_local_fingerprint: str | None = field(init=False)
-    app_local_fingerprint: str | None = field(init=False)
     archived_at: str | None = field(init=False)
     created_at: str = field(init=False)
     currency: str = field(init=False)
@@ -1227,7 +1216,6 @@ class FinancialAccountUpdateResponse(ApiModel):
     reference: str | None = field(init=False)
     supplied: ResourceSupply | None = field(init=False)
     type: Literal['wallet', 'bank_account', 'dosh_account'] = field(init=False)
-    universal_fingerprint: str | None = field(init=False)
     verification: dict[str, Any] | None = field(init=False)
     bank_account: FinancialAccountBankUpdateResponse | None = field(init=False)
     disconnected_at: str | None = field(init=False)
@@ -1792,8 +1780,6 @@ class TokenizePaymentMethodResponse(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentMethod(ApiModel):
     active: bool = field(init=False)
-    app_customer_local_fingerprint: str | None = field(init=False)
-    app_local_fingerprint: str | None = field(init=False)
     archived_at: str | None = field(init=False)
     bank_account: PaymentMethodBankAccount | None = field(init=False)
     created_at: str = field(init=False)
@@ -1806,7 +1792,6 @@ class PaymentMethod(ApiModel):
     owner: PaymentMethodOwner | None = field(init=False)
     type: Literal['mobile_money', 'bank_account', 'card', 'motito'] = field(init=False)
     supplied: PaymentMethodSupplied | None = field(init=False)
-    universal_fingerprint: str | None = field(init=False)
     verification: PaymentMethodVerification | None = field(init=False)
     verified_at: str | None = field(init=False)
 
