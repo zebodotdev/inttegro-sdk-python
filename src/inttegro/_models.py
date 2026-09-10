@@ -508,6 +508,23 @@ class Order(ApiModel):
     payment_due_at: datetime | None = field(init=False)
     reference: str | None = field(init=False)
 
+    def is_paid(self) -> bool:
+        """Whether the order has recorded payment, including after completion."""
+        return self.status == "paid" or getattr(self, "paid_at", None) is not None
+
+    def requires_payment(self) -> bool:
+        """Whether the order is waiting for payment."""
+        return self.status == "requires_payment"
+
+    def is_terminal(self) -> bool:
+        """Whether the order has reached a final state."""
+        return self.status in {"paid", "completed", "canceled", "expired"}
+
+    def required_payment_action(self) -> PaymentNextAction | None:
+        """Return nested action details when the order payment requires action."""
+        payment = getattr(self, "payment", None)
+        return payment.required_action() if payment is not None else None
+
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class OrderCheckoutSettings(ApiModel):
     redirect_url: str | None = field(init=False)
@@ -670,6 +687,22 @@ class Payment(ApiModel):
     paid_offline: bool | None = field(init=False)
     payment_method_types: list[str] | None = field(init=False)
     payout_configuration: PaymentPayoutConfiguration | None = field(init=False)
+
+    def is_paid(self) -> bool:
+        """Whether the payment completed successfully."""
+        return self.status == "paid"
+
+    def requires_action(self) -> bool:
+        """Whether the payment is waiting for customer or merchant action."""
+        return self.status == "requires_action"
+
+    def is_terminal(self) -> bool:
+        """Whether the payment has reached a final state."""
+        return self.status in {"paid", "canceled", "expired", "failed"}
+
+    def required_action(self) -> PaymentNextAction | None:
+        """Return action details when the payment currently requires action."""
+        return getattr(self, "next_action", None) if self.requires_action() else None
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class BalanceTransaction(ApiModel):
@@ -1830,6 +1863,18 @@ class PaymentMethod(ApiModel):
     verification: PaymentMethodVerification | None = field(init=False)
     verified_at: datetime | None = field(init=False)
 
+    def is_archived(self) -> bool:
+        """Whether the payment method is archived."""
+        return getattr(self, "archived_at", None) is not None
+
+    def is_verified(self) -> bool:
+        """Whether payment-method ownership has been verified."""
+        return getattr(self, "verified_at", None) is not None
+
+    def is_reusable(self) -> bool:
+        """Whether the payment method may be reused in new payment flows."""
+        return self.active and not self.is_archived() and getattr(self, "ephemeral", False) is not True
+
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentMethodBankAccount(ApiModel):
     ghana_bank_account: PaymentMethodBankAccountGhanaBankAccount | None = field(init=False)
@@ -1986,6 +2031,18 @@ class Product(ApiModel):
     published_at: datetime | None = field(init=False)
     unit_dim: str | None = field(init=False)
 
+    def is_archived(self) -> bool:
+        """Whether the product is archived."""
+        return getattr(self, "archived_at", None) is not None
+
+    def is_published(self) -> bool:
+        """Whether the product is currently published and available."""
+        return self.active and not self.is_archived()
+
+    def was_ever_published(self) -> bool:
+        """Whether the product has a recorded first publication."""
+        return getattr(self, "published_at", None) is not None
+
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class ProductPriceSummary(ApiModel):
     id: str = field(init=False)
@@ -2124,6 +2181,22 @@ class PurchaseIntent(ApiModel):
     updated_at: datetime | None = field(init=False)
     usage: PurchaseIntentUsage = field(init=False)
     variant_set: PurchaseIntentVariantSet | None = field(init=False)
+
+    def is_active(self) -> bool:
+        """Whether the purchase intent is currently active."""
+        return self.status == "active"
+
+    def is_single_use(self) -> bool:
+        """Whether the purchase intent can create at most one order."""
+        return getattr(self.usage, "single_use", False) is True
+
+    def used_order_id(self) -> str | None:
+        """Return the order ID that consumed a single-use purchase intent."""
+        if not self.is_single_use():
+            return None
+        order = getattr(self.usage, "order", None)
+        order_id = getattr(order, "id", None)
+        return order_id if order_id else None
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PurchaseIntentActivityLog(ApiModel):
