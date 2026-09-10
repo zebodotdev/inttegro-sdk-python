@@ -43,6 +43,46 @@ REFUND_BODY = {
     "line_items": [],
     "created_at": "2026-09-02T12:00:00Z",
 }
+BALANCE_BODY = {
+    "ghs": {
+        "available": {"amount": 1000},
+        "includes_transactions_before": "2026-09-09T12:00:00Z",
+        "pending": {"amount": 200},
+        "refund": {"amount": 50},
+        "reserved": {"amount": 100},
+    }
+}
+PURCHASE_INTENT_BODY = {
+    "activity": {
+        "recent": [
+            {
+                "created_at": "2026-09-09T12:01:00Z",
+                "id": "saleevt_123",
+                "purchase_intent_id": "sale_123",
+                "type": "viewed",
+                "visitor": {"ip_address": "203.0.113.7"},
+            }
+        ]
+    },
+    "allow_variants": False,
+    "created_at": "2026-09-09T12:00:00Z",
+    "id": "sale_123",
+    "merchant": {"organization_name": "Tea House Ltd"},
+    "product": {
+        "active": True,
+        "created_at": "2026-09-09T11:00:00Z",
+        "dimensions": {"digital": {"bytes": 1024}},
+        "id": "prod_123",
+        "name": "Tea guide",
+        "type": "digital",
+    },
+    "quantity": {"min": 1},
+    "status": "active",
+    "usage": {
+        "order": {"created_at": "2026-09-09T12:02:00Z", "id": "or_123"},
+        "single_use": True,
+    },
+}
 
 
 class TransportRecorder:
@@ -62,10 +102,18 @@ class TransportRecorder:
             response = {"page": {"number": 0, "size": 1, "orders": [ORDER_BODY]}}
         elif path in {"/orders/send_invoice", "/orders/send_receipt"}:
             response = {"order": ORDER_BODY, "delivery": {}}
-        elif path == "/orders/refund" or path in {"/refunds/create", "/refunds/cancel", "/refunds/lookup"}:
+        elif path in {"/refunds/create", "/refunds/cancel", "/refunds/lookup"}:
             response = {"refund": REFUND_BODY}
         elif path == "/refunds/page":
             response = {"page": {"number": 0, "size": 1, "refunds": [REFUND_BODY]}}
+        elif path == "/balances":
+            response = {"balances": BALANCE_BODY}
+        elif path == "/purchase_intents/page":
+            response = {
+                "page": {"number": 1, "size": 1, "purchase_intents": [PURCHASE_INTENT_BODY]}
+            }
+        elif path.startswith("/purchase_intents/"):
+            response = {"purchase_intent": PURCHASE_INTENT_BODY}
         elif path.startswith("/orders/"):
             response = {"order": ORDER_BODY}
         else:
@@ -315,7 +363,7 @@ class InttegroClientTest(unittest.TestCase):
             OrderDocumentDeliveryResult,
         )
         self.assertIsInstance(
-            client.orders.refund(
+            client.refunds.create(
                 {
                     "order_id": "or_123",
                     "reason": "requested_by_customer",
@@ -353,7 +401,6 @@ class InttegroClientTest(unittest.TestCase):
         client = InttegroClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
 
         client.orders.create({"number": "1"})
-        client.orders.new({"number": "2"})
         client.orders.lookup("or_1")
         client.orders.update({"order_id": "or_1", "number": "ORDER-1A"})
         client.orders.pay({"order_id": "or_1"})
@@ -364,14 +411,6 @@ class InttegroClientTest(unittest.TestCase):
         client.orders.complete({"order_id": "or_1"})
         client.orders.send_invoice({"order_id": "or_1"})
         client.orders.send_receipt({"order_id": "or_1"})
-        client.orders.refund({
-            "order_id": "or_1",
-            "reason": "requested_by_customer",
-            "line_items": [{
-                "order_line_item_id": "oli_1",
-                "refund_amount": {"currency": "ghs", "value": 100},
-            }],
-        })
         client.orders.page({})
 
         client.payment_methods.tokenize({"type": "mobile_money"})
@@ -513,7 +552,13 @@ class InttegroClientTest(unittest.TestCase):
         })
         client.purchase_intents.update({"id": "sale_1", "quantity": {"min": 1}})
         client.purchase_intents.cancel("sale_1")
-        client.purchase_intents.lookup("sale_1")
+        purchase_intent = client.purchase_intents.lookup("sale_1")
+        self.assertEqual(
+            "203.0.113.7", purchase_intent.activity.recent[0].visitor.ip_address
+        )
+        self.assertEqual("Tea House Ltd", purchase_intent.merchant.organization_name)
+        self.assertEqual(1024, purchase_intent.product.dimensions.digital.bytes)
+        self.assertEqual("or_123", purchase_intent.usage.order.id)
         client.purchase_intents.page({"page_number": 1, "page_size": 20})
 
         client.prices.create({"currency": "ghs", "amount": 100})
@@ -537,7 +582,9 @@ class InttegroClientTest(unittest.TestCase):
         client.refunds.page({"page_number": 1})
 
         client.spec.countries()
-        client.balances.get()
+        balance = client.balances.get()
+        self.assertIsInstance(balance, inttegro.BalanceSnapshot)
+        self.assertEqual(1000, balance.ghs.available.amount)
 
         covered_paths = {urllib.parse.urlparse(req.full_url).path for req in recorder.requests}
         spec_path = openapi_spec_path()
@@ -560,26 +607,6 @@ class InttegroClientTest(unittest.TestCase):
 
         order = client.orders.create({"number": "ORDER-3"})
         self.assertEqual("or_123", order.id)
-
-    def test_order_refund_alias_preserves_create_refund_shape(self):
-        recorder = TransportRecorder()
-        client = InttegroClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
-        payload = {
-            "order_id": "or_1",
-            "reason": "requested_by_customer",
-            "request_meta": {"idempotency_key": "refund-alias-1"},
-            "line_items": [{
-                "order_line_item_id": "oli_1",
-                "refund_amount": {"currency": "ghs", "value": 100},
-            }],
-        }
-
-        client.orders.refund(payload, idempotency_key="refund-alias-header-1")
-
-        request = recorder.requests[-1]
-        self.assertEqual("/orders/refund", urllib.parse.urlparse(request.full_url).path)
-        self.assertEqual(payload, json.loads(request.data.decode("utf-8")))
-        self.assertEqual("refund-alias-header-1", request.headers["Idempotency-key"])
 
     def test_authentication_error_is_raised(self):
         client = InttegroClient(api_key="bad", base_url="https://api.inttegro.com", transport=ErrorTransport())

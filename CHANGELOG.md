@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [7.0.0] - 2026-09-10
+
+- Breaking: replaced generic dictionaries with named models for balances, purchase intents, products, payment methods, payments, and orders.
+- Breaking: exposed API timestamps as timezone-aware `datetime` values and accepted them in timestamp request fields.
+
 ## [6.3.1] - 2026-09-08
 
 - Tightened financial-account and payment-method response models to exclude internal platform fields.

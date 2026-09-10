@@ -26,10 +26,7 @@ class AsyncFinancialAccounts:
 
     async def create(self, payload: dict):
         """
-        Create a new financial account (deprecated—use connect() instead).
-
-        This method exists for backward compatibility but connect() is preferred for all new
-        integrations as it provides a clearer API and better validation.
+        Create a new financial account.
 
         Args:
             payload: Account creation parameters
@@ -37,8 +34,6 @@ class AsyncFinancialAccounts:
         Returns:
             domain object with created financial account
 
-        See Also:
-            - connect(): Preferred method for adding financial accounts
         """
         return await self.http.post('/financial_accounts/create', payload)
 

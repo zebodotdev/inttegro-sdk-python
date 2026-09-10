@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any, Literal, TypeAlias
 
 from ._request_base import ApiRequest, UNSET, UnsetType
@@ -138,7 +139,7 @@ class ScheduleChimeRequest(ApiRequest):
     sender_id: str | UnsetType = field(default=UNSET)
     purpose: str | UnsetType = field(default=UNSET)
     recipients: list[ChimeRecipientInput]
-    send_after: str
+    send_after: datetime
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ScheduleChimeRequestRequestMeta(ApiRequest):
@@ -791,7 +792,7 @@ class PageBalanceTransactionsRequest(ApiRequest):
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class SchedulePayoutRequest(ApiRequest):
-    execute_after: str | UnsetType = field(default=UNSET)
+    execute_after: datetime | UnsetType = field(default=UNSET)
     max_amount: int | UnsetType = field(default=UNSET)
     destination_id: str
     reference: str
@@ -835,8 +836,8 @@ class PageFilesRequest(ApiRequest):
     status: Literal['uploading', 'processing', 'available', 'failed', 'deleted', FileStatus.UPLOADING, FileStatus.PROCESSING, FileStatus.AVAILABLE, FileStatus.FAILED, FileStatus.DELETED] | UnsetType = field(default=UNSET)
     page_number: int | UnsetType = field(default=UNSET)
     page_size: int | UnsetType = field(default=UNSET)
-    created_after: str | UnsetType = field(default=UNSET)
-    created_before: str | UnsetType = field(default=UNSET)
+    created_after: datetime | UnsetType = field(default=UNSET)
+    created_before: datetime | UnsetType = field(default=UNSET)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class FileContentsRequest(ApiRequest):
@@ -854,7 +855,7 @@ class CreateFileLinkRequest(ApiRequest):
     access: FileLinkAccessRequest | UnsetType = field(default=UNSET)
     created_by: FileActorInput | UnsetType = field(default=UNSET)
     custom_data: dict[str, str] | UnsetType = field(default=UNSET)
-    expires_at: str | UnsetType = field(default=UNSET)
+    expires_at: datetime | UnsetType = field(default=UNSET)
     file_id: str
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -904,7 +905,7 @@ class CreateUploadRequestRequest(ApiRequest):
     requester: FileActorInput | UnsetType = field(default=UNSET)
     attempts: UploadRequestAttemptsRequest | UnsetType = field(default=UNSET)
     custom_data: dict[str, str] | UnsetType = field(default=UNSET)
-    expires_at: str | UnsetType = field(default=UNSET)
+    expires_at: datetime | UnsetType = field(default=UNSET)
     purpose: str
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -1186,7 +1187,7 @@ class CreatePurchaseIntentRequest(ApiRequest):
     price: CreatePurchaseIntentRequestPrice | UnsetType = field(default=UNSET)
     price_id: str | UnsetType = field(default=UNSET)
     usage: CreatePurchaseIntentRequestUsage | UnsetType = field(default=UNSET)
-    expires_at: str | UnsetType = field(default=UNSET)
+    expires_at: datetime | UnsetType = field(default=UNSET)
     quantity: CreatePurchaseIntentRequestQuantity
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -1218,7 +1219,7 @@ class CreatePurchaseIntentRequestUsage(ApiRequest):
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UpdatePurchaseIntentRequest(ApiRequest):
-    expires_at: str | None | UnsetType = field(default=UNSET)
+    expires_at: datetime | None | UnsetType = field(default=UNSET)
     id: str | UnsetType = field(default=UNSET)
     quantity: UpdatePurchaseIntentRequestQuantity | UnsetType = field(default=UNSET)
     purchase_intent_id: str | UnsetType = field(default=UNSET)

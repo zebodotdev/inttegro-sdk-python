@@ -2,7 +2,7 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import CurrencyBalanceSnapshot
+from .._models import BalanceSnapshot
 from ..request_types import *
 
 class AsyncBalances:
@@ -10,5 +10,5 @@ class AsyncBalances:
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def get(self) -> dict[str, CurrencyBalanceSnapshot]:
+    async def get(self) -> BalanceSnapshot:
         ...

@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import TypeVar
 from .._model_base import ApiModel
 from ..async_http_client import AsyncHttpClient
-from .._models import Order, OrderPage, Refund
+from .._models import Order, OrderPage
 from .._dynamic_value import DynamicValue
 ModelT = TypeVar('ModelT', bound=ApiModel)
 
@@ -140,26 +140,6 @@ class AsyncOrders:
             - https://studio.inttegro.com/create-your-first-order
         """
         return _resource(await self.http.post('/orders/create', payload), 'order', Order)
-
-    async def new(self, payload: dict):
-        """
-        Create an order through the legacy /orders/new compatibility endpoint.
-
-        This is a convenience method that calls create() internally. Use whichever
-        method name feels more natural in your code.
-
-        Args:
-            payload: Same parameters as create()
-
-        Returns:
-            The created Order.
-
-        Example:
-            ```python
-            order = client.orders.new({...})
-            ```
-        """
-        return _resource(await self.http.post('/orders/new', payload), 'order', Order)
 
     async def lookup(self, order_id: str, **options):
         """
@@ -513,45 +493,6 @@ class AsyncOrders:
             - https://studio.inttegro.com/api/orders/cancel
         """
         return _resource(await self.http.post('/orders/cancel', {'order_id': order_id, 'request_meta': request_meta or _stable_order_request_meta('cancel', order_id)}), 'order', Order)
-
-    async def refund(self, payload: dict, idempotency_key: str | None=None):
-        """
-        Create a refund through the ``/orders/refund`` compatibility alias.
-
-        This accepts the same line-item payload as :meth:`client.refunds.create` and
-        returns the created Refund directly. New integrations should use that canonical method.
-
-        Args:
-            payload: A create-refund payload containing ``order_id``, ``reason``, and
-                one or more ``line_items``.
-            idempotency_key: Optional header value for safely retrying the request.
-
-        Returns:
-            The created Refund.
-
-        Raises:
-            ApiError: If the order or line-item amount is not refundable, or processing fails.
-
-        Example:
-            ```python
-            refund = client.orders.refund({
-                "order_id": "or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
-                "reason": "requested_by_customer",
-                "line_items": [{
-                    "order_line_item_id": "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
-                    "refund_amount": {"currency": "ghs", "value": 2500},
-                }],
-            })
-            print(f"Refund status: {refund.status}")
-            print(f"Refund amount: {refund.total.value} {refund.total.currency}")
-            ```
-
-        See Also:
-            - ``client.refunds.create``: Canonical refund creation API
-            - https://studio.inttegro.com/refunds
-        """
-        headers = {'Idempotency-Key': idempotency_key} if idempotency_key else {}
-        return _resource(await self.http.post_with_headers('/orders/refund', payload, headers), 'refund', Refund)
 
     async def page(self, payload: dict | None=None):
         """
