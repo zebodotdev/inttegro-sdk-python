@@ -3,6 +3,7 @@ from __future__ import annotations
 import types
 from collections.abc import Iterator, Mapping
 from dataclasses import fields
+from datetime import datetime
 from enum import Enum
 from typing import Any, Literal, TypeVar, Union, cast, get_args, get_origin, get_type_hints
 
@@ -141,6 +142,17 @@ def decode_value(annotation: Any, value: Any) -> Any:
         except ValueError as error:
             raise ModelDecodeError(f"{value!r} is not valid for {annotation.__name__}") from error
 
+    if annotation is datetime:
+        if not isinstance(value, str):
+            raise ModelDecodeError(f"expected ISO-8601 timestamp, got {type(value).__name__}")
+        try:
+            decoded = datetime.fromisoformat(value[:-1] + "+00:00" if value.endswith("Z") else value)
+        except ValueError as error:
+            raise ModelDecodeError(f"invalid ISO-8601 timestamp: {value!r}") from error
+        if decoded.tzinfo is None:
+            raise ModelDecodeError(f"timestamp must include a UTC offset: {value!r}")
+        return decoded
+
     if annotation is float:
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             raise ModelDecodeError(f"expected float, got {type(value).__name__}")
@@ -159,6 +171,10 @@ def encode_value(value: Any) -> Any:
         return value.to_dict()
     if isinstance(value, Enum):
         return value.value
+    if isinstance(value, datetime):
+        if value.tzinfo is None:
+            raise ModelDecodeError("timestamp must include a UTC offset")
+        return value.isoformat().replace("+00:00", "Z")
     if isinstance(value, list):
         return [encode_value(item) for item in value]
     if isinstance(value, tuple):

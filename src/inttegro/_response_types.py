@@ -20,7 +20,7 @@ def _resource(model: Any, field: str) -> ResponseShape:
 
 RESPONSE_TYPES_BY_PATH: dict[str, ResponseShape] = {
     '/apps/create': _resource(m.Application, 'app'), '/apps/lookup': _resource(m.Application, 'app'), '/apps/update': _resource(m.Application, 'app'),
-    '/balance_transactions/lookup': _resource(m.BalanceTransaction, 'transaction'), '/balance_transactions/page': _resource(m.BalanceTransactionPage, 'page'), '/balances': _resource(dict[str, m.CurrencyBalanceSnapshot], 'balances'),
+    '/balance_transactions/lookup': _resource(m.BalanceTransaction, 'transaction'), '/balance_transactions/page': _resource(m.BalanceTransactionPage, 'page'), '/balances': _resource(m.BalanceSnapshot, 'balances'),
     '/broadcasts/cancel': _resource(m.BroadcastDetail, 'broadcast'), '/broadcasts/lookup': _resource(m.BroadcastDetail, 'broadcast'),
     '/chimes/broadcast': _resource(m.BroadcastCreationDetail, 'broadcast'), '/chimes/lookup': _resource(m.Chime, 'chime'), '/chimes/page': _resource(m.ChimePage, 'page'), '/chimes/schedule': _resource(m.ScheduleCreationDetail, 'scheduled_chime'), '/chimes/send': _resource(m.Chime, 'chime'),
     '/customers/create': _resource(m.Customer, 'customer'), '/customers/lookup': _resource(m.Customer, 'customer'), '/customers/page': _resource(m.CustomerPage, 'page'), '/customers/update': _resource(m.Customer, 'customer'),
@@ -34,7 +34,7 @@ RESPONSE_TYPES_BY_PATH: dict[str, ResponseShape] = {
     '/message_templates/archive': _resource(m.MessageTemplate, 'message_template'), '/message_templates/create': _resource(m.MessageTemplate, 'message_template'), '/message_templates/lookup': _resource(m.MessageTemplate, 'message_template'),
     '/message_templates/page': _resource(m.MessageTemplatesPage, 'page'), '/message_templates/publish': _resource(m.MessageTemplate, 'message_template'), '/message_templates/render_preview': ResponseShape(m.MessageTemplatePreview), '/message_templates/update': _resource(m.MessageTemplate, 'message_template'),
     '/orders/cancel': _resource(m.Order, 'order'), '/orders/complete': _resource(m.Order, 'order'), '/orders/confirm_payment': _resource(m.Order, 'order'), '/orders/create': _resource(m.Order, 'order'), '/orders/finalize': _resource(m.Order, 'order'),
-    '/orders/lookup': _resource(m.Order, 'order'), '/orders/new': _resource(m.Order, 'order'), '/orders/page': _resource(m.OrderPage, 'page'), '/orders/pay': _resource(m.Order, 'order'), '/orders/refund': _resource(m.Refund, 'refund'),
+    '/orders/lookup': _resource(m.Order, 'order'), '/orders/page': _resource(m.OrderPage, 'page'), '/orders/pay': _resource(m.Order, 'order'),
     '/orders/request_confirmation': _resource(m.Order, 'order'), '/orders/send_invoice': ResponseShape(m.OrderDocumentDeliveryResult), '/orders/send_receipt': ResponseShape(m.OrderDocumentDeliveryResult), '/orders/update': _resource(m.Order, 'order'),
     '/otp/cancel': _resource(m.OTPTransaction, 'transaction'), '/otp/initiate': _resource(m.OTPTransaction, 'transaction'), '/otp/lookup': _resource(m.OTPTransaction, 'transaction'), '/otp/verify': ResponseShape(m.OTPVerification),
     '/payment_methods/activate': _resource(m.PaymentMethod, 'payment_method'), '/payment_methods/archive': _resource(m.PaymentMethod, 'payment_method'), '/payment_methods/confirm_verification': _resource(m.PaymentMethod, 'payment_method'),

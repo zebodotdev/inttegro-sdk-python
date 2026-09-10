@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, fields
+from datetime import datetime
 from enum import Enum
 from typing import Any
 
@@ -47,6 +48,10 @@ def encode_request_value(value: Any) -> Any:
         return value.to_dict()
     if isinstance(value, Enum):
         return value.value
+    if isinstance(value, datetime):
+        if value.tzinfo is None:
+            raise ValueError("timestamp must include a UTC offset")
+        return value.isoformat().replace("+00:00", "Z")
     if isinstance(value, Mapping):
         return {
             str(key): encode_request_value(item)

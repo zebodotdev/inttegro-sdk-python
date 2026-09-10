@@ -116,6 +116,7 @@ from ._models import OTPVerification as OTPVerification
 from ._models import PaymentMethod as PaymentMethod
 from ._models import PaymentMethodBankAccount as PaymentMethodBankAccount
 from ._models import PaymentMethodBankAccountGhanaBankAccount as PaymentMethodBankAccountGhanaBankAccount
+from ._models import PaymentMethodCard as PaymentMethodCard
 from ._models import PaymentMethodDeletion as PaymentMethodDeletion
 from ._models import PaymentMethodMobileMoney as PaymentMethodMobileMoney
 from ._models import PaymentMethodOwner as PaymentMethodOwner
@@ -124,6 +125,7 @@ from ._models import PaymentMethodPage as PaymentMethodPage
 from ._models import PaymentMethodSupplied as PaymentMethodSupplied
 from ._models import PaymentMethodVerification as PaymentMethodVerification
 from ._models import PaymentMethodVerificationSession as PaymentMethodVerificationSession
+from ._models import PaymentMethodVerificationDelivery as PaymentMethodVerificationDelivery
 from ._models import PayoutPage as PayoutPage
 from ._models import PricePage as PricePage
 from ._models import ProductPage as ProductPage
@@ -134,6 +136,7 @@ from ._models import UploadRequest as UploadRequest
 from ._models import BalanceTransaction as BalanceTransaction
 from ._models import BalanceTransactionAmount as BalanceTransactionAmount
 from ._models import BalanceValue as BalanceValue
+from ._models import BalanceSnapshot as BalanceSnapshot
 from ._models import BroadcastCancelDetail as BroadcastCancelDetail
 from ._models import BroadcastCreationDetail as BroadcastCreationDetail
 from ._models import BroadcastDetail as BroadcastDetail
@@ -215,6 +218,8 @@ from ._models import OrderDocumentDeliveryAttempt as OrderDocumentDeliveryAttemp
 from ._models import OrderDocumentDeliveryFailure as OrderDocumentDeliveryFailure
 from ._models import OrderDocumentDeliveryResult as OrderDocumentDeliveryResult
 from ._models import OrderDocumentFormat as OrderDocumentFormat
+from ._models import OrderDiscountLineItem as OrderDiscountLineItem
+from ._models import OrderDiscountLineItemDiscount as OrderDiscountLineItemDiscount
 from ._models import OrderFeeLineItem as OrderFeeLineItem
 from ._models import OrderFeeLineItemFee as OrderFeeLineItemFee
 from ._models import OrderInvoice as OrderInvoice
@@ -224,6 +229,9 @@ from ._models import OrderLineItemGroup as OrderLineItemGroup
 from ._models import OrderPage as OrderPage
 from ._models import Payment as Payment
 from ._models import PaymentAttempt as PaymentAttempt
+from ._models import PaymentAttemptError as PaymentAttemptError
+from ._models import PaymentBillingDetails as PaymentBillingDetails
+from ._models import PaymentError as PaymentError
 from ._models import PaymentMethodSnapshot as PaymentMethodSnapshot
 from ._models import PaymentMethodSnapshotBankAccount as PaymentMethodSnapshotBankAccount
 from ._models import PaymentMethodSnapshotGhanaBankAccount as PaymentMethodSnapshotGhanaBankAccount
@@ -244,6 +252,7 @@ from ._models import PaymentNextActionConfirmPaymentAttempt as PaymentNextAction
 from ._models import PaymentNextActionConfirmPaymentRequest as PaymentNextActionConfirmPaymentRequest
 from ._models import PaymentNextActionRedirect as PaymentNextActionRedirect
 from ._models import PaymentNextActionRedirectLatestVisit as PaymentNextActionRedirectLatestVisit
+from ._models import PaymentNextActionRequestConfirmation as PaymentNextActionRequestConfirmation
 from ._models import Payout as Payout
 from ._models import PayoutError as PayoutError
 from ._models import PayoutSettingsLookup as PayoutSettingsLookup
@@ -258,16 +267,24 @@ from ._models import PriceEmbeddedProductAttributesItem as PriceEmbeddedProductA
 from ._models import PricePageItem as PricePageItem
 from ._models import Product as Product
 from ._models import ProductAttribute as ProductAttribute
+from ._models import ProductDelivery as ProductDelivery
 from ._models import ProductDimensions as ProductDimensions
 from ._models import ProductDimensionsCustom as ProductDimensionsCustom
 from ._models import ProductDimensionsDigital as ProductDimensionsDigital
 from ._models import ProductDimensionsPhysical as ProductDimensionsPhysical
+from ._models import ProductDownload as ProductDownload
 from ._models import ProductMedia as ProductMedia
 from ._models import ProductPriceSummary as ProductPriceSummary
+from ._models import ProductRender as ProductRender
+from ._models import ProductService as ProductService
 from ._models import ProductShipment as ProductShipment
+from ._models import ProductStream as ProductStream
 from ._models import PublicFileStorage as PublicFileStorage
 from ._models import PurchaseIntent as PurchaseIntent
 from ._models import PurchaseIntentActivity as PurchaseIntentActivity
+from ._models import PurchaseIntentActivityAttribution as PurchaseIntentActivityAttribution
+from ._models import PurchaseIntentActivityLog as PurchaseIntentActivityLog
+from ._models import PurchaseIntentActivityVisitor as PurchaseIntentActivityVisitor
 from ._models import PurchaseIntentMerchant as PurchaseIntentMerchant
 from ._models import PurchaseIntentOriginalPrice as PurchaseIntentOriginalPrice
 from ._models import PurchaseIntentPrice as PurchaseIntentPrice

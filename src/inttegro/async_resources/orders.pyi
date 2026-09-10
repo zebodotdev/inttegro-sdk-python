@@ -2,7 +2,7 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import Order, OrderDocumentDeliveryResult, OrderPage, Refund
+from .._models import Order, OrderDocumentDeliveryResult, OrderPage
 from ..request_types import *
 
 class AsyncOrders:
@@ -11,9 +11,6 @@ class AsyncOrders:
         ...
 
     async def create(self, payload: CreateOrderRequest) -> Order:
-        ...
-
-    async def new(self, payload: CreateOrderRequest) -> Order:
         ...
 
     async def lookup(self, order_id: str, **options: object) -> Order:
@@ -44,9 +41,6 @@ class AsyncOrders:
         ...
 
     async def cancel(self, order_id: str, request_meta: dict[str, str] | None=None) -> Order:
-        ...
-
-    async def refund(self, payload: CreateRefundRequest, idempotency_key: str | None=None) -> Refund:
         ...
 
     async def page(self, payload: PageOrdersRequest | None=None) -> OrderPage:

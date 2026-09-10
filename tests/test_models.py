@@ -2,6 +2,7 @@ import json
 import sys
 import unittest
 from dataclasses import FrozenInstanceError, is_dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -13,6 +14,7 @@ from inttegro import (
     ChimeEmailMessageInput,
     InttegroClient,
     Refund,
+    UpdatePurchaseIntentRequest,
 )
 
 
@@ -69,6 +71,8 @@ class TypedModelTest(unittest.TestCase):
         self.assertTrue(is_dataclass(response))
         self.assertEqual("rf_1", response.id)
         self.assertEqual(2500, response.total.value)
+        self.assertIsInstance(response.created_at, datetime)
+        self.assertEqual(timezone.utc, response.created_at.tzinfo)
         self.assertEqual("rf_1", response["id"])
         with self.assertRaises(FrozenInstanceError):
             response.id = "rf_2"
@@ -89,6 +93,30 @@ class TypedModelTest(unittest.TestCase):
 
         self.assertEqual({"enabled": True}, response["future_field"])
         self.assertEqual({"enabled": True}, response.to_dict()["future_field"])
+        self.assertEqual("2026-09-02T12:00:00Z", response.to_dict()["created_at"])
+
+    def test_timestamp_fields_reject_values_without_an_offset(self):
+        with self.assertRaisesRegex(ValueError, "UTC offset"):
+            Refund.from_dict(
+                {
+                    "id": "rf_1",
+                    "order_id": "or_1",
+                    "reason": "custom",
+                    "status": "pending",
+                    "total": {"currency": "ghs", "value": 100},
+                    "line_items": [],
+                    "created_at": "2026-09-02T12:00:00",
+                }
+            )
+
+    def test_request_timestamps_serialize_to_iso_8601(self):
+        request = UpdatePurchaseIntentRequest(
+            expires_at=datetime(2026, 10, 1, 12, 0, tzinfo=timezone.utc)
+        )
+        self.assertEqual("2026-10-01T12:00:00Z", request.to_dict()["expires_at"])
+
+        with self.assertRaisesRegex(ValueError, "UTC offset"):
+            UpdatePurchaseIntentRequest(expires_at=datetime(2026, 10, 1, 12, 0)).to_dict()
 
     def test_absent_optional_fields_retain_presence_semantics(self):
         response = BalanceTransaction.from_dict(

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any, Literal, TypeAlias
 
 from ._model_base import ApiModel
@@ -16,11 +17,11 @@ class InitiateOTPResponse(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class OTPTransaction(ApiModel):
     cancel_reason: str | None = field(init=False)
-    canceled_at: str | None = field(init=False)
-    expires_at: str = field(init=False)
+    canceled_at: datetime | None = field(init=False)
+    expires_at: datetime = field(init=False)
     full_message: str = field(init=False)
     id: str = field(init=False)
-    initiated_at: str = field(init=False)
+    initiated_at: datetime = field(init=False)
     status: Literal['canceled', 'expired', 'pending', 'pending_delivery', 'pending_verification', 'verified'] = field(init=False)
     transmission: OTPTransmission | None = field(init=False)
 
@@ -28,7 +29,7 @@ class OTPTransaction(ApiModel):
 class OTPTransmission(ApiModel):
     recipient: str = field(init=False)
     sender_id: str = field(init=False)
-    sent_at: str | None = field(init=False)
+    sent_at: datetime | None = field(init=False)
     sent_via: Literal['sms'] | None = field(init=False)
     status: Literal['delivered', 'failed', 'submitted'] | None = field(init=False)
 
@@ -39,7 +40,7 @@ class OTPVerification(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class OTPVerificationAttempt(ApiModel):
-    attempted_at: str = field(init=False)
+    attempted_at: datetime = field(init=False)
     id: str = field(init=False)
     presented_token: str = field(init=False)
     recipient: str = field(init=False)
@@ -60,7 +61,7 @@ class ChimeResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class Chime(ApiModel):
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     customer_id: str | None = field(init=False)
     email: ChimeEmailMessage | None = field(init=False)
@@ -130,24 +131,24 @@ class ChimeRecipientEmail(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class ChimeTransmission(ApiModel):
     address: str = field(init=False)
-    created_at: str = field(init=False)
-    delivered_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    delivered_at: datetime | None = field(init=False)
     email_events: list[ChimeEmailEvent] | None = field(init=False)
     email_failure_code: str | None = field(init=False)
     email_failure_reason: str | None = field(init=False)
     email_status: str | None = field(init=False)
     error: str | None = field(init=False)
-    failed_at: str | None = field(init=False)
+    failed_at: datetime | None = field(init=False)
     gateway: str = field(init=False)
     gateway_message_id: str | None = field(init=False)
     id: str = field(init=False)
-    initialized_at: str = field(init=False)
-    last_email_event_at: str | None = field(init=False)
+    initialized_at: datetime = field(init=False)
+    last_email_event_at: datetime | None = field(init=False)
     mechanism: Literal['sms', 'email'] = field(init=False)
-    sent_at: str | None = field(init=False)
+    sent_at: datetime | None = field(init=False)
     sent_via: Literal['sms', 'email'] | None = field(init=False)
     status: str = field(init=False)
-    suppressed_at: str | None = field(init=False)
+    suppressed_at: datetime | None = field(init=False)
     suppression_reason: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -156,7 +157,7 @@ class ChimeEmailEvent(ApiModel):
     bounce_type: str | None = field(init=False)
     complaint_sub_type: str | None = field(init=False)
     id: str = field(init=False)
-    occurred_at: str = field(init=False)
+    occurred_at: datetime = field(init=False)
     provider: str = field(init=False)
     provider_message_id: str = field(init=False)
     reason: str | None = field(init=False)
@@ -183,16 +184,16 @@ class ScheduleResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class ScheduleCreationDetail(ApiModel):
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     customer_ids: list[str] | None = field(init=False)
     email: ChimeEmailMessage | None = field(init=False)
-    executed_at: str | None = field(init=False)
+    executed_at: datetime | None = field(init=False)
     full_message: str = field(init=False)
     id: str = field(init=False)
     idempotency_key: str | None = field(init=False)
     purpose: str | None = field(init=False)
     recipients: list[str] | None = field(init=False)
-    send_after: str = field(init=False)
+    send_after: datetime = field(init=False)
     sender_id: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -202,14 +203,14 @@ class BroadcastResponse(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class BroadcastCreationDetail(ApiModel):
     content: str = field(init=False)
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     customer_ids: list[str] | None = field(init=False)
     email: ChimeEmailMessage | None = field(init=False)
     id: str = field(init=False)
     idempotency_key: str | None = field(init=False)
     purpose: str | None = field(init=False)
     recipients: list[str] = field(init=False)
-    send_after: str = field(init=False)
+    send_after: datetime = field(init=False)
     sender_id: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -220,16 +221,16 @@ class ScheduleLookupResponse(ApiModel):
 class ScheduleDetail(ApiModel):
     chime_ids: list[str] | None = field(init=False)
     content: str = field(init=False)
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     customer_ids: list[str] | None = field(init=False)
     email: ChimeEmailMessage | None = field(init=False)
     errors: list[ScheduleError] | None = field(init=False)
-    executed_at: str | None = field(init=False)
+    executed_at: datetime | None = field(init=False)
     id: str = field(init=False)
     idempotency_key: str | None = field(init=False)
     purpose: str | None = field(init=False)
     recipients: list[str] = field(init=False)
-    send_after: str = field(init=False)
+    send_after: datetime = field(init=False)
     sender_id: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -246,18 +247,18 @@ class ScheduleCancelResponse(ApiModel):
 class ScheduleCancelDetail(ApiModel):
     chime_ids: list[str] | None = field(init=False)
     content: str = field(init=False)
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     customer_ids: list[str] | None = field(init=False)
     email: ChimeEmailMessage | None = field(init=False)
     errors: list[ScheduleError] | None = field(init=False)
-    executed_at: str | None = field(init=False)
+    executed_at: datetime | None = field(init=False)
     id: str = field(init=False)
     idempotency_key: str | None = field(init=False)
     purpose: str | None = field(init=False)
     recipients: list[str] = field(init=False)
-    send_after: str = field(init=False)
+    send_after: datetime = field(init=False)
     sender_id: str = field(init=False)
-    canceled_at: str | None = field(init=False)
+    canceled_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class LookupBroadcastResponse(ApiModel):
@@ -267,16 +268,16 @@ class LookupBroadcastResponse(ApiModel):
 class BroadcastDetail(ApiModel):
     chime_ids: list[str] | None = field(init=False)
     content: str = field(init=False)
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     customer_ids: list[str] | None = field(init=False)
     email: ChimeEmailMessage | None = field(init=False)
     errors: list[BroadcastError] | None = field(init=False)
-    executed_at: str | None = field(init=False)
+    executed_at: datetime | None = field(init=False)
     id: str = field(init=False)
     idempotency_key: str | None = field(init=False)
     purpose: str | None = field(init=False)
     recipients: list[str] = field(init=False)
-    send_after: str = field(init=False)
+    send_after: datetime = field(init=False)
     sender_id: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -293,18 +294,18 @@ class BroadcastCancelResponse(ApiModel):
 class BroadcastCancelDetail(ApiModel):
     chime_ids: list[str] | None = field(init=False)
     content: str = field(init=False)
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     customer_ids: list[str] | None = field(init=False)
     email: ChimeEmailMessage | None = field(init=False)
     errors: list[BroadcastError] | None = field(init=False)
-    executed_at: str | None = field(init=False)
+    executed_at: datetime | None = field(init=False)
     id: str = field(init=False)
     idempotency_key: str | None = field(init=False)
     purpose: str | None = field(init=False)
     recipients: list[str] = field(init=False)
-    send_after: str = field(init=False)
+    send_after: datetime = field(init=False)
     sender_id: str = field(init=False)
-    canceled_at: str | None = field(init=False)
+    canceled_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class MessageTemplateEnvelope(ApiModel):
@@ -327,10 +328,10 @@ class MessageTemplate(ApiModel):
     sms: MessageTemplateSMSContent | None = field(init=False)
     email: MessageTemplateEmailContent | None = field(init=False)
     attachments: MessageTemplateAttachmentIDs | None = field(init=False)
-    created_at: str = field(init=False)
-    updated_at: str = field(init=False)
-    published_at: str | None = field(init=False)
-    archived_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    updated_at: datetime = field(init=False)
+    published_at: datetime | None = field(init=False)
+    archived_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class MessageTemplateVariable(ApiModel):
@@ -430,7 +431,7 @@ class CustomerResponse(ApiModel):
 class Customer(ApiModel):
     balance: dict[str, CustomerBalanceValue] = field(init=False)
     billing_address: CustomerAddress | None = field(init=False)
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     email_address: str | None = field(init=False)
     guest: bool = field(init=False)
@@ -441,11 +442,11 @@ class Customer(ApiModel):
     shipping_address: CustomerAddress | None = field(init=False)
     suffix: str | None = field(init=False)
     title: str | None = field(init=False)
-    updated_at: str | None = field(init=False)
+    updated_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class CustomerBalanceValue(ApiModel):
-    as_of: str = field(init=False)
+    as_of: datetime = field(init=False)
     available: Amount = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -485,29 +486,27 @@ class OrderEnvelope(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class Order(ApiModel):
-    canceled_at: str | None = field(init=False)
+    canceled_at: datetime | None = field(init=False)
     checkout_settings: OrderCheckoutSettings | None = field(init=False)
-    completed_at: str | None = field(init=False)
+    completed_at: datetime | None = field(init=False)
     created_from: OrderCreatedFrom | None = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     customer: OrderCustomer = field(init=False)
-    expires_at: str | None = field(init=False)
+    expires_at: datetime | None = field(init=False)
     id: str = field(init=False)
-    initiated_at: str = field(init=False)
+    initiated_at: datetime = field(init=False)
     invoice: OrderInvoice | None = field(init=False)
     number: str | None = field(init=False)
     receipt_number: str | None = field(init=False)
     refunds: list[Refund] | None = field(init=False)
     invoice_settings: InvoiceSettings | None = field(init=False)
     status: Literal['preparing', 'requires_payment', 'paid', 'completed', 'canceled', 'expired', 'unknown'] = field(init=False)
-    sealed_at: str | None = field(init=False)
+    sealed_at: datetime | None = field(init=False)
     line_item_group: OrderLineItemGroup | None = field(init=False)
     payment: Payment | None = field(init=False)
-    paid_at: str | None = field(init=False)
-    payment_due_at: str | None = field(init=False)
-    payout_settings: dict[str, Any] | None = field(init=False)
+    paid_at: datetime | None = field(init=False)
+    payment_due_at: datetime | None = field(init=False)
     reference: str | None = field(init=False)
-    shipping: dict[str, Any] | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class OrderCheckoutSettings(ApiModel):
@@ -544,7 +543,7 @@ class OrderAddress(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class OrderInvoice(ApiModel):
     number: str | None = field(init=False)
-    format: OrderInvoiceFormat | None = field(init=False)
+    format: OrderInvoiceFormat = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class OrderInvoiceFormat(ApiModel):
@@ -558,19 +557,19 @@ class OrderDocumentFormat(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class Refund(ApiModel):
-    canceled_at: str | None = field(init=False)
-    created_at: str = field(init=False)
+    canceled_at: datetime | None = field(init=False)
+    created_at: datetime = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
-    failed_at: str | None = field(init=False)
+    failed_at: datetime | None = field(init=False)
     id: str = field(init=False)
     line_items: list[RefundLineItem] = field(init=False)
     order_id: str = field(init=False)
-    processing_at: str | None = field(init=False)
+    processing_at: datetime | None = field(init=False)
     reason: RefundReasonValue = field(init=False)
     reason_details: str | None = field(init=False)
     reference: str | None = field(init=False)
     status: Literal['canceled', 'failed', 'pending', 'processing', 'succeeded'] = field(init=False)
-    succeeded_at: str | None = field(init=False)
+    succeeded_at: datetime | None = field(init=False)
     total: Amount = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -640,6 +639,15 @@ class OrderShippingLineItemShipping(ApiModel):
     fee: Amount = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class OrderDiscountLineItem(ApiModel):
+    type: Literal['discount'] = field(init=False)
+    discount: OrderDiscountLineItemDiscount = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class OrderDiscountLineItemDiscount(ApiModel):
+    pass
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class Payment(ApiModel):
     id: str = field(init=False)
     status: Literal['initiated', 'requires_action', 'overdue', 'executed', 'paid', 'canceled', 'expired', 'failed', 'unknown'] = field(init=False)
@@ -647,15 +655,18 @@ class Payment(ApiModel):
     amount: Amount = field(init=False)
     balance_transaction: BalanceTransaction | None = field(init=False)
     payment_method: PaymentMethodSnapshot | None = field(init=False)
+    billing_details: PaymentBillingDetails | None = field(init=False)
+    customer: OrderCustomer | None = field(init=False)
     latest_attempt: PaymentAttempt | None = field(init=False)
     next_action: PaymentNextAction | None = field(init=False)
-    initiated_at: str = field(init=False)
-    executed_at: str | None = field(init=False)
-    paid_at: str | None = field(init=False)
-    canceled_at: str | None = field(init=False)
-    due_at: str | None = field(init=False)
-    expired_at: str | None = field(init=False)
-    failed_at: str | None = field(init=False)
+    latest_error: PaymentError | None = field(init=False)
+    initiated_at: datetime = field(init=False)
+    executed_at: datetime | None = field(init=False)
+    paid_at: datetime | None = field(init=False)
+    canceled_at: datetime | None = field(init=False)
+    due_at: datetime | None = field(init=False)
+    expired_at: datetime | None = field(init=False)
+    failed_at: datetime | None = field(init=False)
     paid_offline: bool | None = field(init=False)
     payment_method_types: list[str] | None = field(init=False)
     payout_configuration: PaymentPayoutConfiguration | None = field(init=False)
@@ -663,16 +674,17 @@ class Payment(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class BalanceTransaction(ApiModel):
     amount: BalanceTransactionAmount = field(init=False)
-    available_at: str | None = field(init=False)
-    claimed_at: str | None = field(init=False)
-    created_at: str = field(init=False)
+    available_at: datetime | None = field(init=False)
+    claimed_at: datetime | None = field(init=False)
+    created_at: datetime = field(init=False)
     id: str = field(init=False)
     order_id: str = field(init=False)
-    paid_at: str | None = field(init=False)
+    paid_at: datetime | None = field(init=False)
     payment_id: str | None = field(init=False)
     payout_id: str | None = field(init=False)
     refund_id: str | None = field(init=False)
     type: Literal['payment', 'refund'] = field(init=False)
+    payout_configuration: PaymentPayoutConfiguration | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class BalanceTransactionAmount(ApiModel):
@@ -683,14 +695,14 @@ class BalanceTransactionAmount(ApiModel):
 class PaymentMethodSnapshot(ApiModel):
     id: str = field(init=False)
     bank_account: PaymentMethodSnapshotBankAccount | None = field(init=False)
-    card: dict[str, Any] | None = field(init=False)
-    created_at: str = field(init=False)
+    card: PaymentMethodCard | None = field(init=False)
+    created_at: datetime = field(init=False)
     customer_id: str = field(init=False)
     mobile_money: PaymentMethodSnapshotMobileMoney | None = field(init=False)
     owner: PaymentMethodSnapshotOwner | None = field(init=False)
     type: Literal['mobile_money', 'bank_account', 'card', 'motito'] = field(init=False)
     verified: bool = field(init=False)
-    verified_at: str | None = field(init=False)
+    verified_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentMethodSnapshotBankAccount(ApiModel):
@@ -717,74 +729,96 @@ class PaymentMethodSnapshotOwner(ApiModel):
     address: OrderAddress | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class PaymentBillingDetails(ApiModel):
+    owner: PaymentMethodSnapshotOwner | None = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class PaymentError(ApiModel):
+    message: str = field(init=False)
+    docs_url: str = field(init=False)
+    source: str = field(init=False)
+    type: str = field(init=False)
+    code: str = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentAttempt(ApiModel):
     payment_method_type: str | None = field(init=False)
     payment_method_id: str | None = field(init=False)
+    error: PaymentAttemptError | None = field(init=False)
     reference: str | None = field(init=False)
-    status: Literal['initiated', 'executed', 'succeeded', 'canceled', 'expired', 'failed', 'unknown'] | None = field(init=False)
-    initiated_at: str | None = field(init=False)
-    succeeded_at: str | None = field(init=False)
+    status: Literal['initiated', 'executed', 'succeeded', 'canceled', 'expired', 'failed', 'unknown'] = field(init=False)
+    initiated_at: datetime = field(init=False)
+    succeeded_at: datetime | None = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class PaymentAttemptError(ApiModel):
+    message: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentNextAction(ApiModel):
-    type: Literal['confirm_payment', 'execute', 'redirect', 'authorize', 'none'] = field(init=False)
+    type: Literal['confirm_payment', 'execute', 'redirect', 'authorize_payment', 'request_confirmation'] = field(init=False)
     confirm_payment: PaymentNextActionConfirmPayment | None = field(init=False)
-    execute: dict[str, Any] | None = field(init=False)
     redirect: PaymentNextActionRedirect | None = field(init=False)
     authorize: PaymentNextActionAuthorize | None = field(init=False)
+    request_confirmation: PaymentNextActionRequestConfirmation | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentNextActionConfirmPayment(ApiModel):
-    expires_at: str | None = field(init=False)
-    scheme: str | None = field(init=False)
+    expires_at: datetime = field(init=False)
+    scheme: str = field(init=False)
     request: PaymentNextActionConfirmPaymentRequest | None = field(init=False)
     attempt: PaymentNextActionConfirmPaymentAttempt | None = field(init=False)
-    confirmed: bool | None = field(init=False)
-    status: str | None = field(init=False)
+    confirmed: bool = field(init=False)
+    status: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentNextActionConfirmPaymentRequest(ApiModel):
-    id: str | None = field(init=False)
-    recipient: str | None = field(init=False)
-    sent_via: Literal['sms', 'email', 'push'] | None = field(init=False)
-    token_size: int | None = field(init=False)
-    sender_id: str | None = field(init=False)
+    id: str = field(init=False)
+    recipient: str = field(init=False)
+    sent_via: Literal['sms', 'email', 'push'] = field(init=False)
+    token_size: int = field(init=False)
+    sender_id: str = field(init=False)
+    status: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentNextActionConfirmPaymentAttempt(ApiModel):
-    status: str | None = field(init=False)
-    confirmed: bool | None = field(init=False)
-    reason: str | None = field(init=False)
-    token: str | None = field(init=False)
-    executed_at: str | None = field(init=False)
-    created_at: str | None = field(init=False)
+    status: str = field(init=False)
+    confirmed: bool = field(init=False)
+    reason: str = field(init=False)
+    executed_at: datetime | None = field(init=False)
+    created_at: datetime = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentNextActionRedirect(ApiModel):
-    redirect_url: str | None = field(init=False)
-    valid_until: str | None = field(init=False)
+    redirect_url: str = field(init=False)
+    valid_until: datetime = field(init=False)
     latest_visit: PaymentNextActionRedirectLatestVisit | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentNextActionRedirectLatestVisit(ApiModel):
-    user_agent: str | None = field(init=False)
-    ip_address: str | None = field(init=False)
-    at: str | None = field(init=False)
+    user_agent: str = field(init=False)
+    ip_address: str = field(init=False)
+    at: datetime = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentNextActionAuthorize(ApiModel):
-    beneficiary: str | None = field(init=False)
-    scheme: str | None = field(init=False)
-    expires_at: str | None = field(init=False)
+    beneficiary: str = field(init=False)
+    scheme: str = field(init=False)
+    expires_at: datetime = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class PaymentNextActionRequestConfirmation(ApiModel):
+    last_request: PaymentNextActionConfirmPaymentRequest | None = field(init=False)
+    after: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentPayoutConfiguration(ApiModel):
-    enable_fx: Literal[False] | None = field(init=False)
-    destination: PaymentPayoutConfigurationDestination | None = field(init=False)
+    enable_fx: Literal[False] = field(init=False)
+    destination: PaymentPayoutConfigurationDestination = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentPayoutConfigurationDestination(ApiModel):
-    financial_account_id: str | None = field(init=False)
+    financial_account_id: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinalizeOrderEnvelope(ApiModel):
@@ -825,9 +859,9 @@ class PageOrdersEnvelope(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class OrderPage(ApiModel):
-    number: int | None = field(init=False)
-    size: int | None = field(init=False)
-    orders: list[Order] | None = field(init=False)
+    number: int = field(init=False)
+    size: int = field(init=False)
+    orders: list[Order] = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class RefundResponse(ApiModel):
@@ -853,9 +887,9 @@ class Application(ApiModel):
     name: str = field(init=False)
     alias: str | None = field(init=False)
     description: str | None = field(init=False)
-    created_at: str = field(init=False)
-    updated_at: str | None = field(init=False)
-    archived_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    updated_at: datetime | None = field(init=False)
+    archived_at: datetime | None = field(init=False)
     secret_key: ApplicationSecretKey | None = field(init=False)
     relationship: ApplicationRelationship | None = field(init=False)
 
@@ -863,7 +897,7 @@ class Application(ApiModel):
 class ApplicationSecretKey(ApiModel):
     id: str | None = field(init=False)
     token_type: str | None = field(init=False)
-    issued_at: str | None = field(init=False)
+    issued_at: datetime | None = field(init=False)
     token: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -880,7 +914,7 @@ class ApplicationRelationship(ApiModel):
     child_standing: str = field(init=False)
     relationship_policy: ApplicationRelationshipPolicy = field(init=False)
     retained_creator_authority_exists: bool = field(init=False)
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class ApplicationRelationshipPolicy(ApiModel):
@@ -898,9 +932,9 @@ class LookupApplicationResponseApp(ApiModel):
     name: str = field(init=False)
     alias: str | None = field(init=False)
     description: str | None = field(init=False)
-    created_at: str = field(init=False)
-    updated_at: str | None = field(init=False)
-    archived_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    updated_at: datetime | None = field(init=False)
+    archived_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class UpdateApplicationResponse(ApiModel):
@@ -912,8 +946,8 @@ class UpdateApplicationResponseApp(ApiModel):
     name: str = field(init=False)
     alias: str | None = field(init=False)
     description: str | None = field(init=False)
-    created_at: str = field(init=False)
-    updated_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    updated_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class GenerateSecretKeyResponse(ApiModel):
@@ -924,7 +958,7 @@ class GeneratedSecretKey(ApiModel):
     id: str = field(init=False)
     label: str | None = field(init=False)
     token_type: Literal['bearer'] = field(init=False)
-    issued_at: str = field(init=False)
+    issued_at: datetime = field(init=False)
     token: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -945,13 +979,13 @@ class SecretKey(ApiModel):
     id: str = field(init=False)
     label: str | None = field(init=False)
     token_type: Literal['bearer'] = field(init=False)
-    issued_at: str = field(init=False)
-    updated_at: str | None = field(init=False)
-    expires_at: str | None = field(init=False)
+    issued_at: datetime = field(init=False)
+    updated_at: datetime | None = field(init=False)
+    expires_at: datetime | None = field(init=False)
     status: Literal['active', 'revoked', 'expired'] = field(init=False)
     active: bool = field(init=False)
-    revoked_at: str | None = field(init=False)
-    last_used_at: str | None = field(init=False)
+    revoked_at: datetime | None = field(init=False)
+    last_used_at: datetime | None = field(init=False)
     usage_count: int | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -983,7 +1017,7 @@ class SecretKeyUsagePage(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class SecretKeyUsageRow(ApiModel):
     secret_key_id: str = field(init=False)
-    occurred_at: str = field(init=False)
+    occurred_at: datetime = field(init=False)
     auth_result: Literal['succeeded', 'failed'] = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -992,8 +1026,8 @@ class CreateFinancialAccountResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccountCreateResponse(ApiModel):
-    archived_at: str | None = field(init=False)
-    created_at: str = field(init=False)
+    archived_at: datetime | None = field(init=False)
+    created_at: datetime = field(init=False)
     currency: str = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     description: str | None = field(init=False)
@@ -1039,19 +1073,19 @@ class FinancialInstitutionMobileMoneyProvider(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccountPullConfiguration(ApiModel):
-    enabled_at: str = field(init=False)
+    enabled_at: datetime = field(init=False)
     mandate: FinancialAccountPullConfigurationMandate = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccountPullConfigurationMandate(ApiModel):
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     id: str = field(init=False)
     ip_address: str = field(init=False)
     user_agent: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccountPushConfiguration(ApiModel):
-    enabled_at: str = field(init=False)
+    enabled_at: datetime = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class ResourceSupply(ApiModel):
@@ -1060,7 +1094,7 @@ class ResourceSupply(ApiModel):
     channel: str | None = field(init=False)
     resource_id: str | None = field(init=False)
     resource_type: str | None = field(init=False)
-    supplied_at: str = field(init=False)
+    supplied_at: datetime = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccountBankCreateResponse(ApiModel):
@@ -1112,8 +1146,8 @@ class LookupFinancialAccountResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccount(ApiModel):
-    archived_at: str | None = field(init=False)
-    created_at: str = field(init=False)
+    archived_at: datetime | None = field(init=False)
+    created_at: datetime = field(init=False)
     currency: str = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     description: str | None = field(init=False)
@@ -1127,7 +1161,7 @@ class FinancialAccount(ApiModel):
     type: Literal['wallet', 'bank_account', 'dosh_account'] = field(init=False)
     verification: dict[str, Any] | None = field(init=False)
     bank_account: FinancialAccountBank | None = field(init=False)
-    disconnected_at: str | None = field(init=False)
+    disconnected_at: datetime | None = field(init=False)
     dosh_account: dict[str, Any] | None = field(init=False)
     owner: FinancialAccountOwner | None = field(init=False)
     wallet: FinancialAccountWallet | None = field(init=False)
@@ -1178,8 +1212,8 @@ class ConnectFinancialAccountResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccountConnectedResponse(ApiModel):
-    archived_at: str | None = field(init=False)
-    created_at: str = field(init=False)
+    archived_at: datetime | None = field(init=False)
+    created_at: datetime = field(init=False)
     currency: str = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     description: str | None = field(init=False)
@@ -1203,8 +1237,8 @@ class UpdateFinancialAccountResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccountUpdateResponse(ApiModel):
-    archived_at: str | None = field(init=False)
-    created_at: str = field(init=False)
+    archived_at: datetime | None = field(init=False)
+    created_at: datetime = field(init=False)
     currency: str = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     description: str | None = field(init=False)
@@ -1218,7 +1252,7 @@ class FinancialAccountUpdateResponse(ApiModel):
     type: Literal['wallet', 'bank_account', 'dosh_account'] = field(init=False)
     verification: dict[str, Any] | None = field(init=False)
     bank_account: FinancialAccountBankUpdateResponse | None = field(init=False)
-    disconnected_at: str | None = field(init=False)
+    disconnected_at: datetime | None = field(init=False)
     dosh_account: dict[str, Any] | None = field(init=False)
     owner: FinancialAccountOwnerUpdateResponse | None = field(init=False)
     wallet: FinancialAccountWalletRawResponse | None = field(init=False)
@@ -1280,10 +1314,10 @@ class DisconnectFinancialAccountResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FinancialAccountCompactResponse(ApiModel):
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     currency: str = field(init=False)
     description: str | None = field(init=False)
-    disconnected_at: str | None = field(init=False)
+    disconnected_at: datetime | None = field(init=False)
     id: str = field(init=False)
     label: str | None = field(init=False)
     type: Literal['wallet', 'bank_account', 'dosh_account'] = field(init=False)
@@ -1302,16 +1336,16 @@ class DisableFinancialAccountPullResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class BalanceSnapshotResponse(ApiModel):
-    balances: BalanceSnapshotResponseBalances = field(init=False)
+    balances: BalanceSnapshot = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class BalanceSnapshotResponseBalances(ApiModel):
+class BalanceSnapshot(ApiModel):
     ghs: CurrencyBalanceSnapshot = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class CurrencyBalanceSnapshot(ApiModel):
     available: BalanceValue = field(init=False)
-    includes_transactions_before: str = field(init=False)
+    includes_transactions_before: datetime = field(init=False)
     pending: BalanceValue = field(init=False)
     refund: CurrencyBalanceSnapshotRefund = field(init=False)
     reserved: CurrencyBalanceSnapshotReserved = field(init=False)
@@ -1350,32 +1384,32 @@ class SchedulePayoutResponse(ApiModel):
 class Payout(ApiModel):
     amount: Amount | None = field(init=False)
     balance_transactions: list[str] | None = field(init=False)
-    canceled_at: str | None = field(init=False)
+    canceled_at: datetime | None = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     destination_id: str = field(init=False)
     error: PayoutError | None = field(init=False)
-    execute_after: str = field(init=False)
+    execute_after: datetime = field(init=False)
     executed_by: str | None = field(init=False)
-    expected_at: str | None = field(init=False)
-    failed_at: str | None = field(init=False)
+    expected_at: datetime | None = field(init=False)
+    failed_at: datetime | None = field(init=False)
     id: str = field(init=False)
-    initiated_at: str = field(init=False)
+    initiated_at: datetime = field(init=False)
     initiated_by: str | None = field(init=False)
     max_amount: Amount = field(init=False)
     reference: str | None = field(init=False)
     schedule_id: str | None = field(init=False)
-    scheduled_at: str | None = field(init=False)
+    scheduled_at: datetime | None = field(init=False)
     scheduled_by: str | None = field(init=False)
-    sent_at: str | None = field(init=False)
+    sent_at: datetime | None = field(init=False)
     source_id: str | None = field(init=False)
     status: Literal['initialized', 'scheduled', 'processing', 'executing', 'succeeded', 'invalid', 'canceled'] = field(init=False)
-    succeeded_at: str | None = field(init=False)
+    succeeded_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PayoutError(ApiModel):
     cause: str = field(init=False)
     message: str = field(init=False)
-    occurred_at: str = field(init=False)
+    occurred_at: datetime = field(init=False)
     type: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -1479,10 +1513,10 @@ class File(ApiModel):
     latest_error: FileLatestError | None = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     metadata: dict[str, str] | None = field(init=False)
-    created_at: str = field(init=False)
-    updated_at: str = field(init=False)
-    available_at: str | None = field(init=False)
-    expires_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    updated_at: datetime = field(init=False)
+    available_at: datetime | None = field(init=False)
+    expires_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FileActor(ApiModel):
@@ -1526,7 +1560,7 @@ class FileLatestError(ApiModel):
     code: str | None = field(init=False)
     message: str | None = field(init=False)
     retryable: bool | None = field(init=False)
-    at: str | None = field(init=False)
+    at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FilePageResponse(ApiModel):
@@ -1557,10 +1591,10 @@ class FileLink(ApiModel):
     revoked_by: FileLinkActor | None = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     metadata: dict[str, str] | None = field(init=False)
-    created_at: str = field(init=False)
-    updated_at: str = field(init=False)
-    expires_at: str = field(init=False)
-    revoked_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    updated_at: datetime = field(init=False)
+    expires_at: datetime = field(init=False)
+    revoked_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FileLinkDelivery(ApiModel):
@@ -1573,7 +1607,7 @@ class FileLinkDelivery(ApiModel):
 class FileLinkAccess(ApiModel):
     max_accesses: int | None = field(init=False)
     access_count: int | None = field(init=False)
-    last_accessed_at: str | None = field(init=False)
+    last_accessed_at: datetime | None = field(init=False)
     allow_download: bool | None = field(init=False)
     allowed_origins: list[str] | None = field(init=False)
 
@@ -1621,13 +1655,13 @@ class UploadRequest(ApiModel):
     canceled_by: UploadRequestActor | None = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     metadata: dict[str, str] | None = field(init=False)
-    created_at: str = field(init=False)
-    updated_at: str = field(init=False)
-    expires_at: str = field(init=False)
-    uploading_at: str | None = field(init=False)
-    fulfilled_at: str | None = field(init=False)
-    expired_at: str | None = field(init=False)
-    canceled_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    updated_at: datetime = field(init=False)
+    expires_at: datetime = field(init=False)
+    uploading_at: datetime | None = field(init=False)
+    fulfilled_at: datetime | None = field(init=False)
+    expired_at: datetime | None = field(init=False)
+    canceled_at: datetime | None = field(init=False)
     attempt: UploadRequestAttempt | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -1670,7 +1704,7 @@ class UploadRequestAttempts(ApiModel):
     max_attempts: int | None = field(init=False)
     attempt_count: int = field(init=False)
     failed_attempt_count: int = field(init=False)
-    last_attempted_at: str | None = field(init=False)
+    last_attempted_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class UploadRequestLatestError(ApiModel):
@@ -1678,7 +1712,7 @@ class UploadRequestLatestError(ApiModel):
     param: str | None = field(init=False)
     message: str | None = field(init=False)
     retryable: bool | None = field(init=False)
-    at: str | None = field(init=False)
+    at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class UploadRequestWithAttemptResponse(ApiModel):
@@ -1703,39 +1737,39 @@ class UploadRequestWithAttemptObject(ApiModel):
     canceled_by: UploadRequestActor | None = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     metadata: dict[str, str] | None = field(init=False)
-    created_at: str = field(init=False)
-    updated_at: str = field(init=False)
-    expires_at: str = field(init=False)
-    uploading_at: str | None = field(init=False)
-    fulfilled_at: str | None = field(init=False)
-    expired_at: str | None = field(init=False)
-    canceled_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    updated_at: datetime = field(init=False)
+    expires_at: datetime = field(init=False)
+    uploading_at: datetime | None = field(init=False)
+    fulfilled_at: datetime | None = field(init=False)
+    expired_at: datetime | None = field(init=False)
+    canceled_at: datetime | None = field(init=False)
     attempt: UploadRequestAttempt | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class UploadRequestAttempt(ApiModel):
-    attempted_at: str = field(init=False)
+    attempted_at: datetime = field(init=False)
     content_type: str | None = field(init=False)
     declared_size: int | None = field(init=False)
     error: UploadRequestLatestError | None = field(init=False)
-    failed_at: str | None = field(init=False)
+    failed_at: datetime | None = field(init=False)
     file_id: str | None = field(init=False)
     filename: str | None = field(init=False)
     id: str = field(init=False)
     ordinal: int = field(init=False)
     review: UploadRequestReview | None = field(init=False)
     status: str = field(init=False)
-    succeeded_at: str | None = field(init=False)
+    succeeded_at: datetime | None = field(init=False)
     upload_request_id: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class UploadRequestReview(ApiModel):
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     decision: Literal['approved', 'rejected'] = field(init=False)
     file_id: str | None = field(init=False)
     public_message: str | None = field(init=False)
     reasons: list[UploadRequestReviewReason] | None = field(init=False)
-    reviewed_at: str = field(init=False)
+    reviewed_at: datetime = field(init=False)
     type: Literal['automatic', 'manual'] = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -1762,7 +1796,7 @@ class UploadFulfillment(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class FileUploadReceipt(ApiModel):
     content_type: str = field(init=False)
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     filename: str | None = field(init=False)
     id: str = field(init=False)
     name: str | None = field(init=False)
@@ -1780,20 +1814,21 @@ class TokenizePaymentMethodResponse(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentMethod(ApiModel):
     active: bool = field(init=False)
-    archived_at: str | None = field(init=False)
+    archived_at: datetime | None = field(init=False)
     bank_account: PaymentMethodBankAccount | None = field(init=False)
-    created_at: str = field(init=False)
+    card: PaymentMethodCard | None = field(init=False)
+    created_at: datetime = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     customer_id: str = field(init=False)
     ephemeral: bool | None = field(init=False)
-    expires_on: str | None = field(init=False)
+    expires_on: datetime | None = field(init=False)
     id: str = field(init=False)
     mobile_money: PaymentMethodMobileMoney | None = field(init=False)
     owner: PaymentMethodOwner | None = field(init=False)
     type: Literal['mobile_money', 'bank_account', 'card', 'motito'] = field(init=False)
     supplied: PaymentMethodSupplied | None = field(init=False)
     verification: PaymentMethodVerification | None = field(init=False)
-    verified_at: str | None = field(init=False)
+    verified_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentMethodBankAccount(ApiModel):
@@ -1807,6 +1842,10 @@ class PaymentMethodBankAccountGhanaBankAccount(ApiModel):
     account_number: str = field(init=False)
     sort_code: str | None = field(init=False)
     swift_code: str | None = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class PaymentMethodCard(ApiModel):
+    pass
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentMethodMobileMoney(ApiModel):
@@ -1837,12 +1876,12 @@ class PaymentMethodSupplied(ApiModel):
     channel: str | None = field(init=False)
     resource_id: str | None = field(init=False)
     resource_type: str | None = field(init=False)
-    supplied_at: str = field(init=False)
+    supplied_at: datetime = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentMethodVerification(ApiModel):
-    completed_at: str | None = field(init=False)
-    initiated_at: str = field(init=False)
+    completed_at: datetime | None = field(init=False)
+    initiated_at: datetime = field(init=False)
     mechanism: str | None = field(init=False)
     request_id: str = field(init=False)
     type: str = field(init=False)
@@ -1904,9 +1943,15 @@ class PaymentMethodTypeSetting(ApiModel):
 class PaymentMethodVerificationSession(ApiModel):
     payment_method_id: str = field(init=False)
     status: str = field(init=False)
-    token_sent_at: str | None = field(init=False)
-    expires_at: str | None = field(init=False)
-    delivery: dict[str, Any] | None = field(init=False)
+    token_sent_at: datetime | None = field(init=False)
+    expires_at: datetime | None = field(init=False)
+    delivery: PaymentMethodVerificationDelivery | None = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class PaymentMethodVerificationDelivery(ApiModel):
+    recipient: str | None = field(init=False)
+    channel: str | None = field(init=False)
+    sender_id: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PaymentMethodDeletion(ApiModel):
@@ -1935,10 +1980,10 @@ class Product(ApiModel):
     dimensions: ProductDimensions | None = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     active: bool = field(init=False)
-    created_at: str = field(init=False)
-    updated_at: str | None = field(init=False)
-    archived_at: str | None = field(init=False)
-    published_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    updated_at: datetime | None = field(init=False)
+    archived_at: datetime | None = field(init=False)
+    published_at: datetime | None = field(init=False)
     unit_dim: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -1951,11 +1996,31 @@ class ProductPriceSummary(ApiModel):
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class ProductShipment(ApiModel):
     type: Literal['delivery', 'download', 'render', 'service', 'stream'] = field(init=False)
-    delivery: dict[str, Any] | None = field(init=False)
-    download: dict[str, Any] | None = field(init=False)
-    render: dict[str, Any] | None = field(init=False)
-    service: dict[str, Any] | None = field(init=False)
-    stream: dict[str, Any] | None = field(init=False)
+    delivery: ProductDelivery | None = field(init=False)
+    download: ProductDownload | None = field(init=False)
+    render: ProductRender | None = field(init=False)
+    service: ProductService | None = field(init=False)
+    stream: ProductStream | None = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class ProductDelivery(ApiModel):
+    pass
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class ProductDownload(ApiModel):
+    pass
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class ProductRender(ApiModel):
+    pass
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class ProductService(ApiModel):
+    pass
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class ProductStream(ApiModel):
+    pass
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class ProductMedia(ApiModel):
@@ -2026,8 +2091,8 @@ class UpdatedProduct(ApiModel):
     dimensions: ProductDimensions | None = field(init=False)
     prices: list[ProductPriceSummary] | None = field(init=False)
     unit_dim: str | None = field(init=False)
-    created_at: str = field(init=False)
-    updated_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    updated_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PageProductsResponse(ApiModel):
@@ -2035,9 +2100,9 @@ class PageProductsResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class ProductPage(ApiModel):
-    number: int | None = field(init=False)
-    size: int | None = field(init=False)
-    products: list[Product] | None = field(init=False)
+    number: int = field(init=False)
+    size: int = field(init=False)
+    products: list[Product] = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PurchaseIntentResponse(ApiModel):
@@ -2045,24 +2110,67 @@ class PurchaseIntentResponse(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PurchaseIntent(ApiModel):
-    activity: PurchaseIntentActivity | None = field(init=False)
+    activity: PurchaseIntentActivityLog | None = field(init=False)
     allow_variants: bool = field(init=False)
-    created_at: str = field(init=False)
-    expires_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    expires_at: datetime | None = field(init=False)
     id: str = field(init=False)
-    inactive_at: str | None = field(init=False)
+    inactive_at: datetime | None = field(init=False)
     merchant: PurchaseIntentMerchant | None = field(init=False)
     price: PurchaseIntentPrice | None = field(init=False)
     product: PurchaseIntentProduct | None = field(init=False)
     quantity: PurchaseIntentQuantity = field(init=False)
     status: Literal['active', 'expired', 'inactive', 'used'] = field(init=False)
-    updated_at: str | None = field(init=False)
+    updated_at: datetime | None = field(init=False)
     usage: PurchaseIntentUsage = field(init=False)
     variant_set: PurchaseIntentVariantSet | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
-class PurchaseIntentActivity(ApiModel):
+class PurchaseIntentActivityLog(ApiModel):
     recent: list[PurchaseIntentActivity] | None = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class PurchaseIntentActivity(ApiModel):
+    amount: Amount | None = field(init=False)
+    attribution: PurchaseIntentActivityAttribution | None = field(init=False)
+    created_at: datetime = field(init=False)
+    error_code: str | None = field(init=False)
+    id: str = field(init=False)
+    order_id: str | None = field(init=False)
+    payment_id: str | None = field(init=False)
+    product_id: str | None = field(init=False)
+    purchase_intent_id: str = field(init=False)
+    quantity: int | None = field(init=False)
+    source: str | None = field(init=False)
+    type: Literal['expired_viewed', 'order_created', 'payment_failed', 'payment_started', 'viewed'] = field(init=False)
+    variant_product_id: str | None = field(init=False)
+    visitor: PurchaseIntentActivityVisitor | None = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class PurchaseIntentActivityAttribution(ApiModel):
+    campaign: str | None = field(init=False)
+    channel: str | None = field(init=False)
+    content: str | None = field(init=False)
+    landing_url: str | None = field(init=False)
+    medium: str | None = field(init=False)
+    referrer: str | None = field(init=False)
+    referrer_host: str | None = field(init=False)
+    source: str | None = field(init=False)
+    term: str | None = field(init=False)
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class PurchaseIntentActivityVisitor(ApiModel):
+    browser: str | None = field(init=False)
+    city: str | None = field(init=False)
+    country: str | None = field(init=False)
+    device: str | None = field(init=False)
+    ip_address: str | None = field(init=False)
+    os: str | None = field(init=False)
+    region: str | None = field(init=False)
+    session_id: str | None = field(init=False)
+    timezone: str | None = field(init=False)
+    user_agent: str | None = field(init=False)
+    visitor_id: str | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PurchaseIntentMerchant(ApiModel):
@@ -2090,22 +2198,22 @@ class PurchaseIntentProduct(ApiModel):
     id: str = field(init=False)
     about: str | None = field(init=False)
     active: bool = field(init=False)
-    archived_at: str | None = field(init=False)
+    archived_at: datetime | None = field(init=False)
     attributes: list[PurchaseIntentProductAttributesItem] | None = field(init=False)
     category: str | None = field(init=False)
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     description: str | None = field(init=False)
-    dimensions: dict[str, Any] | None = field(init=False)
-    media: dict[str, Any] | None = field(init=False)
+    dimensions: ProductDimensions | None = field(init=False)
+    media: ProductMedia | None = field(init=False)
     name: str = field(init=False)
-    published_at: str | None = field(init=False)
+    published_at: datetime | None = field(init=False)
     reference: str | None = field(init=False)
-    shipment: dict[str, Any] | None = field(init=False)
+    shipment: ProductShipment | None = field(init=False)
     tax_code: str | None = field(init=False)
     type: Literal['physical', 'digital', 'service', 'voucher', 'custom', 'cause'] = field(init=False)
     unit_dim: str | None = field(init=False)
-    updated_at: str | None = field(init=False)
+    updated_at: datetime | None = field(init=False)
     prices: list[ProductPriceSummary] | None = field(init=False)
     variant_set_id: str | None = field(init=False)
 
@@ -2127,7 +2235,7 @@ class PurchaseIntentUsage(ApiModel):
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PurchaseIntentUsageOrder(ApiModel):
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     id: str = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
@@ -2180,31 +2288,31 @@ class CatalogPrice(ApiModel):
     nominal: Amount = field(init=False)
     product_id: str | None = field(init=False)
     product: PriceEmbeddedProduct | None = field(init=False)
-    created_at: str = field(init=False)
-    updated_at: str | None = field(init=False)
-    archived_at: str | None = field(init=False)
+    created_at: datetime = field(init=False)
+    updated_at: datetime | None = field(init=False)
+    archived_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PriceEmbeddedProduct(ApiModel):
     id: str = field(init=False)
     about: str | None = field(init=False)
     active: bool = field(init=False)
-    archived_at: str | None = field(init=False)
+    archived_at: datetime | None = field(init=False)
     attributes: list[PriceEmbeddedProductAttributesItem] | None = field(init=False)
     category: str | None = field(init=False)
-    created_at: str = field(init=False)
+    created_at: datetime = field(init=False)
     custom_data: dict[str, str] | None = field(init=False)
     description: str | None = field(init=False)
-    dimensions: dict[str, Any] | None = field(init=False)
-    media: dict[str, Any] | None = field(init=False)
+    dimensions: ProductDimensions | None = field(init=False)
+    media: ProductMedia | None = field(init=False)
     name: str = field(init=False)
-    published_at: str | None = field(init=False)
+    published_at: datetime | None = field(init=False)
     reference: str | None = field(init=False)
-    shipment: dict[str, Any] | None = field(init=False)
+    shipment: ProductShipment | None = field(init=False)
     tax_code: str | None = field(init=False)
     type: Literal['physical', 'digital', 'service', 'voucher', 'custom', 'cause'] = field(init=False)
     unit_dim: str | None = field(init=False)
-    updated_at: str | None = field(init=False)
+    updated_at: datetime | None = field(init=False)
 
 @dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
 class PriceEmbeddedProductAttributesItem(ApiModel):
@@ -2261,7 +2369,7 @@ class CountryBankBranch(ApiModel):
 
 MessageTemplateAttachmentIDs: TypeAlias = list[str]
 RefundReasonValue: TypeAlias = Literal['requested_by_customer', 'duplicate', 'fraudulent', 'order_canceled', 'item_returned', 'item_damaged', 'item_not_received', 'item_not_as_described', 'custom']
-OrderLineItem: TypeAlias = OrderProductLineItem | OrderFeeLineItem | OrderShippingLineItem
+OrderLineItem: TypeAlias = OrderProductLineItem | OrderFeeLineItem | OrderShippingLineItem | OrderDiscountLineItem
 PricePageItem: TypeAlias = CatalogPrice
 
 def _is_public_model(value: Any) -> bool:
