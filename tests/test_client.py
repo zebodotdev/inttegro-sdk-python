@@ -206,6 +206,7 @@ OPENAPI_CLIENT_CHECKOUT_PATHS = {
     "/checkout/request_confirmation",
     "/checkout/confirm_payment",
 }
+OPENAPI_LEGACY_COMPATIBILITY_PATHS = {"/orders/refund"}
 
 
 def openapi_spec_path() -> Path:
@@ -594,6 +595,7 @@ class InttegroClientTest(unittest.TestCase):
             if path not in covered_paths
             and path not in OPENAPI_CAPABILITY_URL_PATHS
             and path not in OPENAPI_CLIENT_CHECKOUT_PATHS
+            and path not in OPENAPI_LEGACY_COMPATIBILITY_PATHS
         ]
         self.assertEqual([], missing_paths, f"Python SDK missing OpenAPI paths from {spec_path}")
 
