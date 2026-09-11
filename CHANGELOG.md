@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [8.0.0] - 2026-09-11
+
+- Breaking: moved resource models and enums from the `inttegro` root into singular resource packages such as `inttegro.payment.Payment`, with one public type per file.
+- Breaking: removed the obsolete flat and plural-package compatibility aliases.
+- Added focused question and accessor methods for common resource state, actionability, amounts, customers, and payment methods.
+- Expanded and automatically verified the API documentation for resource types, enum values, and synchronous and asynchronous client operations.
+
 ## [7.0.0] - 2026-09-10
 
 - Breaking: replaced generic dictionaries with named models for balances, purchase intents, products, payment methods, payments, and orders.
