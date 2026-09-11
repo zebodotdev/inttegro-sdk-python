@@ -4,19 +4,61 @@ from __future__ import annotations
 from ..async_http_client import AsyncHttpClient
 
 class AsyncApps:
-    """Application creation, lookup, and update operations."""
+    """Application creation, lookup, and update operations.
+
+    Access this service as ``AsyncInttegroClient.apps``. Methods use the client's shared transport and return the typed resource shapes documented below.
+    """
 
     def __init__(self, http: AsyncHttpClient):
         self.http = http
 
     async def create(self, payload: dict):
-        """Create a Inttegro application."""
+        """Create a Inttegro application.
+
+        API endpoint: ``/apps/create``.
+
+        Args:
+            payload (dict): Typed request object or equivalent request mapping for this operation.
+
+        Returns:
+            ``App`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/apps/create', payload)
 
     async def lookup(self):
-        """Retrieve the application associated with the configured API key."""
+        """Retrieve the application associated with the configured API key.
+
+        API endpoint: ``/apps/lookup``.
+
+        Returns:
+            ``App`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/apps/lookup', {})
 
     async def update(self, payload: dict):
-        """Update one or more attributes of the configured API key's application."""
+        """Update one or more attributes of the configured API key's application.
+
+        API endpoint: ``/apps/update``.
+
+        Args:
+            payload (dict): Typed request object or equivalent request mapping for this operation.
+
+        Returns:
+            ``App`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/apps/update', payload)

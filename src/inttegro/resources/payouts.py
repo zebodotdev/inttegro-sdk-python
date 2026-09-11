@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from ..http_client import HttpClient
-from ..request_types import SetPayoutDestinationsRequest
+from inttegro.payout.set_destinations_request import SetDestinationsRequest
 
 
 class Payouts:
@@ -30,7 +30,7 @@ class Payouts:
 
     def set_destinations(
         self,
-        destinations: SetPayoutDestinationsRequest | dict[str, str],
+        destinations: SetDestinationsRequest | dict[str, str],
     ):
         """
         Configure where funds should be sent for each currency.
@@ -112,7 +112,7 @@ class Payouts:
             - settings(): View current payout configuration
             - https://studio.inttegro.com/set-up-financial-account
         """
-        if isinstance(destinations, SetPayoutDestinationsRequest):
+        if isinstance(destinations, SetDestinationsRequest):
             return self.http.post("/payouts/set_destinations", destinations)
         return self.http.post("/payouts/set_destinations", {"destinations": destinations})
 

@@ -2,27 +2,33 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import CatalogPrice, Product, ProductPage
-from ..request_types import *
+from inttegro.price.price import Price
+from inttegro.product.product import Product
+from inttegro.product.page import Page
+from inttegro.product.create_request import CreateRequest
+from inttegro.product.add_price_request import AddPriceRequest
+from inttegro.product.lookup_request import LookupRequest
+from inttegro.product.update_request import UpdateRequest
+from inttegro.product.page_request import PageRequest
 
 class AsyncProducts:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def create(self, payload: CreateProductRequest) -> Product:
+    async def create(self, payload: CreateRequest) -> Product:
         ...
 
-    async def add_price(self, payload: AddProductPriceRequest) -> CatalogPrice:
+    async def add_price(self, payload: AddPriceRequest) -> Price:
         ...
 
-    async def set_default_unit_price(self, payload: LookupProductRequest) -> Product:
+    async def set_default_unit_price(self, payload: LookupRequest) -> Product:
         ...
 
     async def lookup(self, product_id: str) -> Product:
         ...
 
-    async def update(self, payload: UpdateProductRequest) -> Product:
+    async def update(self, payload: UpdateRequest) -> Product:
         ...
 
     async def publish(self, product_id: str) -> Product:
@@ -34,5 +40,5 @@ class AsyncProducts:
     async def archive(self, product_id: str) -> Product:
         ...
 
-    async def page(self, payload: PageProductsRequest | None=None) -> ProductPage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...

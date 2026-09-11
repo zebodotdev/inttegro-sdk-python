@@ -2,16 +2,16 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import ScheduleCancelDetail, ScheduleDetail
-from ..request_types import *
+from inttegro.schedule.cancel_detail import CancelDetail
+from inttegro.schedule.schedule import Schedule
 
 class AsyncSchedules:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def lookup(self, schedule_id: str) -> ScheduleDetail:
+    async def lookup(self, schedule_id: str) -> Schedule:
         ...
 
-    async def cancel(self, schedule_id: str) -> ScheduleCancelDetail:
+    async def cancel(self, schedule_id: str) -> CancelDetail:
         ...

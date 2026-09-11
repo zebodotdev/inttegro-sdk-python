@@ -176,7 +176,11 @@ def render(source_path: Path) -> str:
     tree = ast.parse(source_path.read_text(encoding="utf-8"))
     transformed = AsyncTransformer(resource_class_names(tree)).visit(tree)
     ast.fix_missing_locations(transformed)
-    return HEADER + stable_unparse(transformed) + "\n"
+    rendered = stable_unparse(transformed).replace(
+        f"``InttegroClient.{source_path.stem}``",
+        f"``AsyncInttegroClient.{source_path.stem}``",
+    )
+    return HEADER + rendered + "\n"
 
 
 def render_stub(stub_path: Path, source_path: Path) -> str:

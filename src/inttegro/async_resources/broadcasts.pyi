@@ -2,16 +2,16 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import BroadcastCancelDetail, BroadcastDetail
-from ..request_types import *
+from inttegro.broadcast.cancel_detail import CancelDetail
+from inttegro.broadcast.broadcast import Broadcast
 
 class AsyncBroadcasts:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def lookup(self, broadcast_id: str) -> BroadcastDetail:
+    async def lookup(self, broadcast_id: str) -> Broadcast:
         ...
 
-    async def cancel(self, broadcast_id: str) -> BroadcastCancelDetail:
+    async def cancel(self, broadcast_id: str) -> CancelDetail:
         ...

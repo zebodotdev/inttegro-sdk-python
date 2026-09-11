@@ -1,20 +1,24 @@
 import inttegro
-from inttegro import AsyncInttegroClient, InttegroClient, Refund
+from inttegro import AsyncInttegroClient, InttegroClient
+from inttegro.refund import Refund
 
 
 def refund(client: InttegroClient) -> tuple[str, int]:
-    request = inttegro.refunds.CreateRequest(
+    request = inttegro.refund.CreateRequest(
         order_id="or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
-        reason=inttegro.RefundReason.REQUESTED_BY_CUSTOMER,
+        reason=inttegro.refund.Reason.REQUESTED_BY_CUSTOMER,
         line_items=[
-            inttegro.refunds.LineItem(
+            inttegro.refund.CreateLineItemInput(
                 order_line_item_id="oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
-                refund_amount=inttegro.AmountParams(currency=inttegro.Currency.GHS, value=2500),
+                refund_amount=inttegro.money.AmountParams(
+                    currency=inttegro.money.Currency.GHS,
+                    value=2500,
+                ),
             )
         ],
     )
     response: Refund = client.refunds.create(request)
-    invalid_request = inttegro.refunds.CreateRequest(  # type: ignore[call-arg]
+    invalid_request = inttegro.refund.CreateRequest(  # type: ignore[call-arg]
         order_id="or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
     )
     wrong_response: str = client.refunds.create(request)  # type: ignore[assignment]
@@ -24,27 +28,30 @@ def refund(client: InttegroClient) -> tuple[str, int]:
 
 
 def create_order(client: InttegroClient) -> str:
-    request = inttegro.orders.CreateRequest(
-        customer_data=inttegro.orders.Customer(
+    request = inttegro.order.CreateNewCustomerInput(
+        customer_data=inttegro.customer.DataInput(
             name="Akua Mensah",
             email_address="akua@example.com",
             phone_number="+233544998605",
         ),
-        payment_method_data=inttegro.orders.PaymentMethod(
-            type=inttegro.PaymentMethodType.MOBILE_MONEY,
-            mobile_money=inttegro.orders.MobileMoney(
-                network=inttegro.MobileMoneyNetwork.MTN,
+        payment_method_data=inttegro.payment_method.DataInput(
+            type=inttegro.payment_method.Type.MOBILE_MONEY,
+            mobile_money=inttegro.payment_method.DataInputMobileMoney(
+                network=inttegro.payment_method.MobileMoneyNetwork.MTN,
                 account_number="0544998605",
             ),
         ),
         line_items=[
-            inttegro.orders.ProductLineItem(
-                type=inttegro.LineItemType.PRODUCT,
-                product=inttegro.orders.Product(
+            inttegro.product.LineItemInput(
+                type=inttegro.order.LineItemType.PRODUCT,
+                product=inttegro.product.InlineDetailsInput(
                     name="Monthly subscription",
-                    price=inttegro.PriceParams(currency=inttegro.Currency.GHS, value=5000),
+                    price=inttegro.price.InlineParams(
+                        currency=inttegro.money.Currency.GHS,
+                        value=5000,
+                    ),
                     quantity=1,
-                    type=inttegro.ProductType.DIGITAL,
+                    type=inttegro.product.Type.DIGITAL,
                 ),
             )
         ],
@@ -53,20 +60,23 @@ def create_order(client: InttegroClient) -> str:
 
 
 async def create_order_async(client: AsyncInttegroClient) -> str:
-    request = inttegro.orders.CreateRequest(
-        customer_data=inttegro.orders.Customer(
+    request = inttegro.order.CreateNewCustomerInput(
+        customer_data=inttegro.customer.DataInput(
             name="Akua Mensah",
             email_address="akua@example.com",
             phone_number="+233544998605",
         ),
         line_items=[
-            inttegro.orders.ProductLineItem(
-                type=inttegro.LineItemType.PRODUCT,
-                product=inttegro.orders.Product(
+            inttegro.product.LineItemInput(
+                type=inttegro.order.LineItemType.PRODUCT,
+                product=inttegro.product.InlineDetailsInput(
                     name="Monthly subscription",
-                    price=inttegro.PriceParams(currency=inttegro.Currency.GHS, value=5000),
+                    price=inttegro.price.InlineParams(
+                        currency=inttegro.money.Currency.GHS,
+                        value=5000,
+                    ),
                     quantity=1,
-                    type=inttegro.ProductType.DIGITAL,
+                    type=inttegro.product.Type.DIGITAL,
                 ),
             )
         ],

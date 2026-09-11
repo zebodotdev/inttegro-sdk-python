@@ -2,19 +2,39 @@
 
 from __future__ import annotations
 
-from .._models import Refund, RefundPage
+from inttegro.refund.refund import Refund
+from inttegro.refund.page import Page
 from ..http_client import HttpClient
-from ..request_types import CreateRefundRequest, PageRefundsRequest
+from inttegro.refund.create_request import CreateRequest
+from inttegro.refund.page_request import PageRequest
 
 
 class Refunds:
-    """Create, cancel, look up, and page through refunds."""
+    """Create, cancel, look up, and page through refunds.
+
+    Access this service as ``InttegroClient.refunds``. Methods use the client's shared transport and return the typed resource shapes documented below.
+    """
 
     def __init__(self, http: HttpClient):
         self.http = http
 
-    def create(self, payload: CreateRefundRequest, idempotency_key: str | None = None) -> Refund:
-        """Create a refund for paid order line items."""
+    def create(self, payload: CreateRequest, idempotency_key: str | None = None) -> Refund:
+        """Create a refund for paid order line items.
+
+        API endpoint: ``/refunds/create``.
+
+        Args:
+            payload (CreateRequest): Typed request object or equivalent request mapping for this operation.
+            idempotency_key (str | None): Optional stable key to reuse when retrying the same logical write.
+
+        Returns:
+            ``Refund`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return self.http.post_with_headers(
             "/refunds/create",
             payload,
@@ -22,7 +42,22 @@ class Refunds:
         )
 
     def cancel(self, refund_id: str, idempotency_key: str | None = None) -> Refund:
-        """Cancel a pending refund."""
+        """Cancel a pending refund.
+
+        API endpoint: ``/refunds/cancel``.
+
+        Args:
+            refund_id (str): Unique identifier of the refund.
+            idempotency_key (str | None): Optional stable key to reuse when retrying the same logical write.
+
+        Returns:
+            ``Refund`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return self.http.post_with_headers(
             "/refunds/cancel",
             {"refund_id": refund_id},
@@ -30,11 +65,39 @@ class Refunds:
         )
 
     def lookup(self, refund_id: str) -> Refund:
-        """Look up a refund by ID."""
+        """Look up a refund by ID.
+
+        API endpoint: ``/refunds/lookup``.
+
+        Args:
+            refund_id (str): Unique identifier of the refund.
+
+        Returns:
+            ``Refund`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return self.http.post("/refunds/lookup", {"refund_id": refund_id})
 
-    def page(self, payload: PageRefundsRequest) -> RefundPage:
-        """Page through refunds."""
+    def page(self, payload: PageRequest) -> Page:
+        """Page through refunds.
+
+        API endpoint: ``/refunds/page``.
+
+        Args:
+            payload (PageRequest): Typed request object or equivalent request mapping for this operation.
+
+        Returns:
+            ``Page`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return self.http.post("/refunds/page", payload)
 
     def _idempotency_headers(self, idempotency_key: str | None) -> dict[str, str]:

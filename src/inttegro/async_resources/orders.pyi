@@ -2,27 +2,35 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import Order, OrderDocumentDeliveryResult, OrderPage
-from ..request_types import *
+from inttegro.order.order import Order
+from inttegro.order.document_delivery_result import DocumentDeliveryResult
+from inttegro.order.page import Page
+from inttegro.order.update_request import UpdateRequest
+from inttegro.order.pay_request import PayRequest
+from inttegro.payment.confirm_request import ConfirmRequest
+from inttegro.order.complete_request import CompleteRequest
+from inttegro.order.document_delivery_request import DocumentDeliveryRequest
+from inttegro.order.page_request import PageRequest
+from inttegro.order.create_request import CreateRequest
 
 class AsyncOrders:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def create(self, payload: CreateOrderRequest) -> Order:
+    async def create(self, payload: CreateRequest) -> Order:
         ...
 
     async def lookup(self, order_id: str, **options: object) -> Order:
         ...
 
-    async def update(self, payload: UpdateOrderRequest) -> Order:
+    async def update(self, payload: UpdateRequest) -> Order:
         ...
 
-    async def pay(self, payload: PayOrderRequest) -> Order:
+    async def pay(self, payload: PayRequest) -> Order:
         ...
 
-    async def confirm_payment(self, payload: ConfirmPaymentRequest) -> Order:
+    async def confirm_payment(self, payload: ConfirmRequest) -> Order:
         ...
 
     async def request_confirmation(self, order_id: str, request_meta: dict[str, str] | None=None) -> Order:
@@ -31,17 +39,17 @@ class AsyncOrders:
     async def finalize(self, order_id: str, request_meta: dict[str, str] | None=None) -> Order:
         ...
 
-    async def send_invoice(self, payload: OrderDocumentDeliveryRequest) -> OrderDocumentDeliveryResult:
+    async def send_invoice(self, payload: DocumentDeliveryRequest) -> DocumentDeliveryResult:
         ...
 
-    async def send_receipt(self, payload: OrderDocumentDeliveryRequest) -> OrderDocumentDeliveryResult:
+    async def send_receipt(self, payload: DocumentDeliveryRequest) -> DocumentDeliveryResult:
         ...
 
-    async def complete(self, payload: CompleteOrderRequest) -> Order:
+    async def complete(self, payload: CompleteRequest) -> Order:
         ...
 
     async def cancel(self, order_id: str, request_meta: dict[str, str] | None=None) -> Order:
         ...
 
-    async def page(self, payload: PageOrdersRequest | None=None) -> OrderPage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...

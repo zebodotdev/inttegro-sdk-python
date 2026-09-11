@@ -4,7 +4,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from inttegro import Order, Payment, PaymentMethod, Product, PurchaseIntent
+from inttegro.order import Order
+from inttegro.payment import Payment
+from inttegro.payment_method import PaymentMethod
+from inttegro.product import Product
+from inttegro.purchase_intent import PurchaseIntent
 
 
 class ResourceSemanticsTest(unittest.TestCase):

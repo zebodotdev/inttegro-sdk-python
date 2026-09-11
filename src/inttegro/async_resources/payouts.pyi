@@ -2,39 +2,44 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import Payout, PayoutPage, PayoutSettingsLookup, PayoutSettingsMutation
-from ..request_types import *
+from inttegro.payout.payout import Payout
+from inttegro.payout.page import Page
+from inttegro.payout.settings_lookup import SettingsLookup
+from inttegro.payout.settings_mutation import SettingsMutation
+from inttegro.schedule.payout_request import PayoutRequest
+from inttegro.payout.set_destinations_request import SetDestinationsRequest
+from inttegro.payout.page_request import PageRequest
 
 class AsyncPayouts:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def set_destinations(self, destinations: SetPayoutDestinationsRequest | dict[str, str]) -> PayoutSettingsMutation:
+    async def set_destinations(self, destinations: SetDestinationsRequest | dict[str, str]) -> SettingsMutation:
         ...
 
-    async def settings(self) -> PayoutSettingsLookup:
+    async def settings(self) -> SettingsLookup:
         ...
 
-    async def schedule(self, payload: SchedulePayoutRequest) -> Payout:
+    async def schedule(self, payload: PayoutRequest) -> Payout:
         ...
 
     async def lookup(self, payout_id: str) -> Payout:
         ...
 
-    async def disable_automatic(self) -> PayoutSettingsMutation:
+    async def disable_automatic(self) -> SettingsMutation:
         ...
 
-    async def enable_automatic(self) -> PayoutSettingsMutation:
+    async def enable_automatic(self) -> SettingsMutation:
         ...
 
-    async def enable_fx(self) -> PayoutSettingsLookup:
+    async def enable_fx(self) -> SettingsLookup:
         ...
 
-    async def disable_fx(self) -> PayoutSettingsLookup:
+    async def disable_fx(self) -> SettingsLookup:
         ...
 
-    async def page(self, payload: PagePayoutsRequest | None=None) -> PayoutPage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...
 
     async def cancel(self, payout_id: str) -> Payout:

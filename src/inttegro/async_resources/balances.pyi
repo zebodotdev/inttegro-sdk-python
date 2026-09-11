@@ -2,13 +2,12 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import BalanceSnapshot
-from ..request_types import *
+from inttegro.balance.balance import Balance
 
 class AsyncBalances:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def get(self) -> BalanceSnapshot:
+    async def get(self) -> Balance:
         ...

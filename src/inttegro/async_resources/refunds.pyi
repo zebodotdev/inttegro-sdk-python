@@ -2,15 +2,17 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import Refund, RefundPage
-from ..request_types import *
+from inttegro.refund.refund import Refund
+from inttegro.refund.page import Page
+from inttegro.refund.create_request import CreateRequest
+from inttegro.refund.page_request import PageRequest
 
 class AsyncRefunds:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def create(self, payload: CreateRefundRequest, idempotency_key: str | None=None) -> Refund:
+    async def create(self, payload: CreateRequest, idempotency_key: str | None=None) -> Refund:
         ...
 
     async def cancel(self, refund_id: str, idempotency_key: str | None=None) -> Refund:
@@ -19,5 +21,5 @@ class AsyncRefunds:
     async def lookup(self, refund_id: str) -> Refund:
         ...
 
-    async def page(self, payload: PageRefundsRequest) -> RefundPage:
+    async def page(self, payload: PageRequest) -> Page:
         ...

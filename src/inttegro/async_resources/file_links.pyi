@@ -2,8 +2,12 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import FileLink, FileLinkCreation, FileLinkPage
-from ..request_types import *
+from inttegro.file_link.file_link import FileLink
+from inttegro.file_link.creation import Creation
+from inttegro.file_link.page import Page
+from inttegro.file_link.create_request import CreateRequest
+from inttegro.file_link.page_request import PageRequest
+from inttegro.file_link.revoke_request import RevokeRequest
 from .files import FileDownload
 
 class AsyncFileLinks:
@@ -11,16 +15,16 @@ class AsyncFileLinks:
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def create(self, payload: CreateFileLinkRequest, idempotency_key: str | None=None) -> FileLinkCreation:
+    async def create(self, payload: CreateRequest, idempotency_key: str | None=None) -> Creation:
         ...
 
     async def lookup(self, id: str) -> FileLink:
         ...
 
-    async def page(self, payload: PageFileLinksRequest | None=None) -> FileLinkPage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...
 
-    async def revoke(self, payload: RevokeFileLinkRequest, idempotency_key: str | None=None) -> FileLink:
+    async def revoke(self, payload: RevokeRequest, idempotency_key: str | None=None) -> FileLink:
         ...
 
     async def open(self, url: str, save_to: str | None=None) -> FileDownload:

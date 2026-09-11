@@ -2,31 +2,34 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import CatalogPrice, PricePage
-from ..request_types import *
+from inttegro.price.price import Price
+from inttegro.price.page import Page
+from inttegro.price.params import Params
+from inttegro.price.page_request import PageRequest
+from inttegro.price.update_request import UpdateRequest
 
 class AsyncPrices:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def create(self, payload: CatalogPriceParams) -> CatalogPrice:
+    async def create(self, payload: Params) -> Price:
         ...
 
-    async def lookup(self, price_id: str) -> CatalogPrice:
+    async def lookup(self, price_id: str) -> Price:
         ...
 
-    async def page(self, payload: PricePageRequest | None=None) -> PricePage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...
 
-    async def update(self, payload: UpdatePriceRequest) -> CatalogPrice:
+    async def update(self, payload: UpdateRequest) -> Price:
         ...
 
-    async def activate(self, price_id: str) -> CatalogPrice:
+    async def activate(self, price_id: str) -> Price:
         ...
 
-    async def deactivate(self, price_id: str) -> CatalogPrice:
+    async def deactivate(self, price_id: str) -> Price:
         ...
 
-    async def archive(self, price_id: str, idempotency_key: str | None=None) -> CatalogPrice:
+    async def archive(self, price_id: str, idempotency_key: str | None=None) -> Price:
         ...

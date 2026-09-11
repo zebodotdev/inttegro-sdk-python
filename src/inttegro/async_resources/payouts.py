@@ -2,7 +2,7 @@
 """Payouts resource for managing fund transfers to financial accounts."""
 from __future__ import annotations
 from ..async_http_client import AsyncHttpClient
-from ..request_types import SetPayoutDestinationsRequest
+from inttegro.payout.set_destinations_request import SetDestinationsRequest
 
 class AsyncPayouts:
     """
@@ -26,7 +26,7 @@ class AsyncPayouts:
         """Initialize Payouts resource with HTTP client."""
         self.http = http
 
-    async def set_destinations(self, destinations: SetPayoutDestinationsRequest | dict[str, str]):
+    async def set_destinations(self, destinations: SetDestinationsRequest | dict[str, str]):
         """
         Configure where funds should be sent for each currency.
 
@@ -107,7 +107,7 @@ class AsyncPayouts:
             - settings(): View current payout configuration
             - https://studio.inttegro.com/set-up-financial-account
         """
-        if isinstance(destinations, SetPayoutDestinationsRequest):
+        if isinstance(destinations, SetDestinationsRequest):
             return await self.http.post('/payouts/set_destinations', destinations)
         return await self.http.post('/payouts/set_destinations', {'destinations': destinations})
 

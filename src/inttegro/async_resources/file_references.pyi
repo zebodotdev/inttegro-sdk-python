@@ -2,13 +2,13 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import FileReferenceReconciliation
-from ..request_types import *
+from inttegro.file_reference.reconciliation import Reconciliation
+from inttegro.file_reference.reconcile_request import ReconcileRequest
 
 class AsyncFileReferences:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def reconcile(self, payload: FileReferenceReconcileRequest) -> FileReferenceReconciliation:
+    async def reconcile(self, payload: ReconcileRequest) -> Reconciliation:
         ...

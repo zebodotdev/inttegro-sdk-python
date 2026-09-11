@@ -2,25 +2,31 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import BroadcastCreationDetail, Chime, ChimePage, ScheduleCreationDetail
-from ..request_types import *
+from inttegro.broadcast.creation_detail import CreationDetail as BroadcastCreation
+from inttegro.chime.chime import Chime
+from inttegro.chime.page import Page
+from inttegro.schedule.creation_detail import CreationDetail as ScheduleCreation
+from inttegro.chime.send_request import SendRequest
+from inttegro.chime.page_request import PageRequest
+from inttegro.schedule.chime_request import ChimeRequest
+from inttegro.broadcast.request import Request
 
 class AsyncChimes:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def send(self, payload: SendChimeRequest) -> Chime:
+    async def send(self, payload: SendRequest) -> Chime:
         ...
 
     async def lookup(self, chime_id: str) -> Chime:
         ...
 
-    async def page(self, payload: PageChimesRequest | None=None) -> ChimePage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...
 
-    async def schedule(self, payload: ScheduleChimeRequest) -> ScheduleCreationDetail:
+    async def schedule(self, payload: ChimeRequest) -> ScheduleCreation:
         ...
 
-    async def broadcast(self, payload: BroadcastRequest) -> BroadcastCreationDetail:
+    async def broadcast(self, payload: Request) -> BroadcastCreation:
         ...

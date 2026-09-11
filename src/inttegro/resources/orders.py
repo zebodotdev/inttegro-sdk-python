@@ -6,7 +6,8 @@ from typing import TypeVar
 
 from .._model_base import ApiModel
 from ..http_client import HttpClient
-from .._models import Order, OrderPage
+from inttegro.order.order import Order
+from inttegro.order.page import Page
 from .._dynamic_value import DynamicValue
 
 
@@ -548,7 +549,7 @@ class Orders:
                 - customer_id: Optional customer whose orders should be returned
 
         Returns:
-            A typed OrderPage.
+            A typed Page.
 
         Example:
             ```python
@@ -588,4 +589,4 @@ class Orders:
             - lookup(): Get a single order by ID
             - https://studio.inttegro.com/api/orders/page
         """
-        return _resource(self.http.post("/orders/page", payload or {}), "page", OrderPage)
+        return _resource(self.http.post("/orders/page", payload or {}), "page", Page)

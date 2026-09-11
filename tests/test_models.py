@@ -8,14 +8,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from inttegro import (
-    BalanceTransaction,
-    ChimeEmailMailboxInput,
-    ChimeEmailMessageInput,
-    InttegroClient,
-    Refund,
-    UpdatePurchaseIntentRequest,
-)
+from inttegro import InttegroClient
+from inttegro.balance_transaction import BalanceTransaction
+from inttegro.chime import EmailMailboxInput, EmailMessageInput
+from inttegro.purchase_intent import UpdateRequest
+from inttegro.refund import Refund
 
 
 class StaticTransport:
@@ -29,10 +26,10 @@ class StaticTransport:
 
 class TypedModelTest(unittest.TestCase):
     def test_request_objects_are_frozen_and_preserve_wire_field_names(self):
-        request = ChimeEmailMessageInput(
+        request = EmailMessageInput(
             subject="Payment receipt",
             text="Your payment succeeded.",
-            from_=ChimeEmailMailboxInput(address="billing@example.com"),
+            from_=EmailMailboxInput(address="billing@example.com"),
         )
 
         self.assertTrue(is_dataclass(request))
@@ -110,13 +107,13 @@ class TypedModelTest(unittest.TestCase):
             )
 
     def test_request_timestamps_serialize_to_iso_8601(self):
-        request = UpdatePurchaseIntentRequest(
+        request = UpdateRequest(
             expires_at=datetime(2026, 10, 1, 12, 0, tzinfo=timezone.utc)
         )
         self.assertEqual("2026-10-01T12:00:00Z", request.to_dict()["expires_at"])
 
         with self.assertRaisesRegex(ValueError, "UTC offset"):
-            UpdatePurchaseIntentRequest(expires_at=datetime(2026, 10, 1, 12, 0)).to_dict()
+            UpdateRequest(expires_at=datetime(2026, 10, 1, 12, 0)).to_dict()
 
     def test_absent_optional_fields_retain_presence_semantics(self):
         response = BalanceTransaction.from_dict(

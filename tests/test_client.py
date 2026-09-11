@@ -17,11 +17,10 @@ from inttegro import (
     APIError,
     AuthenticationError,
     ErrorReport,
-    Order,
-    OrderDocumentDeliveryResult,
-    OrderPage,
-    Refund,
 )
+from inttegro.order import DocumentDeliveryResult as OrderDocumentDeliveryResult
+from inttegro.order import Order, Page as OrderPage
+from inttegro.refund import Refund
 from inttegro.client import InttegroClient
 from inttegro._telemetry import _request_details
 
@@ -583,7 +582,7 @@ class InttegroClientTest(unittest.TestCase):
 
         client.spec.countries()
         balance = client.balances.get()
-        self.assertIsInstance(balance, inttegro.BalanceSnapshot)
+        self.assertIsInstance(balance, inttegro.balance.Balance)
         self.assertEqual(1000, balance.ghs.available.amount)
 
         covered_paths = {urllib.parse.urlparse(req.full_url).path for req in recorder.requests}
@@ -627,27 +626,30 @@ class InttegroClientTest(unittest.TestCase):
     def test_typed_request_objects_serialize_nested_values_and_omit_unset_fields(self):
         recorder = TransportRecorder()
         client = InttegroClient(api_key="test", base_url="https://api.inttegro.com", transport=recorder)
-        request = inttegro.orders.CreateRequest(
-            customer_data=inttegro.orders.Customer(
+        request = inttegro.order.CreateNewCustomerInput(
+            customer_data=inttegro.customer.DataInput(
                 name="Akua Mensah",
                 email_address="akua@example.com",
                 phone_number="+233544998605",
             ),
-            payment_method_data=inttegro.orders.PaymentMethod(
-                type=inttegro.PaymentMethodType.MOBILE_MONEY,
-                mobile_money=inttegro.orders.MobileMoney(
-                    network=inttegro.MobileMoneyNetwork.MTN,
+            payment_method_data=inttegro.payment_method.DataInput(
+                type=inttegro.payment_method.Type.MOBILE_MONEY,
+                mobile_money=inttegro.payment_method.DataInputMobileMoney(
+                    network=inttegro.payment_method.MobileMoneyNetwork.MTN,
                     account_number="0544998605",
                 ),
             ),
             line_items=[
-                inttegro.orders.ProductLineItem(
-                    type=inttegro.LineItemType.PRODUCT,
-                    product=inttegro.orders.Product(
+                inttegro.product.LineItemInput(
+                    type=inttegro.order.LineItemType.PRODUCT,
+                    product=inttegro.product.InlineDetailsInput(
                         name="Monthly subscription",
-                        price=inttegro.PriceParams(currency=inttegro.Currency.GHS, value=5000),
+                        price=inttegro.price.InlineParams(
+                            currency=inttegro.money.Currency.GHS,
+                            value=5000,
+                        ),
                         quantity=1,
-                        type=inttegro.ProductType.DIGITAL,
+                        type=inttegro.product.Type.DIGITAL,
                     ),
                 )
             ],

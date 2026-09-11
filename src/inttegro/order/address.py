@@ -1,0 +1,38 @@
+"""Address in the ``inttegro.order`` resource namespace.
+
+Generated from the Inttegro API contract; do not edit by hand.
+"""
+
+from __future__ import annotations
+from dataclasses import dataclass, field
+from inttegro._model_base import ApiModel
+
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class Address(ApiModel):
+    """Typed address data in the order resource namespace.
+
+    Instances are immutable API responses. ``from_dict()`` decodes nested
+    objects, string-backed enums, and timezone-aware ISO-8601 timestamps;
+    ``to_dict()`` returns the corresponding JSON-compatible wire shape.
+    Fields not returned by the API remain absent and can still be queried
+    through mapping-style access.
+
+    API contract schema: ``OrderAddress``.
+    """
+    name: str | None = field(init=False)
+    """Human-readable name of the address. Optional; nullable. Python type: ``str | None``; wire name: ``name``; JSON type: string"""
+    phone_number: str | None = field(init=False)
+    """Customer or recipient phone number in international form. Optional; nullable. Python type: ``str | None``; wire name: ``phone_number``; JSON type: string"""
+    line1: str | None = field(init=False)
+    """The line1 associated with this address. Optional; nullable. Python type: ``str | None``; wire name: ``line1``; JSON type: string"""
+    line2: str | None = field(init=False)
+    """The line2 associated with this address. Optional; nullable. Python type: ``str | None``; wire name: ``line2``; JSON type: string"""
+    city: str | None = field(init=False)
+    """The city associated with this address. Optional; nullable. Python type: ``str | None``; wire name: ``city``; JSON type: string"""
+    region: str | None = field(init=False)
+    """The region associated with this address. Optional; nullable. Python type: ``str | None``; wire name: ``region``; JSON type: string"""
+    post_code: str | None = field(init=False)
+    """The post code associated with this address. Optional; nullable. Python type: ``str | None``; wire name: ``post_code``; JSON type: string"""
+    country: str = field(init=False)
+    """The country associated with this address. Required. Python type: ``str``; wire name: ``country``; JSON type: string"""

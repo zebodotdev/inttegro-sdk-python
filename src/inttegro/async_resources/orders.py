@@ -4,7 +4,8 @@ from __future__ import annotations
 from typing import TypeVar
 from .._model_base import ApiModel
 from ..async_http_client import AsyncHttpClient
-from .._models import Order, OrderPage
+from inttegro.order.order import Order
+from inttegro.order.page import Page
 from .._dynamic_value import DynamicValue
 ModelT = TypeVar('ModelT', bound=ApiModel)
 
@@ -509,7 +510,7 @@ class AsyncOrders:
                 - customer_id: Optional customer whose orders should be returned
 
         Returns:
-            A typed OrderPage.
+            A typed Page.
 
         Example:
             ```python
@@ -549,4 +550,4 @@ class AsyncOrders:
             - lookup(): Get a single order by ID
             - https://studio.inttegro.com/api/orders/page
         """
-        return _resource(await self.http.post('/orders/page', payload or {}), 'page', OrderPage)
+        return _resource(await self.http.post('/orders/page', payload or {}), 'page', Page)

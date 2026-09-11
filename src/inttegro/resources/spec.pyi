@@ -3,8 +3,7 @@
 from typing import Any
 
 from ..http_client import HttpClient
-from .._models import CountrySpecification
-from ..request_types import *
+from inttegro.shared.country_specification import CountrySpecification
 
 class Spec:
     def __init__(self, http: HttpClient) -> None: ...

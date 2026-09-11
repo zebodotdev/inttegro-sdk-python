@@ -273,7 +273,21 @@ class AsyncFinancialAccounts:
         return await self.http.post('/financial_accounts/update', payload)
 
     async def enable_push(self, account_id: str):
-        """Enable push configuration for payouts."""
+        """Enable push configuration for payouts.
+
+        API endpoint: ``/financial_accounts/enable_push``.
+
+        Args:
+            account_id (str): Unique identifier of the account.
+
+        Returns:
+            ``FinancialAccount`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/financial_accounts/enable_push', {'account_id': account_id})
 
     async def disable_push(self, account_id: str, unset_as_payout_destination: bool | None=None):
@@ -313,9 +327,37 @@ class AsyncFinancialAccounts:
         return await self.http.post('/financial_accounts/reconnect', {'account_id': account_id})
 
     async def enable_pull(self, account_id: str):
-        """Enable pull configuration for charges (creates mandate)."""
+        """Enable pull configuration for charges (creates mandate).
+
+        API endpoint: ``/financial_accounts/enable_pull``.
+
+        Args:
+            account_id (str): Unique identifier of the account.
+
+        Returns:
+            ``FinancialAccount`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/financial_accounts/enable_pull', {'account_id': account_id})
 
     async def disable_pull(self, account_id: str):
-        """Disable pull configuration for charges."""
+        """Disable pull configuration for charges.
+
+        API endpoint: ``/financial_accounts/disable_pull``.
+
+        Args:
+            account_id (str): Unique identifier of the account.
+
+        Returns:
+            ``FinancialAccount`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/financial_accounts/disable_pull', {'account_id': account_id})
