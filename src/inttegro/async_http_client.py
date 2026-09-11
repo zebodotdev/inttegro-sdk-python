@@ -9,7 +9,10 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Protocol
 import httpx
 from .error_reporting import ErrorReporter, ErrorReportingPolicy
 from .errors import NetworkError, TimeoutError
+from ._model_base import ApiModel
+from ._dynamic_value import DynamicValue
 from .http_client import HttpClient, RequestBody, generate_idempotency_key
+from .response import InttegroResponse
 from ._telemetry import Telemetry
 from .version import VERSION
 
@@ -92,8 +95,8 @@ class AsyncHttpClient:
         self.user_agent = self._codec.user_agent
         self.telemetry = self._codec.telemetry
         self.async_transport = transport
-        self._http_client = http_client or httpx.AsyncClient()
-        self._owns_http_client = http_client is None
+        self._http_client = http_client or (None if transport is not None else httpx.AsyncClient())
+        self._owns_http_client = http_client is None and transport is None
         self._closed = False
 
     async def __aenter__(self) -> AsyncHttpClient:
@@ -109,12 +112,15 @@ class AsyncHttpClient:
         closed here. This makes it safe to share a configured connection pool.
         """
 
-        if not self._closed and self._owns_http_client:
+        if not self._closed and self._owns_http_client and self._http_client is not None:
             await self._http_client.aclose()
         self._closed = True
 
     async def get(self, path: str, query: Optional[dict[str, Any]] = None) -> Any:
         return await self.request("GET", path, query=query)
+
+    async def get_with_response(self, path: str, query: Optional[dict[str, Any]] = None) -> InttegroResponse[Any]:
+        return await self.request_with_response("GET", path, query=query)
 
     async def post(
         self,
@@ -123,6 +129,44 @@ class AsyncHttpClient:
         query: Optional[dict[str, Any]] = None,
     ) -> Any:
         return await self.request("POST", path, body=body, query=query)
+
+    async def post_with_response(
+        self,
+        path: str,
+        body: Optional[RequestBody] = None,
+        query: Optional[dict[str, Any]] = None,
+    ) -> InttegroResponse[Any]:
+        return await self.request_with_response("POST", path, body=body, query=query)
+
+    async def post_resource_with_response(
+        self,
+        path: str,
+        field: str,
+        model_type: type[ApiModel],
+        body: Optional[RequestBody] = None,
+        query: Optional[dict[str, Any]] = None,
+    ) -> InttegroResponse[Any]:
+        response = await self.post_with_response(path, body=body, query=query)
+        data = response.data
+        if isinstance(data, model_type):
+            resource = data
+        elif isinstance(data, DynamicValue):
+            payload = data.to_dict()
+            value = payload.get(field) if isinstance(payload, dict) else None
+            if not isinstance(value, dict):
+                raise TypeError(f"Inttegro returned an invalid {field} response")
+            resource = model_type.from_dict(value)
+        else:
+            value = getattr(data, field, None)
+            if not isinstance(value, model_type):
+                raise TypeError(f"Inttegro returned an invalid {field} response")
+            resource = value
+        return InttegroResponse(
+            data=resource,
+            status=response.status,
+            headers=response.headers,
+            meta=response.meta,
+        )
 
     async def post_with_headers(
         self,
@@ -210,6 +254,15 @@ class AsyncHttpClient:
         body: Optional[RequestBody] = None,
         query: Optional[dict[str, Any]] = None,
     ) -> Any:
+        return (await self.request_with_response(method, path, body=body, query=query)).data
+
+    async def request_with_response(
+        self,
+        method: str,
+        path: str,
+        body: Optional[RequestBody] = None,
+        query: Optional[dict[str, Any]] = None,
+    ) -> InttegroResponse[Any]:
         with self.telemetry.operation(path, method, self.base_url, VERSION) as span:
             url = self._build_url(path, query)
             encoded: RequestBody | dict[str, Any] | None = body
@@ -230,7 +283,12 @@ class AsyncHttpClient:
             self.telemetry.response(span, status, headers, decoded=False)
             result = self._parse_response(status, text_body, headers, path)
             self.telemetry.decoded(span)
-            return result
+            return InttegroResponse(
+                data=result,
+                status=status,
+                headers=headers,
+                meta=self._codec._response_meta(text_body),
+            )
 
     def _json_request(
         self,
@@ -257,6 +315,8 @@ class AsyncHttpClient:
             return status, {key.lower(): value for key, value in headers.items()}, body
         try:
             content = req.data if isinstance(req.data, bytes) else None
+            if self._http_client is None:
+                raise RuntimeError("Async HTTP transport is unavailable")
             response = await self._http_client.request(
                 req.get_method(),
                 req.full_url,

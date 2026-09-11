@@ -40,6 +40,38 @@ class AsyncTransportRecorder:
 
 
 class AsyncClientTest(unittest.IsolatedAsyncioTestCase):
+    async def test_response_envelope_exposes_response_only_metadata(self) -> None:
+        async def transport(req, timeout):
+            del req, timeout
+            await asyncio.sleep(0)
+            return (
+                200,
+                {
+                    "content-type": "application/json",
+                    "x-request-id": "req_async_meta",
+                    "retry-after": "12",
+                },
+                json.dumps(
+                    {
+                        "order": ORDER_BODY,
+                        "response_meta": {
+                            "request_id": "req_async_meta",
+                            "debug": {"provider_attempts": 1},
+                        },
+                    }
+                ),
+            )
+
+        async with AsyncInttegroClient(api_key="sk_test_async", transport=transport) as client:
+            response = await client.orders.create_with_response({"line_items": []})
+
+        self.assertIsInstance(response.data, Order)
+        self.assertEqual("or_async_123", response.data.id)
+        self.assertEqual(200, response.status)
+        self.assertEqual("req_async_meta", response.request_id)
+        self.assertEqual("12", response.retry_after)
+        self.assertEqual("req_async_meta", response.meta["request_id"])
+
     async def test_resource_request_is_awaitable_and_decodes_typed_models(self) -> None:
         recorder = AsyncTransportRecorder()
         async with AsyncInttegroClient(api_key="sk_test_async", transport=recorder) as client:

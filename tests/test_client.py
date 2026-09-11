@@ -239,6 +239,38 @@ def read_openapi_paths(path: Path) -> list[str]:
 
 
 class InttegroClientTest(unittest.TestCase):
+    def test_response_envelope_exposes_response_only_metadata(self):
+        class ResponseTransport:
+            def __call__(self, req, timeout):
+                del req, timeout
+                return (
+                    200,
+                    {
+                        "content-type": "application/json",
+                        "x-request-id": "req_123",
+                        "retry-after": "15",
+                    },
+                    json.dumps(
+                        {
+                            "order": ORDER_BODY,
+                            "response_meta": {
+                                "request_id": "req_123",
+                                "debug": {"provider_attempts": 1},
+                            },
+                        }
+                    ),
+                )
+
+        client = InttegroClient(api_key="sk_test", transport=ResponseTransport())
+        response = client.orders.create_with_response({"line_items": []})
+
+        self.assertIsInstance(response.data, Order)
+        self.assertEqual("or_123", response.data.id)
+        self.assertEqual(200, response.status)
+        self.assertEqual("req_123", response.request_id)
+        self.assertEqual("15", response.retry_after)
+        self.assertEqual("req_123", response.meta["request_id"])
+
     def test_telemetry_does_not_name_unknown_routes_from_resource_ids(self):
         operation, route, server_address = _request_details(
             "/orders/or_private_123", "https://api.inttegro.com", None

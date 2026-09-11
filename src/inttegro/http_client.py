@@ -20,6 +20,7 @@ from .errors import APIError, AuthenticationError, NetworkError, RateLimitError,
 from ._dynamic_value import DynamicValue
 from ._telemetry import Telemetry
 from .error_reporting import ErrorReporter, ErrorReportingPolicy
+from .response import InttegroResponse
 from .version import VERSION
 if TYPE_CHECKING:
     from opentelemetry.trace import TracerProvider
@@ -67,6 +68,9 @@ class HttpClient:
     def get(self, path: str, query: Optional[dict[str, Any]] = None) -> Any:
         return self.request("GET", path, query=query)
 
+    def get_with_response(self, path: str, query: Optional[dict[str, Any]] = None) -> InttegroResponse[Any]:
+        return self.request_with_response("GET", path, query=query)
+
     def post(
         self,
         path: str,
@@ -74,6 +78,44 @@ class HttpClient:
         query: Optional[dict[str, Any]] = None,
     ) -> Any:
         return self.request("POST", path, body=body, query=query)
+
+    def post_with_response(
+        self,
+        path: str,
+        body: Optional[RequestBody] = None,
+        query: Optional[dict[str, Any]] = None,
+    ) -> InttegroResponse[Any]:
+        return self.request_with_response("POST", path, body=body, query=query)
+
+    def post_resource_with_response(
+        self,
+        path: str,
+        field: str,
+        model_type: type[ApiModel],
+        body: Optional[RequestBody] = None,
+        query: Optional[dict[str, Any]] = None,
+    ) -> InttegroResponse[Any]:
+        response = self.post_with_response(path, body=body, query=query)
+        data = response.data
+        if isinstance(data, model_type):
+            resource = data
+        elif isinstance(data, DynamicValue):
+            payload = data.to_dict()
+            value = payload.get(field) if isinstance(payload, dict) else None
+            if not isinstance(value, dict):
+                raise TypeError(f"Inttegro returned an invalid {field} response")
+            resource = model_type.from_dict(value)
+        else:
+            value = getattr(data, field, None)
+            if not isinstance(value, model_type):
+                raise TypeError(f"Inttegro returned an invalid {field} response")
+            resource = value
+        return InttegroResponse(
+            data=resource,
+            status=response.status,
+            headers=response.headers,
+            meta=response.meta,
+        )
 
     def post_with_headers(
         self,
@@ -172,6 +214,15 @@ class HttpClient:
         body: Optional[RequestBody] = None,
         query: Optional[dict[str, Any]] = None,
     ) -> Any:
+        return self.request_with_response(method, path, body=body, query=query).data
+
+    def request_with_response(
+        self,
+        method: str,
+        path: str,
+        body: Optional[RequestBody] = None,
+        query: Optional[dict[str, Any]] = None,
+    ) -> InttegroResponse[Any]:
         with self.telemetry.operation(path, method, self.base_url, VERSION) as span:
             url = self._build_url(path, query)
             if body is not None:
@@ -215,7 +266,12 @@ class HttpClient:
             self.telemetry.response(span, status, headers, decoded=False)
             result = self._parse_response(status, text_body, headers, path)
             self.telemetry.decoded(span)
-            return result
+            return InttegroResponse(
+                data=result,
+                status=status,
+                headers=headers,
+                meta=self._response_meta(text_body),
+            )
 
     def _build_url(self, path: str, query: Optional[dict[str, Any]]) -> str:
         if path.startswith("http://") or path.startswith("https://"):
@@ -326,6 +382,13 @@ class HttpClient:
             return json.loads(body)
         except json.JSONDecodeError:
             return body
+
+    def _response_meta(self, body: str) -> dict[str, Any] | None:
+        parsed = self._parse_json(body)
+        if not isinstance(parsed, dict):
+            return None
+        meta = parsed.get("response_meta")
+        return meta if isinstance(meta, dict) else None
 
     def _handle_error(
         self,

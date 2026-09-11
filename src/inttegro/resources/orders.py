@@ -6,6 +6,7 @@ from typing import TypeVar
 
 from .._model_base import ApiModel
 from ..http_client import HttpClient
+from ..response import InttegroResponse
 from inttegro.order.order import Order
 from inttegro.order.page import Page
 from .._dynamic_value import DynamicValue
@@ -148,6 +149,17 @@ class Orders:
             - https://studio.inttegro.com/create-your-first-order
         """
         return _resource(self.http.post("/orders/create", payload), "order", Order)
+
+    def create_with_response(self, payload: dict) -> InttegroResponse[Order]:
+        """Create an order and keep HTTP response metadata with the decoded order."""
+
+        response = self.http.post_resource_with_response("/orders/create", "order", Order, payload)
+        return InttegroResponse(
+            data=response.data,
+            status=response.status,
+            headers=response.headers,
+            meta=response.meta,
+        )
 
     def lookup(self, order_id: str, **options):
         """
