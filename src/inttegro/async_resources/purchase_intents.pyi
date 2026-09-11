@@ -2,18 +2,21 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import PurchaseIntent, PurchaseIntentPage
-from ..request_types import *
+from inttegro.purchase_intent.purchase_intent import PurchaseIntent
+from inttegro.purchase_intent.page import Page
+from inttegro.purchase_intent.create_request import CreateRequest
+from inttegro.purchase_intent.update_request import UpdateRequest
+from inttegro.purchase_intent.page_request import PageRequest
 
 class AsyncPurchaseIntents:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def create(self, payload: CreatePurchaseIntentRequest) -> PurchaseIntent:
+    async def create(self, payload: CreateRequest) -> PurchaseIntent:
         ...
 
-    async def update(self, payload: UpdatePurchaseIntentRequest) -> PurchaseIntent:
+    async def update(self, payload: UpdateRequest) -> PurchaseIntent:
         ...
 
     async def cancel(self, id: str) -> PurchaseIntent:
@@ -22,5 +25,5 @@ class AsyncPurchaseIntents:
     async def lookup(self, id: str) -> PurchaseIntent:
         ...
 
-    async def page(self, payload: PagePurchaseIntentsRequest) -> PurchaseIntentPage:
+    async def page(self, payload: PageRequest) -> Page:
         ...

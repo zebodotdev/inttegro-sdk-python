@@ -2,8 +2,7 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import CountrySpecification
-from ..request_types import *
+from inttegro.shared.country_specification import CountrySpecification
 
 class AsyncSpec:
 

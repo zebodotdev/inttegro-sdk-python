@@ -4,15 +4,46 @@ from __future__ import annotations
 from ..async_http_client import AsyncHttpClient
 
 class AsyncBroadcasts:
-    """Broadcasts resource for managing broadcast chimes."""
+    """Broadcasts resource for managing broadcast chimes.
+
+    Access this service as ``AsyncInttegroClient.broadcasts``. Methods use the client's shared transport and return the typed resource shapes documented below.
+    """
 
     def __init__(self, http: AsyncHttpClient):
         self.http = http
 
     async def lookup(self, broadcast_id: str):
-        """Lookup a broadcast by broadcast ID."""
+        """Lookup a broadcast by broadcast ID.
+
+        API endpoint: ``/broadcasts/lookup``.
+
+        Args:
+            broadcast_id (str): Unique identifier of the broadcast.
+
+        Returns:
+            ``Broadcast`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/broadcasts/lookup', {'broadcast_id': broadcast_id})
 
     async def cancel(self, broadcast_id: str):
-        """Cancel a broadcast by broadcast ID."""
+        """Cancel a broadcast by broadcast ID.
+
+        API endpoint: ``/broadcasts/cancel``.
+
+        Args:
+            broadcast_id (str): Unique identifier of the broadcast.
+
+        Returns:
+            ``CancelDetail`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/broadcasts/cancel', {'broadcast_id': broadcast_id})

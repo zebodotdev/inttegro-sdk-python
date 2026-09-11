@@ -16,7 +16,7 @@ class ModelDecodeError(ValueError):
 
 
 class ApiModel:
-    """Read-only, typed API response with backwards-compatible mapping access."""
+    """Read-only, typed API response with mapping-style access."""
 
     __slots__ = ("_extra", "_present_fields")
     _extra: dict[str, Any]

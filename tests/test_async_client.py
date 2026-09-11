@@ -11,7 +11,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import httpx
 
-from inttegro import AsyncInttegroClient, AuthenticationError, InttegroClient, Order
+from inttegro import AsyncInttegroClient, AuthenticationError, InttegroClient
+from inttegro.order import Order
 
 
 ORDER_BODY = {

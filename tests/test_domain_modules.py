@@ -6,28 +6,25 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from inttegro import (
-    CatalogPrice,
-    CatalogPriceParams,
-    Currency,
-    Price,
-    PriceParams,
-    bank_accounts,
-    chimes,
-    orders,
-    payment_methods,
-    payments,
-    products,
-    purchase_intents,
-    wallets,
+    bank_account,
+    broadcast,
+    chime,
+    order,
+    payment,
+    payment_method,
+    price,
+    product,
+    schedule,
+    wallet,
 )
-from inttegro.money import Amount
+from inttegro.money import Amount, Currency
 
 
 class DomainModuleTest(unittest.TestCase):
     def test_amount_and_price_types_preserve_request_and_response_shapes(self) -> None:
-        price = PriceParams(currency=Currency.GHS, value=3005)
-        catalog_params = CatalogPriceParams(amount=price, label="Retail")
-        catalog_price = CatalogPrice.from_dict(
+        inline_price_params = price.InlineParams(currency=Currency.GHS, value=3005)
+        catalog_params = price.Params(amount=inline_price_params, label="Retail")
+        catalog_price = price.Price.from_dict(
             {
                 "id": "pr_123",
                 "active": True,
@@ -36,9 +33,9 @@ class DomainModuleTest(unittest.TestCase):
                 "created_at": "2026-09-02T12:00:00Z",
             }
         )
-        inline_price = Price.from_dict({"currency": "eur", "value": 900})
+        inline_price = price.Inline.from_dict({"currency": "eur", "value": 900})
 
-        self.assertEqual({"currency": "ghs", "value": 3005}, price.to_dict())
+        self.assertEqual({"currency": "ghs", "value": 3005}, inline_price_params.to_dict())
         self.assertEqual(
             {"amount": {"currency": "ghs", "value": 3005}, "label": "Retail"},
             catalog_params.to_dict(),
@@ -48,23 +45,23 @@ class DomainModuleTest(unittest.TestCase):
         self.assertEqual("prod_123", catalog_price.product_id)
         self.assertEqual(Currency.EUR, inline_price.currency)
         self.assertEqual(Currency.GHS, Currency("GHS"))
-        self.assertIs(PriceParams, purchase_intents.NominalPrice)
+        self.assertIsInstance(inline_price, price.Inline)
 
     def test_payments_module_exposes_payment_lifecycle_types(self) -> None:
-        payment = payments.Payment.from_dict(
+        payment_resource = payment.Payment.from_dict(
             {"id": "py_1", "status": "initiated", "amount": {"currency": "ghs", "value": 5000}}
         )
 
-        self.assertEqual("py_1", payment.id)
-        self.assertEqual(5000, payment.amount.value)
-        self.assertEqual("initiated", payments.PaymentStatus.INITIATED.value)
-        self.assertEqual("mobile_money", payment_methods.PaymentMethodType.MOBILE_MONEY.value)
-        self.assertEqual("product", orders.LineItemType.PRODUCT.value)
-        self.assertEqual("digital", products.ProductType.DIGITAL.value)
+        self.assertEqual("py_1", payment_resource.id)
+        self.assertEqual(5000, payment_resource.amount.value)
+        self.assertEqual("initiated", payment.Status.INITIATED.value)
+        self.assertEqual("mobile_money", payment_method.Type.MOBILE_MONEY.value)
+        self.assertEqual("product", order.LineItemType.PRODUCT.value)
+        self.assertEqual("digital", product.Type.DIGITAL.value)
 
     def test_chimes_module_exposes_chimes_broadcasts_and_schedules(self) -> None:
-        chime = chimes.Chime.from_dict({"id": "ch_1"})
-        broadcast = chimes.Broadcast.from_dict(
+        chime_resource = chime.Chime.from_dict({"id": "ch_1"})
+        broadcast_resource = broadcast.Broadcast.from_dict(
             {
                 "id": "br_1",
                 "recipients": ["+233544998605"],
@@ -74,7 +71,7 @@ class DomainModuleTest(unittest.TestCase):
                 "created_at": "2026-09-03T11:00:00Z",
             }
         )
-        schedule = chimes.Schedule.from_dict(
+        schedule_resource = schedule.Schedule.from_dict(
             {
                 "id": "sch_1",
                 "recipients": ["+233544998605"],
@@ -85,20 +82,20 @@ class DomainModuleTest(unittest.TestCase):
             }
         )
 
-        self.assertEqual("ch_1", chime.id)
-        self.assertEqual("br_1", broadcast.id)
-        self.assertEqual("sch_1", schedule.id)
-        self.assertEqual("sms", chimes.ChimeTransport.SMS.value)
+        self.assertEqual("ch_1", chime_resource.id)
+        self.assertEqual("br_1", broadcast_resource.id)
+        self.assertEqual("sch_1", schedule_resource.id)
+        self.assertEqual("sms", chime.Transport.SMS.value)
 
     def test_financial_account_variants_have_focused_modules(self) -> None:
-        wallet = wallets.Wallet.from_dict(
+        wallet_resource = wallet.Wallet.from_dict(
             {
                 "id": "wallet_1",
                 "type": "mobile_money",
                 "mobile_money": {"account_number": "233200000000", "network": "mtn"},
             }
         )
-        bank_account = bank_accounts.BankAccount.from_dict(
+        bank_account_resource = bank_account.BankAccount.from_dict(
             {
                 "type": "ghana_bank_account",
                 "ghana_bank_account": {
@@ -116,17 +113,17 @@ class DomainModuleTest(unittest.TestCase):
             }
         )
 
-        self.assertEqual("mtn", wallet.mobile_money.network)
-        self.assertEqual("0123456789", bank_account.ghana_bank_account.number)
+        self.assertEqual("mtn", wallet_resource.mobile_money.network)
+        self.assertEqual("0123456789", bank_account_resource.ghana_bank_account.number)
 
-        bank_params = bank_accounts.Params(
-            type=bank_accounts.BankAccountType.GHANA_BANK_ACCOUNT,
-            ghana_bank_account=bank_accounts.GhanaBankAccountParams(
+        bank_params = bank_account.Params(
+            type=bank_account.Type.GHANA_BANK_ACCOUNT,
+            ghana_bank_account=bank_account.GhanaBankAccountParams(
                 number="0123456789",
                 sort_code="010100",
-                holder=bank_accounts.OwnerParams(
+                holder=bank_account.OwnerParams(
                     name="Yaw Boakye",
-                    address=bank_accounts.OwnerAddressParams(country="GH"),
+                    address=bank_account.OwnerAddressParams(country="GH"),
                 ),
             ),
         )

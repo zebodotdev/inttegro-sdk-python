@@ -2,18 +2,23 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import MessageTemplate, MessageTemplatePreview, MessageTemplatesPage
-from ..request_types import *
+from inttegro.message_template.message_template import MessageTemplate
+from inttegro.message_template.preview import Preview
+from inttegro.message_template.page import Page
+from inttegro.message_template.update_request import UpdateRequest
+from inttegro.message_template.page_request import PageRequest
+from inttegro.message_template.render_preview_request import RenderPreviewRequest
+from inttegro.message_template.create_request import CreateRequest
 
 class AsyncMessageTemplates:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def create(self, payload: CreateMessageTemplateRequest, idempotency_key: str | None=None) -> MessageTemplate:
+    async def create(self, payload: CreateRequest, idempotency_key: str | None=None) -> MessageTemplate:
         ...
 
-    async def update(self, payload: UpdateMessageTemplateRequest, idempotency_key: str | None=None) -> MessageTemplate:
+    async def update(self, payload: UpdateRequest, idempotency_key: str | None=None) -> MessageTemplate:
         ...
 
     async def publish(self, template_id: str, idempotency_key: str | None=None) -> MessageTemplate:
@@ -25,8 +30,8 @@ class AsyncMessageTemplates:
     async def lookup(self, template_id: str) -> MessageTemplate:
         ...
 
-    async def page(self, payload: PageMessageTemplatesRequest | None=None) -> MessageTemplatesPage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...
 
-    async def render_preview(self, payload: RenderMessageTemplatePreviewRequest) -> MessageTemplatePreview:
+    async def render_preview(self, payload: RenderPreviewRequest) -> Preview:
         ...

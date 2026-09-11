@@ -2,22 +2,25 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import Customer, CustomerPage
-from ..request_types import *
+from inttegro.customer.customer import Customer
+from inttegro.customer.page import Page
+from inttegro.customer.create_request import CreateRequest
+from inttegro.customer.update_request import UpdateRequest
+from inttegro.customer.page_request import PageRequest
 
 class AsyncCustomers:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def create(self, payload: CreateCustomerRequest) -> Customer:
+    async def create(self, payload: CreateRequest) -> Customer:
         ...
 
     async def lookup(self, customer_id: str) -> Customer:
         ...
 
-    async def update(self, payload: UpdateCustomerRequest, idempotency_key: str | None=None) -> Customer:
+    async def update(self, payload: UpdateRequest, idempotency_key: str | None=None) -> Customer:
         ...
 
-    async def page(self, payload: PageCustomersRequest | None=None) -> CustomerPage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...

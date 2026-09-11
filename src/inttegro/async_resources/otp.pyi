@@ -2,22 +2,25 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import OTPTransaction, OTPVerification
-from ..request_types import *
+from inttegro.otp.transaction import Transaction
+from inttegro.otp.verification import Verification
+from inttegro.otp.initiate_request import InitiateRequest
+from inttegro.otp.verify_request import VerifyRequest
+from inttegro.otp.lookup_request import LookupRequest
 
 class AsyncOtp:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def initiate(self, payload: InitiateOTPRequest) -> OTPTransaction:
+    async def initiate(self, payload: InitiateRequest) -> Transaction:
         ...
 
-    async def verify(self, payload: VerifyOTPRequest) -> OTPVerification:
+    async def verify(self, payload: VerifyRequest) -> Verification:
         ...
 
-    async def lookup(self, payload: LookupOTPRequest) -> OTPTransaction:
+    async def lookup(self, payload: LookupRequest) -> Transaction:
         ...
 
-    async def cancel(self, payload: LookupOTPRequest) -> OTPTransaction:
+    async def cancel(self, payload: LookupRequest) -> Transaction:
         ...

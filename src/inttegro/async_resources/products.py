@@ -4,43 +4,172 @@ from __future__ import annotations
 from ..async_http_client import AsyncHttpClient
 
 class AsyncProducts:
-    """Products resource for creating, updating, and managing products."""
+    """Products resource for creating, updating, and managing products.
+
+    Access this service as ``AsyncInttegroClient.products``. Methods use the client's shared transport and return the typed resource shapes documented below.
+    """
 
     def __init__(self, http: AsyncHttpClient):
         self.http = http
 
     async def create(self, payload: dict):
-        """Create a product."""
+        """Create a product.
+
+        API endpoint: ``/products/create``.
+
+        Args:
+            payload (dict): Typed request object or equivalent request mapping for this operation.
+
+        Returns:
+            ``Product`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/products/create', payload)
 
     async def add_price(self, payload: dict):
-        """Add a price to a product."""
+        """Add a price to a product.
+
+        API endpoint: ``/products/add_price``.
+
+        Args:
+            payload (dict): Typed request object or equivalent request mapping for this operation.
+
+        Returns:
+            ``Price`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/products/add_price', payload)
 
     async def set_default_unit_price(self, payload: dict):
-        """Set a product's default unit price."""
+        """Set a product's default unit price.
+
+        API endpoint: ``/products/set_default_unit_price``.
+
+        Args:
+            payload (dict): Typed request object or equivalent request mapping for this operation.
+
+        Returns:
+            ``Product`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/products/set_default_unit_price', payload)
 
     async def lookup(self, product_id: str):
-        """Lookup a product by ID."""
+        """Lookup a product by ID.
+
+        API endpoint: ``/products/lookup``.
+
+        Args:
+            product_id (str): Unique identifier of the product.
+
+        Returns:
+            ``Product`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/products/lookup', {'product_id': product_id})
 
     async def update(self, payload: dict):
-        """Update a product."""
+        """Update a product.
+
+        API endpoint: ``/products/update``.
+
+        Args:
+            payload (dict): Typed request object or equivalent request mapping for this operation.
+
+        Returns:
+            ``Product`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/products/update', payload)
 
     async def publish(self, product_id: str):
-        """Publish a product."""
+        """Publish a product.
+
+        API endpoint: ``/products/publish``.
+
+        Args:
+            product_id (str): Unique identifier of the product.
+
+        Returns:
+            ``Product`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/products/publish', {'product_id': product_id})
 
     async def unpublish(self, product_id: str):
-        """Unpublish a product."""
+        """Unpublish a product.
+
+        API endpoint: ``/products/unpublish``.
+
+        Args:
+            product_id (str): Unique identifier of the product.
+
+        Returns:
+            ``Product`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/products/unpublish', {'product_id': product_id})
 
     async def archive(self, product_id: str):
-        """Archive a product."""
+        """Archive a product.
+
+        API endpoint: ``/products/archive``.
+
+        Args:
+            product_id (str): Unique identifier of the product.
+
+        Returns:
+            ``Product`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/products/archive', {'product_id': product_id})
 
     async def page(self, payload: dict | None=None):
-        """Page through products."""
+        """Page through products.
+
+        API endpoint: ``/products/page``.
+
+        Args:
+            payload (dict | None): Typed request object or equivalent request mapping for this operation.
+
+        Returns:
+            ``Page`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return await self.http.post('/products/page', payload or {})

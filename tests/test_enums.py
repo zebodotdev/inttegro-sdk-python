@@ -1,7 +1,9 @@
 import json
 import unittest
 
-from inttegro import ProductType, RefundReason, UploadRequestStatus
+from inttegro.product import Type as ProductType
+from inttegro.refund import Reason as RefundReason
+from inttegro.upload_request import Status as UploadRequestStatus
 
 
 class ApiEnumTest(unittest.TestCase):

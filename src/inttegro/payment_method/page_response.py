@@ -1,0 +1,26 @@
+"""PageResponse in the ``inttegro.payment_method`` resource namespace.
+
+Generated from the Inttegro API contract; do not edit by hand.
+"""
+
+from __future__ import annotations
+from dataclasses import dataclass, field
+from inttegro._model_base import ApiModel
+
+
+@dataclass(frozen=True, slots=True, init=False, repr=False, eq=False)
+class PageResponse(ApiModel):
+    """Typed response returned by the page operation.
+
+    Instances are immutable API responses. ``from_dict()`` decodes nested
+    objects, string-backed enums, and timezone-aware ISO-8601 timestamps;
+    ``to_dict()`` returns the corresponding JSON-compatible wire shape.
+    Fields not returned by the API remain absent and can still be queried
+    through mapping-style access.
+
+    API contract schema: ``PaymentMethodPageResponse``.
+    """
+    page: PaymentMethodPage = field(init=False)
+    """Numeric page used by this operation. Required. Python type: ``PaymentMethodPage``; wire name: ``page``; JSON type: object"""
+
+from inttegro.payment_method.page import Page as PaymentMethodPage

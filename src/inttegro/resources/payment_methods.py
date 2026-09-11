@@ -333,23 +333,86 @@ class PaymentMethods:
         return self.http.post("/payment_methods/update", payload)
 
     def activate(self, payment_method_id: str):
-        """Mark a payment method active."""
+        """Mark a payment method active.
+
+        API endpoint: ``/payment_methods/activate``.
+
+        Args:
+            payment_method_id (str): Unique identifier of the payment method.
+
+        Returns:
+            ``PaymentMethod`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return self.http.post("/payment_methods/activate", {"payment_method_id": payment_method_id})
 
     def disactivate(self, payment_method_id: str):
-        """Mark a payment method inactive."""
+        """Mark a payment method inactive.
+
+        API endpoint: ``/payment_methods/disactivate``.
+
+        Args:
+            payment_method_id (str): Unique identifier of the payment method.
+
+        Returns:
+            ``PaymentMethod`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return self.http.post("/payment_methods/disactivate", {"payment_method_id": payment_method_id})
 
     def deactivate(self, payment_method_id: str):
-        """Alias for disactivate()."""
+        """Alias for disactivate().
+
+        Args:
+            payment_method_id (str): Unique identifier of the payment method.
+
+        Returns:
+            ``PaymentMethod`` decoded from the documented response shape.
+        """
         return self.disactivate(payment_method_id)
 
     def archive(self, payment_method_id: str):
-        """Archive a payment method."""
+        """Archive a payment method.
+
+        API endpoint: ``/payment_methods/archive``.
+
+        Args:
+            payment_method_id (str): Unique identifier of the payment method.
+
+        Returns:
+            ``PaymentMethod`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return self.http.post("/payment_methods/archive", {"payment_method_id": payment_method_id})
 
     def unarchive(self, payment_method_id: str):
-        """Unarchive a payment method."""
+        """Unarchive a payment method.
+
+        API endpoint: ``/payment_methods/unarchive``.
+
+        Args:
+            payment_method_id (str): Unique identifier of the payment method.
+
+        Returns:
+            ``PaymentMethod`` decoded from the documented response shape.
+
+        Raises:
+            APIError: The API rejected the request or could not complete it.
+            NetworkError: The request could not reach the Inttegro API.
+            TimeoutError: The configured request deadline elapsed.
+        """
         return self.http.post("/payment_methods/unarchive", {"payment_method_id": payment_method_id})
 
     def delete(self, payment_method_id: str, request_meta: dict | None = None):

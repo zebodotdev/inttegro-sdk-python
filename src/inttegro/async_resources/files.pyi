@@ -2,8 +2,9 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import File, FilePage
-from ..request_types import *
+from inttegro.file.file import File
+from inttegro.file.page import Page
+from inttegro.file.page_request import PageRequest
 
 class FileDownload:
 
@@ -24,7 +25,7 @@ class AsyncFiles:
     async def lookup(self, file_id: str) -> File:
         ...
 
-    async def page(self, payload: PageFilesRequest | None=None) -> FilePage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...
 
     async def contents(self, *, file_id: str, disposition: str='attachment') -> FileDownload:

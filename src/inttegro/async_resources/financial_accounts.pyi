@@ -2,33 +2,38 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import FinancialAccount, FinancialAccountPage
-from ..request_types import *
+from inttegro.financial_account.financial_account import FinancialAccount
+from inttegro.financial_account.page import Page
+from inttegro.financial_account.id_request import IDRequest
+from inttegro.financial_account.page_request import PageRequest
+from inttegro.financial_account.update_request import UpdateRequest
+from inttegro.financial_account.disable_request import DisableRequest
+from inttegro.financial_account.create_request import CreateRequest
 
 class AsyncFinancialAccounts:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def create(self, payload: FinancialAccountCreateRequest) -> FinancialAccount:
+    async def create(self, payload: CreateRequest) -> FinancialAccount:
         ...
 
     async def lookup(self, account_id: str) -> FinancialAccount:
         ...
 
-    async def connect(self, payload: FinancialAccountCreateRequest) -> FinancialAccount:
+    async def connect(self, payload: CreateRequest) -> FinancialAccount:
         ...
 
-    async def archive(self, payload: FinancialAccountDisableRequest) -> FinancialAccount:
+    async def archive(self, payload: DisableRequest) -> FinancialAccount:
         ...
 
-    async def page(self, payload: FinancialAccountPageRequest | None=None) -> FinancialAccountPage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...
 
-    async def verify(self, payload: FinancialAccountIDRequest) -> FinancialAccount:
+    async def verify(self, payload: IDRequest) -> FinancialAccount:
         ...
 
-    async def update(self, payload: FinancialAccountUpdateRequest) -> FinancialAccount:
+    async def update(self, payload: UpdateRequest) -> FinancialAccount:
         ...
 
     async def enable_push(self, account_id: str) -> FinancialAccount:

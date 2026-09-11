@@ -62,11 +62,9 @@ order = client.orders.lookup("or_...")
 The two clients expose the same resources, request types, returned domain
 models, errors, idempotency behavior, and telemetry contract. Do not call the
 synchronous client directly from an async request handler because it blocks
-the event loop. The distinct class name is intentional: silently changing the
-existing `InttegroClient` methods from values to awaitables would break every
-synchronous integration. Version 6.3.0 therefore makes the async client the
-recommended default while preserving the synchronous client as a compatible,
-explicit option for genuinely synchronous applications.
+the event loop. The distinct class names make the concurrency model explicit:
+choose `AsyncInttegroClient` for an event loop and `InttegroClient` for a
+genuinely synchronous application.
 
 ## Create a hosted checkout
 
@@ -76,31 +74,31 @@ Create and finalize an order, then send the customer to its hosted invoice URL:
 import os
 
 import inttegro
-from inttegro import APIError, LineItemType, ProductType
+from inttegro import APIError, customer, money, order, price, product
 
 async def create_checkout() -> str:
-    request = inttegro.orders.CreateRequest(
-        request_meta=inttegro.orders.RequestMeta(
+    request = order.CreateNewCustomerInput(
+        request_meta=order.CreateNewCustomerInputRequestMeta(
             idempotency_key="checkout-cart-123",
         ),
-        customer_data=inttegro.orders.Customer(
+        customer_data=customer.DataInput(
             name="Akua Mensah",
             email_address="akua@example.com",
             phone_number="+233544998605",
         ),
         finalize=True,
-        checkout_settings=inttegro.orders.CheckoutSettings(
+        checkout_settings=order.CreateNewCustomerInputCheckoutSettings(
             redirect_url="https://example.com/orders/complete",
             cancel_url="https://example.com/cart",
         ),
         line_items=[
-            inttegro.orders.ProductLineItem(
-                type=LineItemType.PRODUCT,
-                product=inttegro.orders.Product(
-                    type=ProductType.DIGITAL,
+            product.LineItemInput(
+                type=order.LineItemType.PRODUCT,
+                product=product.InlineDetailsInput(
+                    type=product.Type.DIGITAL,
                     name="Monthly subscription",
                     quantity=1,
-                    price=inttegro.PriceParams(currency=inttegro.Currency.GHS, value=5000),
+                    price=price.InlineParams(currency=money.Currency.GHS, value=5000),
                 ),
             ),
         ],
@@ -154,12 +152,28 @@ Python-specific features:
 
 - Native async HTTP transport powered by HTTPX, plus a dependency-light synchronous standard-library transport.
 - OpenAPI-generated, immutable request and domain dataclasses with fully typed nested fields.
-- Resource namespaces such as `inttegro.orders.CreateRequest` keep related request objects together.
-- Backwards-compatible mapping access and `to_dict()` conversion on every domain object.
-- Backwards-compatible dictionary request payloads for integrations migrating to typed objects.
+- Singular resource namespaces keep the public API navigable: `inttegro.product.Product`, `inttegro.payment.Payment`, and `inttegro.order.CreateRequest`.
+- Mapping-style lookup and `to_dict()` conversion on every returned domain object.
+- Dictionary request payloads remain available when an integration cannot construct typed request objects.
 - JSON-compatible string enums for public API values.
 - Configurable timeout, base URL, and injectable transport for tests or custom networking.
 - Structured authentication, rate-limit, network, timeout, and API exceptions.
+
+The namespace name identifies the resource and its same-named class is the
+primary returned object. Related request objects, nested shapes, and enums live
+beside it, so editors and code-reading agents can discover the full surface
+without searching a monolithic model module:
+
+```python
+from inttegro import payment, product
+
+def summarize(value: payment.Payment) -> str:
+    if value.requires_action():
+        return "customer action required"
+    return f"{value.status}: {value.amount.value} {value.amount.currency.value.upper()}"
+
+item: product.Product
+```
 
 Request and returned domain fields are available to editors, Pyright, and mypy without plugins:
 
@@ -167,22 +181,23 @@ Request and returned domain fields are available to editors, Pyright, and mypy w
 import os
 
 import inttegro
+from inttegro import money, refund
 
 client = inttegro.AsyncInttegroClient(api_key=os.environ["INTTEGRO_API_KEY"])
 
-request = inttegro.refunds.CreateRequest(
+request = refund.CreateRequest(
     order_id="or_0123456789abcdefghijklmnopqrstuvwxyzABCD",
-    reason=inttegro.RefundReason.REQUESTED_BY_CUSTOMER,
+    reason=refund.Reason.REQUESTED_BY_CUSTOMER,
     line_items=[
-        inttegro.refunds.LineItem(
+        refund.CreateLineItemInput(
             order_line_item_id="oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
-            refund_amount=inttegro.AmountParams(currency=inttegro.Currency.GHS, value=2500),
+            refund_amount=money.AmountParams(currency=money.Currency.GHS, value=2500),
         ),
     ],
 )
 
-refund: inttegro.Refund = await client.refunds.create(request)
-print(refund.id, refund.total.value)
+created_refund: refund.Refund = await client.refunds.create(request)
+print(created_refund.id, created_refund.total.value)
 ```
 
 See the [API reference](https://studio.inttegro.com/api-reference) for request fields and lifecycle rules, [errors](https://studio.inttegro.com/errors) for recovery guidance, and [idempotency](https://studio.inttegro.com/idempotency) for safe retries.

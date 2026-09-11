@@ -2,27 +2,33 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import UploadFulfillment, UploadRequest, UploadRequestPage
-from ..request_types import *
+from inttegro.shared.upload_fulfillment import UploadFulfillment
+from inttegro.upload_request.upload_request import UploadRequest
+from inttegro.upload_request.page import Page
+from inttegro.upload_request.create_request import CreateRequest
+from inttegro.upload_request.page_request import PageRequest
+from inttegro.upload_request.cancel_request import CancelRequest
+from inttegro.upload_request.review_attempt_by_id_request import ReviewAttemptByIDRequest
+from inttegro.upload_request.review_attempt_by_ordinal_request import ReviewAttemptByOrdinalRequest
 
 class AsyncUploadRequests:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def create(self, payload: CreateUploadRequestRequest, idempotency_key: str | None=None) -> UploadRequest:
+    async def create(self, payload: CreateRequest, idempotency_key: str | None=None) -> UploadRequest:
         ...
 
     async def lookup(self, id: str) -> UploadRequest:
         ...
 
-    async def page(self, payload: PageUploadRequestsRequest | None=None) -> UploadRequestPage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...
 
-    async def cancel(self, payload: CancelUploadRequestRequest, idempotency_key: str | None=None) -> UploadRequest:
+    async def cancel(self, payload: CancelRequest, idempotency_key: str | None=None) -> UploadRequest:
         ...
 
-    async def review(self, payload: ReviewUploadRequestAttemptByIDRequest | ReviewUploadRequestAttemptByOrdinalRequest, idempotency_key: str | None=None) -> UploadRequest:
+    async def review(self, payload: ReviewAttemptByIDRequest | ReviewAttemptByOrdinalRequest, idempotency_key: str | None=None) -> UploadRequest:
         ...
 
     async def fulfill(self, *, upload_url: str, file: str) -> UploadFulfillment:

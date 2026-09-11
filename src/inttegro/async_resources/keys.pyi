@@ -2,34 +2,42 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import GeneratedSecretKey, SecretKey, SecretKeyPage, SecretKeyUsage
-from ..request_types import *
+from inttegro.secret_key.generated import Generated
+from inttegro.secret_key.secret_key import SecretKey
+from inttegro.secret_key.page import Page
+from inttegro.secret_key.usage import Usage
+from inttegro.secret_key.generate_request import GenerateRequest
+from inttegro.secret_key.page_request import PageRequest
+from inttegro.secret_key.lookup_request import LookupRequest
+from inttegro.secret_key.update_request import UpdateRequest
+from inttegro.secret_key.destroy_request import DestroyRequest
+from inttegro.secret_key.usage_request import UsageRequest
 
 class AsyncKeys:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def generate(self, payload: GenerateSecretKeyRequest | None=None) -> GeneratedSecretKey:
+    async def generate(self, payload: GenerateRequest | None=None) -> Generated:
         ...
 
-    async def page(self, payload: PageSecretKeysRequest | None=None) -> SecretKeyPage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...
 
     async def lookup(self, secret_key_id: str) -> SecretKey:
         ...
 
-    async def lookup_with_params(self, payload: LookupSecretKeyRequest) -> SecretKey:
+    async def lookup_with_params(self, payload: LookupRequest) -> SecretKey:
         ...
 
-    async def update(self, payload: UpdateSecretKeyRequest) -> SecretKey:
+    async def update(self, payload: UpdateRequest) -> SecretKey:
         ...
 
     async def destroy(self, secret_key_id: str) -> SecretKey:
         ...
 
-    async def destroy_with_params(self, payload: DestroySecretKeyRequest) -> SecretKey:
+    async def destroy_with_params(self, payload: DestroyRequest) -> SecretKey:
         ...
 
-    async def usage(self, payload: SecretKeyUsageRequest | str) -> SecretKeyUsage:
+    async def usage(self, payload: UsageRequest | str) -> Usage:
         ...

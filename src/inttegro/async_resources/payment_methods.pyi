@@ -2,30 +2,37 @@
 """Generated public typing surface. Do not edit by hand."""
 from typing import Any
 from ..async_http_client import AsyncHttpClient
-from .._models import PaymentMethod, PaymentMethodDeletion, PaymentMethodPage, PaymentMethodSettings, PaymentMethodVerificationSession
-from ..request_types import *
+from inttegro.payment_method.payment_method import PaymentMethod
+from inttegro.payment_method.deletion import Deletion
+from inttegro.payment_method.page import Page
+from inttegro.payment_method.settings import Settings
+from inttegro.payment_method.verification_session import VerificationSession
+from inttegro.payment_method.tokenize_mobile_money_request import TokenizeMobileMoneyRequest
+from inttegro.payment_method.lookup_request import LookupRequest
+from inttegro.payment_method.page_request import PageRequest
+from inttegro.payment_method.update_request import UpdateRequest
 
 class AsyncPaymentMethods:
 
     def __init__(self, http: AsyncHttpClient) -> None:
         ...
 
-    async def tokenize(self, payload: TokenizeMobileMoneyPaymentMethodRequest) -> PaymentMethod:
+    async def tokenize(self, payload: TokenizeMobileMoneyRequest) -> PaymentMethod:
         ...
 
-    async def verify(self, payment_method_id: str, request_meta: dict[str, str] | None=None) -> PaymentMethodVerificationSession:
+    async def verify(self, payment_method_id: str, request_meta: dict[str, str] | None=None) -> VerificationSession:
         ...
 
-    async def confirm_verification(self, payload: LookupPaymentMethodRequest) -> PaymentMethod:
+    async def confirm_verification(self, payload: LookupRequest) -> PaymentMethod:
         ...
 
     async def lookup(self, payment_method_id: str) -> PaymentMethod:
         ...
 
-    async def page(self, payload: PaymentMethodPageRequest | None=None) -> PaymentMethodPage:
+    async def page(self, payload: PageRequest | None=None) -> Page:
         ...
 
-    async def update(self, payload: UpdatePaymentMethodRequest) -> PaymentMethod:
+    async def update(self, payload: UpdateRequest) -> PaymentMethod:
         ...
 
     async def activate(self, payment_method_id: str) -> PaymentMethod:
@@ -43,8 +50,8 @@ class AsyncPaymentMethods:
     async def unarchive(self, payment_method_id: str) -> PaymentMethod:
         ...
 
-    async def delete(self, payment_method_id: str, request_meta: dict[str, str] | None=None) -> PaymentMethodDeletion:
+    async def delete(self, payment_method_id: str, request_meta: dict[str, str] | None=None) -> Deletion:
         ...
 
-    async def settings(self) -> PaymentMethodSettings:
+    async def settings(self) -> Settings:
         ...
