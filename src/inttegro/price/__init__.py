@@ -9,6 +9,8 @@ if TYPE_CHECKING:
     from .action_request import ActionRequest as ActionRequest
     from .embedded_product import EmbeddedProduct as EmbeddedProduct
     from .embedded_product_attributes_item import EmbeddedProductAttributesItem as EmbeddedProductAttributesItem
+    from .inline import Inline as Inline
+    from .inline_params import InlineParams as InlineParams
     from .lookup_request import LookupRequest as LookupRequest
     from .page import Page as Page
     from .page_item import PageItem as PageItem
