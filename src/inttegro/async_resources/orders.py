@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import TypeVar
 from .._model_base import ApiModel
 from ..async_http_client import AsyncHttpClient
+from ..response import InttegroResponse
 from inttegro.order.order import Order
 from inttegro.order.page import Page
 from .._dynamic_value import DynamicValue
@@ -141,6 +142,11 @@ class AsyncOrders:
             - https://studio.inttegro.com/create-your-first-order
         """
         return _resource(await self.http.post('/orders/create', payload), 'order', Order)
+
+    async def create_with_response(self, payload: dict) -> InttegroResponse[Order]:
+        """Create an order and keep HTTP response metadata with the decoded order."""
+        response = await self.http.post_resource_with_response('/orders/create', 'order', Order, payload)
+        return InttegroResponse(data=response.data, status=response.status, headers=response.headers, meta=response.meta)
 
     async def lookup(self, order_id: str, **options):
         """
