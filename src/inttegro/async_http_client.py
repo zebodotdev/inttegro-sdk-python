@@ -4,7 +4,7 @@ import json
 import urllib.request
 import uuid
 from collections.abc import Awaitable, Callable, Mapping
-from typing import TYPE_CHECKING, Any, Dict, Optional, Protocol
+from typing import TYPE_CHECKING, Any, Dict, NoReturn, Optional, Protocol
 
 import httpx
 from .error_reporting import ErrorReporter, ErrorReportingPolicy
@@ -357,5 +357,5 @@ class AsyncHttpClient:
     ) -> Any:
         return self._codec._parse_response(status, body, headers, path)
 
-    def _handle_error(self, status: int, headers: dict[str, str], raw_body: str) -> Any:
-        return self._codec._handle_error(status, headers, raw_body)
+    def _handle_error(self, status: int, headers: dict[str, str], raw_body: str) -> NoReturn:
+        self._codec._handle_error(status, headers, raw_body)

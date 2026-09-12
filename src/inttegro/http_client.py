@@ -11,7 +11,7 @@ import urllib.parse
 import urllib.request
 from collections.abc import Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, Optional
+from typing import TYPE_CHECKING, Any, Callable, Dict, NoReturn, Optional
 
 from ._model_base import ApiModel, ModelDecodeError, decode_value
 from ._request_base import ApiRequest, encode_request_value
@@ -396,7 +396,7 @@ class HttpClient:
         headers: dict[str, str],
         raw_body: str,
         parsed_body: Any | None = None,
-    ) -> DynamicValue:
+    ) -> NoReturn:
         data = parsed_body if parsed_body is not None else self._parse_json(raw_body)
         message = "HTTP {}".format(status)
         payload = data
