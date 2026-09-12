@@ -1,6 +1,6 @@
 # Inttegro Python SDK
 
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/zebodotdev/inttegro-sdk-python/badge)](https://scorecard.dev/viewer/?uri=github.com/zebodotdev/inttegro-sdk-python)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/inttegro/inttegro-sdk-python/badge)](https://scorecard.dev/viewer/?uri=github.com/inttegro/inttegro-sdk-python)
 
 The official Python client for building server-side Inttegro integrations, with
 native asynchronous and synchronous clients.
@@ -209,7 +209,7 @@ The GitHub release for each version is the canonical record. It contains the exa
 ```bash
 sha256sum --check SHA256SUMS
 gh attestation verify inttegro-7.0.0-py3-none-any.whl \
-  --repo zebodotdev/inttegro-sdk-python
+  --repo inttegro/inttegro-sdk-python
 ```
 
 ## Develop
